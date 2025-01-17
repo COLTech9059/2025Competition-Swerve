@@ -225,8 +225,8 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value(),
-            () -> -driveStickX.value(),
+            () -> -driveStickY.value() / 4,
+            () -> -driveStickX.value() / 4,
             () -> -turnStickX.value()));
 
     // ** Example Commands -- Remap, remove, or change as desired **

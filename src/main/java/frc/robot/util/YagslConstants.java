@@ -31,8 +31,10 @@
 // /**
 //  * The YAGSL swerve drive constants class
 //  *
-//  * <p>The purpose of this class is to convert the YAGSL-based JSON configuration file data into the
-//  * same constants format as produced by the Phoenix Tuner X's ``TunerConstants.java`` file. The goal
+//  * <p>The purpose of this class is to convert the YAGSL-based JSON configuration file data into
+// the
+//  * same constants format as produced by the Phoenix Tuner X's ``TunerConstants.java`` file. The
+// goal
 //  * here is to make implenentation in the drive class easier.
 //  */
 // public class YagslConstants {
