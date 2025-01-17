@@ -17,7 +17,6 @@ import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.generated.TunerConstants;
-import frc.robot.util.YagslConstants;
 
 /**
  * Holds the proper set of drive constants given the type of drive
