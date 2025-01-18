@@ -57,11 +57,12 @@ public class ElevatorIOSpark extends ElevatorIO{
   @Override
   public void setLevel(double speed, int level) {
     speed = Math.abs(speed);
-    if (getLevel() > level) eMotor.set(speed);
+    if (getLevel() > level) eMotor.set(-speed);
     if (getLevel() < level) eMotor.set(speed);
     if (getLevel() == level) eMotor.stopMotor();
 
     if (level > 3) level = 3;
+    if (level < 1) level = 1;
   }
 
   @Override

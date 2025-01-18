@@ -12,4 +12,28 @@ public class ElevatorCommands {
     },
     elevator);
   }
+
+  public static Command downLevel(Elevator elevator, double speed) {
+    return Commands.run( () -> {
+      elevator.setLevel(speed, elevator.getLevel() - 1);
+    },
+    elevator);
+  }
+
+  public static Command timedIntake(Elevator elevator, double speed, double time) {
+    return Commands.run( () -> {
+      elevator.timedIntake(speed, time);
+    },
+    elevator);
+  }
+
+  public static Command timedAlgae(Elevator elevator, double speed, double time) {
+    return Commands.run( () -> {
+      elevator.timedAlgae(speed, time);
+    },
+    elevator);
+  }
+
+  
+
 }

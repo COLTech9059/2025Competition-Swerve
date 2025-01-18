@@ -257,7 +257,22 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press RIGHT BUMPER --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
+    operatorController.rightBumper().onTrue(Commands.runOnce( () -> ElevatorCommands.upLevel(elevator, 0.35), elevator));
+
+    // Press LEFT BUMPER --> Move elevator down one level
+    operatorController.leftBumper().onTrue(Commands.runOnce( () -> ElevatorCommands.downLevel(elevator, 0.35), elevator));
+
+    // Press LEFT TRIGGER --> intake Coral
+    operatorController.leftTrigger().onTrue(Commands.runOnce( () -> ElevatorCommands.timedIntake(elevator, 0.5, 1)));
+
+    // Press RIGHT TRIGGER --> outtake Coral
+    operatorController.rightTrigger().onTrue(Commands.runOnce( () -> ElevatorCommands.timedIntake(elevator, -0.5, 1.25)));
+
+    // Press B button --> intake Algae
+    operatorController.b().onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5)));
+    
+    // Press A button --> outtake Algae
+    operatorController.a().onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.75)));
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController
