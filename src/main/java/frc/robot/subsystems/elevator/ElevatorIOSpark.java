@@ -60,6 +60,8 @@ public class ElevatorIOSpark extends ElevatorIO{
     if (getLevel() > level) eMotor.set(speed);
     if (getLevel() < level) eMotor.set(speed);
     if (getLevel() == level) eMotor.stopMotor();
+
+    if (level > 3) level = 3;
   }
 
   @Override
