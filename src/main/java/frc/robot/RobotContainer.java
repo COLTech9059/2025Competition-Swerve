@@ -41,12 +41,14 @@ import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
+import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -72,10 +74,11 @@ public class RobotContainer {
   final OverrideSwitches overrides = new OverrideSwitches(2); // Console toggle switches
 
   /** Declare the robot subsystems here ************************************ */
-  // These are the "Active Subsystems" that the robot controlls
+  // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
   private final Elevator elevator;
   private final Flywheel m_flywheel;
+  private final LEDs led;
   // These are "Virtual Subsystems" that report information but have no motors
   private final Accelerometer m_accel;
   private final Vision m_vision;
@@ -110,6 +113,7 @@ public class RobotContainer {
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
         elevator = new Elevator();
+        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -135,6 +139,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         elevator = new Elevator();
+        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -148,6 +153,7 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         elevator = new Elevator();
+        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -234,6 +240,8 @@ public class RobotContainer {
             () -> -driveStickX.value() / 4,
             () -> -turnStickX.value()));
 
+    led.setDefaultCommand(Commands.runOnce( () -> LEDCommands.randomColor(led), led));
+    
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
     driverController
@@ -273,6 +281,9 @@ public class RobotContainer {
     
     // Press A button --> outtake Algae
     operatorController.a().onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.75)));
+
+    // Press X button --> level 3 Coral score
+    operatorController.x().onTrue(Commands.runOnce( () -> ElevatorCommands.l3Score(elevator, 0.35, 0.5, 1.25)));
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController

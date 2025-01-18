@@ -3,6 +3,8 @@ package frc.robot.subsystems.cage;
 public class Cage {
 
   /*
+   * !!IMPORTANT NOTE: Changes to this subsystem must be pushed to GitHub through the cage-training branch!!
+   *
    * This subsystem will require three files: Cage.java (this one), CageIO.java, and CageIOSpark.java
    * These files must be created using the Java project manager in the bottom left corner. I will show you 
    * how to use this feature
@@ -28,5 +30,4 @@ public class Cage {
    * You may refer to other parts of the program if you need to, but try to figure things out on your own first.
    * I am also available as a resource to help you and explain anything you're confused about.
    */
-
 }

@@ -34,6 +34,13 @@ public class ElevatorCommands {
     elevator);
   }
 
-  
+  public static Command l3Score(Elevator elevator, double speed, double outtakeSpeed, double outtakeTime) {
+    return Commands.run( () -> {
+      elevator.setLevel(speed, 3);
+      elevator.timedIntake(-outtakeSpeed, outtakeTime);
+      elevator.setLevel(speed, 1);
+    },
+    elevator);
+  }
 
 }
