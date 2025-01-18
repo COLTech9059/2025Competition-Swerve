@@ -92,6 +92,22 @@ public final class Constants {
   /* The remainder of this file contains physical and/or software constants for the various subsystems of the robot */
 
   /** General Constants **************************************************** */
+
+  // Device ID Constants
+  public static final int eMotorID = 14;
+  public static final int eMotor2ID = 15;
+  public static final int intakeID = 16;
+  public static final int algaeID = 17;
+
+  public static final int l1SwitchID = 1;
+  public static final int l2SwitchID = 2;
+  public static final int l3SwitchID = 3;
+
+  // Elevator setpoints
+  public static final double level1 = 0;
+  public static final double level2 = 0;
+  public static final double level3 = 0;
+
   public static final double loopPeriodSecs = 0.02;
 
   public static final boolean tuningMode = false;
