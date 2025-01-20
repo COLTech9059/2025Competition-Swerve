@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class ElevatorIOSpark extends ElevatorIO{
 
+  // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   private RelativeEncoder eEncoder = eMotor.getEncoder();
   private SparkMax eMotor2 = new SparkMax(Constants.eMotor2ID, MotorType.kBrushless);
@@ -24,6 +25,7 @@ public class ElevatorIOSpark extends ElevatorIO{
   private SparkBaseConfig eMConfig;
   private SparkBaseConfig eM2Config;
 
+  // Digital input (limit switch) objects
   private DigitalInput l1Switch = new DigitalInput(Constants.l1SwitchID);
   private DigitalInput l2Switch = new DigitalInput(Constants.l2SwitchID);
   private DigitalInput l3Switch = new DigitalInput(Constants.l3SwitchID);

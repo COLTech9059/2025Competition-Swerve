@@ -209,9 +209,11 @@ public class RobotContainer {
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
 
+    // Register Named Commands for use in PathPlanner autos
     NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
     NamedCommands.registerCommand("L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
+    // Register Event Triggers for use in PathPlanner paths
     new EventTrigger("Collect Coral").onTrue(Commands.runOnce( () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
     new EventTrigger("L3 Score").onTrue(Commands.runOnce( () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
     new EventTrigger("Collect Algae").onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));

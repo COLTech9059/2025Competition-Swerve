@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.572945205479453,
-        "y": 6.9249571917808215
+        "x": 7.58,
+        "y": 6.18
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.7315068493150685,
-        "y": 6.864854452054795
+        "x": 6.738561643835616,
+        "y": 6.119897260273973
       },
       "isLocked": false,
       "linkedName": null
@@ -35,12 +35,6 @@
     {
       "name": "Collect Algae",
       "waypointRelativePos": 0.9,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Coral Score",
-      "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
     }
