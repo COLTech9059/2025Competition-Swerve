@@ -27,6 +27,8 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -208,6 +210,13 @@ public class RobotContainer {
   private void defineAutoCommands() {
 
     NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    NamedCommands.registerCommand("L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+
+    new EventTrigger("Collect Coral").onTrue(Commands.runOnce( () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+    new EventTrigger("L3 Score").onTrue(Commands.runOnce( () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+    new EventTrigger("Collect Algae").onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+    new EventTrigger("Score Algae").onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+  
   }
 
   /**
@@ -283,7 +292,7 @@ public class RobotContainer {
     operatorController.a().onTrue(Commands.runOnce( () -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.75)));
 
     // Press X button --> level 3 Coral score
-    operatorController.x().onTrue(Commands.runOnce( () -> ElevatorCommands.l3Score(elevator, 0.35, 0.5, 1.25)));
+    operatorController.x().onTrue(Commands.runOnce( () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25)));
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController

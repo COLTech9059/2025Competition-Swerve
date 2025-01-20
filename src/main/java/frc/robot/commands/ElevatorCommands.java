@@ -34,13 +34,21 @@ public class ElevatorCommands {
     elevator);
   }
 
-  public static Command l3Score(Elevator elevator, double speed, double outtakeSpeed, double outtakeTime) {
+  public static Command coralScore(Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
     return Commands.run( () -> {
-      elevator.setLevel(speed, 3);
+      elevator.setLevel(speed, level);
       elevator.timedIntake(-outtakeSpeed, outtakeTime);
       elevator.setLevel(speed, 1);
     },
     elevator);
   }
 
+  public static Command coralCollect(Elevator elevator, double speed, double intakeSpeed, double intakeTime) {
+    return Commands.run( () -> {
+      elevator.setLevel(speed, 2);
+      elevator.timedIntake(intakeSpeed, intakeTime);
+      elevator.setLevel(speed, 1);
+    },
+    elevator);
+  }
 }
