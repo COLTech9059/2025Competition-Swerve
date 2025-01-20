@@ -60,6 +60,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class Drive extends SubsystemBase {
 
@@ -207,7 +208,7 @@ public class Drive extends SubsystemBase {
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
-    // Logger.processInputs("Drive/Gyro", (LoggableInputs) gyroInputs);
+    Logger.processInputs("Drive/Gyro", (LoggableInputs) gyroInputs);
     for (var module : modules) {
       module.periodic();
     }

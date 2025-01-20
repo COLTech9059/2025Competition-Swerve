@@ -28,6 +28,7 @@ public class ElevatorIOSpark extends ElevatorIO{
   private DigitalInput l2Switch = new DigitalInput(Constants.l2SwitchID);
   private DigitalInput l3Switch = new DigitalInput(Constants.l3SwitchID);
 
+  // Apply all necessary motor configs
   @Override
   public void configureMotors() {
     // eM2 output will now mirror eM outpput
@@ -45,15 +46,18 @@ public class ElevatorIOSpark extends ElevatorIO{
     eMotor.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  // Get the average between the two encoders
   private double getEncoderAverage() {
     return (eEncoder.getPosition() + eEncoder2.getPosition())/2;
   }
 
+  // Set the encoders to a specific position
  private void setEncoders(double pos) {
     eEncoder.setPosition(pos);
     eEncoder2.setPosition(pos);
   }
 
+  // Move the elevator to the given level at the given speed
   @Override
   public void setLevel(double speed, int level) {
     speed = Math.abs(speed);
@@ -65,6 +69,7 @@ public class ElevatorIOSpark extends ElevatorIO{
     if (level < 1) level = 1;
   }
 
+  // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
     int level = 0;
@@ -75,16 +80,19 @@ public class ElevatorIOSpark extends ElevatorIO{
     return level;
   }
 
+  // Stops the elevator motors
   @Override
   public void stop() {
     eMotor.stopMotor();
   }
 
+  // Runs the intake motor without stopping it
   @Override
   public void activeIntake(double speed) {
     intake.set(speed);
   }
 
+  // Runs the intake at the set speed for a specific amount of time
   @Override
   public void timedIntake(double speed, double time) {
     Timer timer = new Timer();
@@ -94,19 +102,23 @@ public class ElevatorIOSpark extends ElevatorIO{
     if (timer.get() >= time) intake.stopMotor();
   }
 
+  // Runs the intake until a sensor is triggered
   @Override
   public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
 
+  // Stops the intake motor
   @Override
   public void stopIntake() {
     intake.stopMotor();
   }
 
+  // Set the algae motor to the given speed
   @Override
   public void algaeIntake(double speed) {
     algae.set(speed);
   }
 
+  // Set the algae motor to the given speed for a given amount of time
   @Override
   public void timedAlgae(double speed, double time) {
     Timer timer = new Timer();
@@ -116,11 +128,13 @@ public class ElevatorIOSpark extends ElevatorIO{
     if (timer.get() >= time) algae.stopMotor();
   }
 
+  // Stops the algae motor
   @Override
   public void stopAlgae() {
     algae.stopMotor();
   }
 
+  // Updates encoder values according to elevator level
   @Override
   public void periodic() {
     if (getLevel() == 1) setEncoders(Constants.level1); 

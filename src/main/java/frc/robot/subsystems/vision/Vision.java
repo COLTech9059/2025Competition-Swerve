@@ -36,6 +36,7 @@ import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
@@ -75,7 +76,7 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      // Logger.processInputs("Vision/Camera" + Integer.toString(i), (LoggableInputs) inputs[i]);
+      Logger.processInputs("Vision/Camera" + Integer.toString(i), (LoggableInputs) inputs[i]);
     }
 
     // Initialize logging values
