@@ -15,6 +15,8 @@ package frc.robot.subsystems.accelerometer;
 
 import static frc.robot.Constants.AccelerometerConstants.*;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation3d;

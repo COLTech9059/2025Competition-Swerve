@@ -208,9 +208,9 @@ public class Drive extends SubsystemBase {
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    for (var module : modules) {
-      module.periodic();
-    }
+    // for (var module : modules) {
+    //   module.periodic();
+    // }
     odometryLock.unlock();
 
     // Stop moving when disabled
