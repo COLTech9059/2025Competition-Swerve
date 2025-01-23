@@ -32,6 +32,8 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AprilTagConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+
+import frc.robot.subsystems.vision.VisionIO.VisionIOInputs;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;

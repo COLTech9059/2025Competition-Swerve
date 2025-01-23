@@ -191,6 +191,7 @@ public class SwerveConstants {
         kBRYPosMeters = TunerConstants.BackRight.LocationY;
         break;
 
+
       case YAGSL:
         kImuType = YagslConstants.swerveDriveJson.imu.type;
         kCoupleRatio = YagslConstants.kCoupleRatio;
@@ -272,6 +273,7 @@ public class SwerveConstants {
         kBRXPosMeters = Units.inchesToMeters(YagslConstants.kBackRightXPosInches);
         kBRYPosMeters = Units.inchesToMeters(YagslConstants.kBackRightYPosInches);
         break;
+
 
       default:
         throw new RuntimeException("Invalid Swerve Drive Type");

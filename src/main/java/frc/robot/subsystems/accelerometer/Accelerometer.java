@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.VirtualSubsystem;
+
 import frc.robot.util.YagslConstants;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Accelerometer subsystem (built upon a virtual subsystem)
@@ -56,6 +56,7 @@ public class Accelerometer extends VirtualSubsystem {
         pigeonAccelerometer = (Pigeon2) accelerometer;
         navXAccelerometer = null;
         break;
+
 
       case YAGSL:
         // Logic checking the type of IMU included in the parsed YAGSL:
