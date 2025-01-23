@@ -11,7 +11,7 @@ public class Elevator extends RBSISubsystem {
     io.configureMotors();
   }
 
-  private ElevatorIO io = new ElevatorIO();
+  private ElevatorIO io = new ElevatorIO(); 
 
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
