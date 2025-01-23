@@ -24,9 +24,12 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
+import org.littletonrobotics.junction.Logger;
+
+
 public class Module {
   private final ModuleIO io;
-  private final ModuleIO.ModuleIOInputs inputs = new ModuleIO.ModuleIOInputs();
+  private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final int index;
 
   private final Alert driveDisconnectedAlert;
@@ -52,7 +55,9 @@ public class Module {
 
   public void periodic() {
     io.updateInputs(inputs);
-    // Logger.processInputs("Drive/Module" + Integer.toString(index), (LoggableInputs) inputs);
+
+    Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+
 
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together

@@ -26,11 +26,10 @@ import frc.robot.Constants;
 import frc.robot.util.RBSISubsystem;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class Flywheel extends RBSISubsystem {
   private final FlywheelIO io;
-  private final FlywheelIO.FlywheelIOInputs inputs = new FlywheelIO.FlywheelIOInputs();
+  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final SimpleMotorFeedforward ffModel;
   private final SysIdRoutine sysId;
 
@@ -69,7 +68,7 @@ public class Flywheel extends RBSISubsystem {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Flywheel", (LoggableInputs) inputs);
+    Logger.processInputs("Flywheel", inputs);
   }
 
   /** Run open loop at the specified voltage. */

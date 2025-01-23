@@ -23,7 +23,8 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.VirtualSubsystem;
-import org.littletonrobotics.junction.Logger;
+
+import frc.robot.util.YagslConstants;
 
 /**
  * Accelerometer subsystem (built upon a virtual subsystem)
@@ -56,20 +57,21 @@ public class Accelerometer extends VirtualSubsystem {
         navXAccelerometer = null;
         break;
 
-        // case YAGSL:
-        //   // Logic checking the type of IMU included in the parsed YAGSL:
-        //   if (YagslConstants.swerveDriveJson.imu.type == "pigeon2") {
-        //     pigeonAccelerometer = (Pigeon2) accelerometer;
-        //     navXAccelerometer = null;
-        //     break;
-        //   }
 
-        //   if (YagslConstants.swerveDriveJson.imu.type == "navx"
-        //       || YagslConstants.swerveDriveJson.imu.type == "navx_spi") {
-        //     navXAccelerometer = (AHRS) accelerometer;
-        //     pigeonAccelerometer = null;
-        //     break;
-        //   }
+      case YAGSL:
+        // Logic checking the type of IMU included in the parsed YAGSL:
+        if (YagslConstants.swerveDriveJson.imu.type == "pigeon2") {
+          pigeonAccelerometer = (Pigeon2) accelerometer;
+          navXAccelerometer = null;
+          break;
+        }
+
+        if (YagslConstants.swerveDriveJson.imu.type == "navx"
+            || YagslConstants.swerveDriveJson.imu.type == "navx_spi") {
+          navXAccelerometer = (AHRS) accelerometer;
+          pigeonAccelerometer = null;
+          break;
+        }
 
       default:
         // Otherwise kick a message to the console, and set to null
