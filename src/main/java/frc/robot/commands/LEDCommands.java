@@ -3,10 +3,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
 
 public class LEDCommands {
 
+  /**
+   * Set the LEDs to a random one of the solid color routines
+   *
+   * @param led the LED subsystem
+   * @return the relevant code statements as a Command object
+   */
   public static Command randomColor(LEDs led) {
     return Commands.runOnce(
         () -> {
@@ -15,6 +22,13 @@ public class LEDCommands {
         led);
   }
 
+  /**
+   * Set the LEDs to a specific pattern
+   *
+   * @param led the LED subsystem
+   * @param power the motor value (decimal from -0.99 to 0.99) for the Blinkin to interpret
+   * @return the relevant code statements as a Command object
+   */
   public static Command runPattern(LEDs led, double power) {
     return Commands.runOnce(
         () -> {
@@ -23,6 +37,13 @@ public class LEDCommands {
         led);
   }
 
+  /**
+   * Apply a custom LED routine using the team color patterns
+   *
+   * @param led the LED subsystem
+   * @param routine the ID of the routine you want (pulled from a switch case)
+   * @return the relevant code statements as a Command object
+   */
   public static Command teamColorRoutine(LEDs led, int routine) {
     return Commands.run(
         () -> {
@@ -65,6 +86,12 @@ public class LEDCommands {
         led);
   }
 
+  /**
+   * Apply a custom LED routine using the palette patterns
+   * @param led the LED subsystem
+   * @param routine the ID of the routine you want (pulled from a switch case)
+   * @return the relevant code statements as a Command object
+   */
   public static Command patternRoutine(LEDs led, int routine) {
     return Commands.run(
         () -> {
@@ -81,5 +108,17 @@ public class LEDCommands {
           }
         },
         led);
+  }
+
+  public static Command runRoutine(LEDs led, LEDRoutine routine, double delay) {
+    return Commands.run( () -> {
+      Timer time = new Timer();
+      if (time.get() >= delay) {
+        routine.iterate(0);
+        time.reset();
+        time.start();
+      }
+    },
+    led);
   }
 }

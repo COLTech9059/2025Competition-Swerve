@@ -18,6 +18,7 @@ public class Elevator extends RBSISubsystem {
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
   }
+
   /** Returns the current "level" of the elevator */
   public int getLevel() {
     return io.getLevel();
@@ -28,7 +29,10 @@ public class Elevator extends RBSISubsystem {
     io.stop();
   }
 
-  /** Runs the coral intake at the given speed. This method DOES NOT stop the intake motor at any point */
+  /**
+   * Runs the coral intake at the given speed. This method DOES NOT stop the intake motor at any
+   * point
+   */
   public void activeIntake(double speed) {
     io.activeIntake(speed);
   }
@@ -48,7 +52,10 @@ public class Elevator extends RBSISubsystem {
     io.stopIntake();
   }
 
-  /** Runs the algae intake at the given speed. This method DOES NOT stop the algae motor at any point */
+  /**
+   * Runs the algae intake at the given speed. This method DOES NOT stop the algae motor at any
+   * point
+   */
   public void algaeIntake(double speed) {
     io.algaeIntake(speed);
   }

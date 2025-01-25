@@ -16,7 +16,8 @@ public class ElevatorIO extends Elevator {
 
   public void timedIntake(double speed, double time) {}
 
-  public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
+  public void sensorIntake(
+      double speed) {} /* This will only be used if a sensor is placed in the intake */
 
   public void stopIntake() {}
 
