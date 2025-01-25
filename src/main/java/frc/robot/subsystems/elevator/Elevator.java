@@ -18,6 +18,11 @@ public class Elevator extends RBSISubsystem {
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
   }
+  /* TEMPORARY. (TODO: delete/comment this out if you don't want it.)*/
+  public void runMotor(double speed){
+    io.runMotor(speed);
+  }
+
   /** Returns the current "level" of the elevator */
   public int getLevel() {
     return io.getLevel();

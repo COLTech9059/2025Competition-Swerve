@@ -10,6 +10,9 @@ public class ElevatorIO extends Elevator {
     return 0;
   }
 
+  // TEMPORARY; comment out or delete when done with use.
+  public void runMotor(double speed) {}
+
   public void stop() {}
 
   public void activeIntake(double speed) {}

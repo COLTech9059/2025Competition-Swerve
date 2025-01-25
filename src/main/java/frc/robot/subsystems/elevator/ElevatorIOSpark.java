@@ -68,15 +68,20 @@ public class ElevatorIOSpark extends ElevatorIO {
     if (level < 1) level = 1;
   }
 
+  // TEMPORARY; simply for testing the motor
+  @Override
+  public void runMotor(double speed){
+    if (getLevel() > 0) {eMotor.set(0); return;}
+    eMotor.set(speed);
+  }
+
   // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
-    int level = 0;
-    if (l1Switch.get()) level = 1;
-    if (l2Switch.get()) level = 2;
-    if (l3Switch.get()) level = 3;
-
-    return level;
+    if (l1Switch.get()) return 1;
+    if (l2Switch.get()) return 2;
+    if (l3Switch.get()) return 3;
+    return 0;
   }
 
   // Stops the elevator motors
@@ -103,7 +108,6 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   // Runs the intake until a sensor is triggered
-  // TODO: Find out if the intake will be using a sensor
   @Override
   public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
 

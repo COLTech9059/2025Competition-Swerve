@@ -285,7 +285,9 @@ public class RobotContainer {
 
     // Press X button --> Stop with wheels in X-Lock position
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
+    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you don't want it.)
+    driverController.rightTrigger().whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
+    driverController.leftTrigger().whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
     // Press RIGHT BUMPER --> Move elevator up one level
     operatorController
         .rightBumper()
