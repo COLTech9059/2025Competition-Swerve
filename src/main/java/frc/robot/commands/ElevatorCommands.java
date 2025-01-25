@@ -6,11 +6,13 @@ import frc.robot.subsystems.elevator.Elevator;
 
 public class ElevatorCommands {
 
-  /** Moves the elevator up one "level" 
-   * @param elevator the elevator subsystem 
+  /**
+   * Moves the elevator up one "level"
+   *
+   * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) that the elevator will raise itself
    * @return the relevant code statements as a Command object
-  */
+   */
   public static Command upLevel(Elevator elevator, double speed) {
     return Commands.run(
         () -> {
@@ -19,12 +21,13 @@ public class ElevatorCommands {
         elevator);
   }
 
-  /** 
-   * Moves the elevator down one "level" 
-   * @param elevator the elevator subsystem 
+  /**
+   * Moves the elevator down one "level"
+   *
+   * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) that the elevator will lower itself
    * @return the relevant code statements as a Command object
-  */
+   */
   public static Command downLevel(Elevator elevator, double speed) {
     return Commands.run(
         () -> {
@@ -35,6 +38,7 @@ public class ElevatorCommands {
 
   /**
    * Runs the coral intake for a specified speed and time
+   *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) at which the intake motor will run
    * @param time the amount of time (in seconds) that the motor will run for
@@ -50,6 +54,7 @@ public class ElevatorCommands {
 
   /**
    * Runs the algae intake for a speicfied speed and time
+   *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decicmal percentage) at which the algae motor will run
    * @param time the amount of time (in seconds) that the motor will run for
@@ -65,6 +70,7 @@ public class ElevatorCommands {
 
   /**
    * Scores a coral gamepiece at the specified level
+   *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) at which the elevator will move
    * @param level the "level" the elevator will move to
@@ -72,7 +78,8 @@ public class ElevatorCommands {
    * @param outtakeTime the amount of time (in seconds) that the intake motor will run for
    * @return the relevant code statements as a Command object
    */
-  public static Command coralScore(Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
+  public static Command coralScore(
+      Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
     return Commands.run(
         () -> {
           elevator.setLevel(speed, level);
@@ -84,13 +91,15 @@ public class ElevatorCommands {
 
   /**
    * Collects a coral gamepiece from the supply station
+   *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) at which the elevator will move
    * @param intakeSpeed the speed (as a decimal percentage) at which the intake motor will run
    * @param intakeTime the amount of time (in seconds) that the intake motor will run for
    * @return the relevant code statements as a Command object
    */
-  public static Command coralCollect(Elevator elevator, double speed, double intakeSpeed, double intakeTime) {
+  public static Command coralCollect(
+      Elevator elevator, double speed, double intakeSpeed, double intakeTime) {
     return Commands.run(
         () -> {
           elevator.setLevel(speed, 2);
@@ -100,12 +109,13 @@ public class ElevatorCommands {
         elevator);
   }
 
-  // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't want it.)
-  public static Command moveElevator(Elevator elevator, double speed){
+  // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
+  // want it.)
+  public static Command moveElevator(Elevator elevator, double speed) {
     return Commands.run(
-      () -> {
-      elevator.runMotor(speed);
-    }, 
-    elevator);
+        () -> {
+          elevator.runMotor(speed);
+        },
+        elevator);
   }
 }

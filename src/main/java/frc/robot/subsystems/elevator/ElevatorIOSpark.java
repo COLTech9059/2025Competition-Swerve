@@ -70,10 +70,15 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // TEMPORARY; simply for testing the motor
   @Override
-  public void runMotor(double speed){
+  public void runMotor(double speed) {
     int level = getLevel();
-    boolean yesTerminate = ((level == 1 && speed < 0) || ((getEncoderAverage() >= Constants.level2 || level == 2) && speed > 0));
-    if (yesTerminate) {eMotor.set(0); return;}
+    boolean yesTerminate =
+        ((level == 1 && speed < 0)
+            || ((getEncoderAverage() >= Constants.level2 || level == 2) && speed > 0));
+    if (yesTerminate) {
+      eMotor.set(0);
+      return;
+    }
     eMotor.set(speed);
   }
 
@@ -111,7 +116,8 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Runs the intake until a sensor is triggered
   @Override
-  public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
+  public void sensorIntake(
+      double speed) {} /* This will only be used if a sensor is placed in the intake */
 
   // Stops the intake motor
   @Override
