@@ -71,7 +71,9 @@ public class ElevatorIOSpark extends ElevatorIO {
   // TEMPORARY; simply for testing the motor
   @Override
   public void runMotor(double speed){
-    if (getLevel() > 0) {eMotor.set(0); return;}
+    int level = getLevel();
+    boolean yesTerminate = ((level == 1 && speed < 0) || ((getEncoderAverage() >= Constants.level2 || level == 2) && speed > 0));
+    if (yesTerminate) {eMotor.set(0); return;}
     eMotor.set(speed);
   }
 
