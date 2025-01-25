@@ -6,7 +6,9 @@ public class ElevatorIO extends Elevator {
 
   public void setLevel(double speed, int level) {}
 
-  public int getLevel() {return 0;}
+  public int getLevel() {
+    return 0;
+  }
 
   public void stop() {}
 

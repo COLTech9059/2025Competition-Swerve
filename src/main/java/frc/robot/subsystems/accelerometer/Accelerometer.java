@@ -15,8 +15,6 @@ package frc.robot.subsystems.accelerometer;
 
 import static frc.robot.Constants.AccelerometerConstants.*;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -25,8 +23,8 @@ import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.VirtualSubsystem;
-
 import frc.robot.util.YagslConstants;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Accelerometer subsystem (built upon a virtual subsystem)
@@ -58,7 +56,6 @@ public class Accelerometer extends VirtualSubsystem {
         pigeonAccelerometer = (Pigeon2) accelerometer;
         navXAccelerometer = null;
         break;
-
 
       case YAGSL:
         // Logic checking the type of IMU included in the parsed YAGSL:

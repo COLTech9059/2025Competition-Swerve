@@ -3,7 +3,8 @@ package frc.robot.subsystems.elevator;
 import frc.robot.util.RBSISubsystem;
 
 /**
- * This class encompasses all the hardware on the physical elevator subsystem: the elevating mechanism, the coral mechanism, and the algae mechanism
+ * This class encompasses all the hardware on the physical elevator subsystem: the elevating
+ * mechanism, the coral mechanism, and the algae mechanism
  */
 public class Elevator extends RBSISubsystem {
 
@@ -11,7 +12,7 @@ public class Elevator extends RBSISubsystem {
     io.configureMotors();
   }
 
-  private ElevatorIO io = new ElevatorIO(); 
+  private ElevatorIO io = new ElevatorIO();
 
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
@@ -36,7 +37,7 @@ public class Elevator extends RBSISubsystem {
   /* This will only be used if a sensor is placed in the intake */
   public void sensorIntake(double speed) {
     io.sensorIntake(speed);
-  } 
+  }
 
   public void stopIntake() {
     io.stopIntake();
@@ -53,5 +54,4 @@ public class Elevator extends RBSISubsystem {
   public void stopAlgae() {
     io.stopAlgae();
   }
-
 }

@@ -1,19 +1,16 @@
 package frc.robot.subsystems.elevator;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-
-import frc.robot.Constants;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants;
 
-public class ElevatorIOSpark extends ElevatorIO{
+public class ElevatorIOSpark extends ElevatorIO {
 
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
@@ -50,11 +47,11 @@ public class ElevatorIOSpark extends ElevatorIO{
 
   // Get the average between the two encoders
   private double getEncoderAverage() {
-    return (eEncoder.getPosition() + eEncoder2.getPosition())/2;
+    return (eEncoder.getPosition() + eEncoder2.getPosition()) / 2;
   }
 
   // Set the encoders to a specific position
- private void setEncoders(double pos) {
+  private void setEncoders(double pos) {
     eEncoder.setPosition(pos);
     eEncoder2.setPosition(pos);
   }
@@ -98,7 +95,8 @@ public class ElevatorIOSpark extends ElevatorIO{
   @Override
   public void timedIntake(double speed, double time) {
     Timer timer = new Timer();
-    timer.reset(); timer.start();
+    timer.reset();
+    timer.start();
 
     intake.set(speed);
     if (timer.get() >= time) intake.stopMotor();
@@ -106,7 +104,8 @@ public class ElevatorIOSpark extends ElevatorIO{
 
   // Runs the intake until a sensor is triggered
   @Override
-  public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
+  public void sensorIntake(
+      double speed) {} /* This will only be used if a sensor is placed in the intake */
 
   // Stops the intake motor
   @Override
@@ -124,7 +123,8 @@ public class ElevatorIOSpark extends ElevatorIO{
   @Override
   public void timedAlgae(double speed, double time) {
     Timer timer = new Timer();
-    timer.reset(); timer.start();
+    timer.reset();
+    timer.start();
 
     algae.set(speed);
     if (timer.get() >= time) algae.stopMotor();
@@ -139,9 +139,8 @@ public class ElevatorIOSpark extends ElevatorIO{
   // Updates encoder values according to elevator level
   @Override
   public void periodic() {
-    if (getLevel() == 1) setEncoders(Constants.level1); 
-    if (getLevel() == 2) setEncoders(Constants.level2); 
-    if (getLevel() == 3) setEncoders(Constants.level3); 
- }
-
+    if (getLevel() == 1) setEncoders(Constants.level1);
+    if (getLevel() == 2) setEncoders(Constants.level2);
+    if (getLevel() == 3) setEncoders(Constants.level3);
+  }
 }

@@ -23,9 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-
 import org.littletonrobotics.junction.Logger;
-
 
 public class Module {
   private final ModuleIO io;
@@ -57,7 +55,6 @@ public class Module {
     io.updateInputs(inputs);
 
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
-
 
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
