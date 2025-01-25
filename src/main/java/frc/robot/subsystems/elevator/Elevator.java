@@ -14,43 +14,51 @@ public class Elevator extends RBSISubsystem {
 
   private ElevatorIO io = new ElevatorIO();
 
+  /** Moves the elevator to the indicated "level" at the given speed */
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
   }
-
+  /** Returns the current "level" of the elevator */
   public int getLevel() {
     return io.getLevel();
   }
 
+  /** Stops the elevating mechanism */
   public void stop() {
     io.stop();
   }
 
+  /** Runs the coral intake at the given speed. This method DOES NOT stop the intake motor at any point */
   public void activeIntake(double speed) {
     io.activeIntake(speed);
   }
 
+  /** Runs the coral intake at the given speed for the given amount of time in seconds */
   public void timedIntake(double speed, double time) {
     io.timedIntake(speed, time);
   }
 
-  /* This will only be used if a sensor is placed in the intake */
+  /** Currently empty; will only be used if a sensor is added to the intake */
   public void sensorIntake(double speed) {
     io.sensorIntake(speed);
   }
 
+  /** Stops the intake motor */
   public void stopIntake() {
     io.stopIntake();
   }
 
+  /** Runs the algae intake at the given speed. This method DOES NOT stop the algae motor at any point */
   public void algaeIntake(double speed) {
     io.algaeIntake(speed);
   }
 
+  /** Runs the algae intake at the given speed for the given amount of time in seconds */
   public void timedAlgae(double speed, double time) {
     io.timedAlgae(speed, time);
   }
 
+  /** Stops the algae motor */
   public void stopAlgae() {
     io.stopAlgae();
   }

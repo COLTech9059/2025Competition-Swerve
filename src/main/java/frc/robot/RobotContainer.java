@@ -208,7 +208,9 @@ public class RobotContainer {
   private void defineAutoCommands() {
 
     // Register Named Commands for use in PathPlanner autos
-    NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    NamedCommands.registerCommand(
+      "Zero", Commands.runOnce(() -> m_drivebase.zero()));
+
     NamedCommands.registerCommand(
         "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
@@ -217,12 +219,15 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+
     new EventTrigger("L3 Score")
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+
     new EventTrigger("Collect Algae")
         .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+
     new EventTrigger("Score Algae")
         .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
@@ -284,37 +289,37 @@ public class RobotContainer {
     // Press RIGHT BUMPER --> Move elevator up one level
     operatorController
         .rightBumper()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.upLevel(elevator, 0.35), elevator));
+        .onTrue(ElevatorCommands.upLevel(elevator, 0.35));
 
     // Press LEFT BUMPER --> Move elevator down one level
     operatorController
         .leftBumper()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.downLevel(elevator, 0.35), elevator));
+        .onTrue(ElevatorCommands.downLevel(elevator, 0.35));
 
     // Press LEFT TRIGGER --> intake Coral
     operatorController
         .leftTrigger()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedIntake(elevator, 0.5, 1)));
+        .onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
 
     // Press RIGHT TRIGGER --> outtake Coral
     operatorController
         .rightTrigger()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedIntake(elevator, -0.5, 1.25)));
+        .onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
 
     // Press B button --> intake Algae
     operatorController
         .b()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5)));
+        .onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
 
     // Press A button --> outtake Algae
     operatorController
         .a()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.75)));
+        .onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
 
     // Press X button --> level 3 Coral score
     operatorController
         .x()
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25)));
+        .onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController

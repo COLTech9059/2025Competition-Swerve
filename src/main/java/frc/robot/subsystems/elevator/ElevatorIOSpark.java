@@ -103,9 +103,9 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   // Runs the intake until a sensor is triggered
+  // TODO: Find out if the intake will be using a sensor
   @Override
-  public void sensorIntake(
-      double speed) {} /* This will only be used if a sensor is placed in the intake */
+  public void sensorIntake(double speed) {} /* This will only be used if a sensor is placed in the intake */
 
   // Stops the intake motor
   @Override
