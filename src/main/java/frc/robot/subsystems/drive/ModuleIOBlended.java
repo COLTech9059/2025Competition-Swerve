@@ -53,7 +53,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
-import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.util.PhoenixUtil;
 import frc.robot.util.SparkUtil;
 import java.util.Queue;
@@ -205,9 +205,9 @@ public class ModuleIOBlended implements ModuleIO {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(
-            DrivebaseConstants.steerPID.kP,
-            DrivebaseConstants.steerPID.kI,
-            DrivebaseConstants.steerPID.kD,
+            AutoConstants.kPPsteerPID.kP,
+            AutoConstants.kPPsteerPID.kI,
+            AutoConstants.kPPsteerPID.kD,
             0.0);
     turnConfig
         .signals

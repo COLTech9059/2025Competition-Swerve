@@ -26,7 +26,6 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -164,6 +163,7 @@ public class RobotContainer {
         autoChooserChoreo = null;
         autoFactoryChoreo = null;
         break;
+
       case CHOREO:
         autoFactoryChoreo =
             new AutoFactory(
@@ -179,24 +179,25 @@ public class RobotContainer {
         // Set the others to null
         autoChooserPathPlanner = null;
         break;
+
       default:
         // Then, throw the error
         throw new RuntimeException(
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
-    // Configure the trigger bindings
-    configureBindings();
     // Define Auto commands
     defineAutoCommands();
     // Define SysIs Routines
     definesysIdRoutines();
+    // Configure the button and trigger bindings
+    configureBindings();
   }
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
 
-    NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
   }
 
   /**
@@ -257,7 +258,7 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                     () ->
-                        m_drivebase.setPose(
+                        m_drivebase.resetPose(
                             new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
                     m_drivebase)
                 .ignoringDisable(true));
@@ -293,10 +294,6 @@ public class RobotContainer {
 
     // Schedule the selected auto during the autonomous period
     RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
-  }
-
-  public void setDriveMode() {
-    configureBindings();
   }
 
   /** Set the motor neutral mode to BRAKE / COAST for T/F */

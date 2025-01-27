@@ -42,7 +42,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import frc.robot.Constants.DrivebaseConstants;
+import frc.robot.Constants.AutoConstants;
 import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
@@ -155,9 +155,9 @@ public class ModuleIOSparkCANcoder implements ModuleIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pidf(
-            DrivebaseConstants.drivePID.kP,
-            DrivebaseConstants.drivePID.kI,
-            DrivebaseConstants.drivePID.kD,
+            AutoConstants.kPPdrivePID.kP,
+            AutoConstants.kPPdrivePID.kI,
+            AutoConstants.kPPdrivePID.kD,
             0.0);
     driveConfig
         .signals
@@ -195,9 +195,9 @@ public class ModuleIOSparkCANcoder implements ModuleIO {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pidf(
-            DrivebaseConstants.steerPID.kP,
-            DrivebaseConstants.steerPID.kI,
-            DrivebaseConstants.steerPID.kD,
+            AutoConstants.kPPsteerPID.kP,
+            AutoConstants.kPPsteerPID.kI,
+            AutoConstants.kPPsteerPID.kD,
             0.0);
     turnConfig
         .signals
