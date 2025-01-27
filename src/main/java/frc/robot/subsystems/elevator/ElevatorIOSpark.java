@@ -60,13 +60,25 @@ public class ElevatorIOSpark extends ElevatorIO {
   public void setLevel(double speed, int level) {
     speed = Math.abs(speed);
     if (getLevel() > level) {
-      if (motorSwitch.get()) {eMotor.stopMotor(); eMotor2.set(-speed);}
-      if (!motorSwitch.get()) {eMotor.set(-speed); eMotor2.stopMotor();}
+      if (motorSwitch.get()) {
+        eMotor.stopMotor();
+        eMotor2.set(-speed);
+      }
+      if (!motorSwitch.get()) {
+        eMotor.set(-speed);
+        eMotor2.stopMotor();
+      }
     }
 
     if (getLevel() < level) {
-      if (motorSwitch.get()) {eMotor.stopMotor(); eMotor2.set(speed);}
-      if (!motorSwitch.get()) {eMotor.set(speed); eMotor2.stopMotor();}
+      if (motorSwitch.get()) {
+        eMotor.stopMotor();
+        eMotor2.set(speed);
+      }
+      if (!motorSwitch.get()) {
+        eMotor.set(speed);
+        eMotor2.stopMotor();
+      }
     }
 
     if (getLevel() == level) {
@@ -78,15 +90,27 @@ public class ElevatorIOSpark extends ElevatorIO {
     if (level < 0) level = 0;
   }
 
+  // TEMPORARY; simply for testing the motor
+  @Override
+  public void runMotor(double speed) {
+    int level = getLevel();
+    boolean yesTerminate =
+        ((level == 1 && speed < 0)
+            || ((getEncoderAverage() >= Constants.level2 || level == 2) && speed > 0));
+    if (yesTerminate) {
+      eMotor.set(0);
+      return;
+    }
+    eMotor.set(speed);
+  }
+
   // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
-    int level = 0;
-    if (l1Switch.get()) level = 1;
-    if (l2Switch.get()) level = 2;
-    if (l3Switch.get()) level = 3;
-
-    return level;
+    if (l1Switch.get()) return 1;
+    if (l2Switch.get()) return 2;
+    if (l3Switch.get()) return 3;
+    return 0;
   }
 
   // Stops the elevator motors
@@ -113,7 +137,6 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   // Runs the intake until a sensor is triggered
-  // TODO: Find out if the intake will be using a sensor
   @Override
   public void sensorIntake(
       double speed) {} /* This will only be used if a sensor is placed in the intake */

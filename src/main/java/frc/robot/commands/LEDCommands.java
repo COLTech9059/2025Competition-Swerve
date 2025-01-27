@@ -88,6 +88,7 @@ public class LEDCommands {
 
   /**
    * Apply a custom LED routine using the palette patterns
+   *
    * @param led the LED subsystem
    * @param routine the ID of the routine you want (pulled from a switch case)
    * @return the relevant code statements as a Command object
@@ -111,14 +112,15 @@ public class LEDCommands {
   }
 
   public static Command runRoutine(LEDs led, LEDRoutine routine, double delay) {
-    return Commands.run( () -> {
-      Timer time = new Timer();
-      if (time.get() >= delay) {
-        routine.iterate(0);
-        time.reset();
-        time.start();
-      }
-    },
-    led);
+    return Commands.run(
+        () -> {
+          Timer time = new Timer();
+          if (time.get() >= delay) {
+            routine.iterate(0);
+            time.reset();
+            time.start();
+          }
+        },
+        led);
   }
 }
