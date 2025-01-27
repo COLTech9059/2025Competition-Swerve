@@ -66,23 +66,23 @@ public class GyroIONavX implements GyroIO<AHRS> {
     yawPositionQueue.clear();
   }
 
-  /**
-   * Zero the NavX
-   *
-   * <p>This method should always rezero the pigeon in ALWAYS-BLUE-ORIGIN orientation. Testing,
-   * however, shows that it's not doing what I think it should be doing. There is likely
-   * interference with something else in the odometry
-   */
-  @Override
-  public void zero() {
-    // With the Pigeon facing forward, forward depends on the alliance selected.
-    // Set Angle Adjustment based on alliance
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      navx.setAngleAdjustment(0.0);
-    } else {
-      navx.setAngleAdjustment(180.0);
-    }
-    System.out.println("Setting YAW to " + navx.getAngleAdjustment());
-    navx.zeroYaw();
-  }
+  // /**
+  //  * Zero the NavX
+  //  *
+  //  * <p>This method should always rezero the pigeon in ALWAYS-BLUE-ORIGIN orientation. Testing,
+  //  * however, shows that it's not doing what I think it should be doing. There is likely
+  //  * interference with something else in the odometry
+  //  */
+  // @Override
+  // public void zero() {
+  //   // With the Pigeon facing forward, forward depends on the alliance selected.
+  //   // Set Angle Adjustment based on alliance
+  //   if (DriverStation.getAlliance().get() == Alliance.Blue) {
+  //     navx.setAngleAdjustment(0.0);
+  //   } else {
+  //     navx.setAngleAdjustment(180.0);
+  //   }
+  //   System.out.println("Setting YAW to " + navx.getAngleAdjustment());
+  //   navx.zeroYaw();
+  // }
 }

@@ -40,8 +40,7 @@ public class Robot extends LoggedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
-  @Override
-  public void robotInit() {
+  public Robot() {
     // Record metadata
     Logger.recordMetadata("Robot", Constants.getRobot().toString());
     Logger.recordMetadata("TuningMode", Boolean.toString(Constants.tuningMode));
@@ -85,18 +84,14 @@ public class Robot extends LoggedRobot {
         break;
     }
 
-    // See http://bit.ly/3YIzFZ6 for more information on timestamps in AdvantageKit.
-    // Logger.disableDeterministicTimestamps()
-
     // Start AdvantageKit logger
     Logger.start();
 
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our autonomous chooser on the dashboard.
+    // Instantiate our RobotContainer. This will perform all our button bindings, and put our
+    // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
-    // Create a timer to disable motor brake a few seconds after disable. This will
-    // let the robot
+    // Create a timer to disable motor brake a few seconds after disable. This will let the robot
     // stop immediately when disabled, but then also let it be pushed more
     m_disabledTimer = new Timer();
   }
@@ -144,8 +139,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
 
-    // TODO: Make sure Gyro inits here with whatever is in the path planning thingie
+    // Just in case, cancel all running commands
+    CommandScheduler.getInstance().cancelAll();
     m_robotContainer.setMotorBrake(true);
+
+    // TODO: Make sure Gyro inits here with whatever is in the path planning thingie
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
         m_autoCommandPathPlanner = m_robotContainer.getAutonomousCommandPathPlanner();
@@ -179,7 +177,6 @@ public class Robot extends LoggedRobot {
     } else {
       CommandScheduler.getInstance().cancelAll();
     }
-    m_robotContainer.setDriveMode();
     m_robotContainer.setMotorBrake(true);
   }
 
@@ -192,7 +189,6 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    m_robotContainer.setDriveMode();
   }
 
   /** This function is called periodically during test mode. */
