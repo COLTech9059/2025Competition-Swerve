@@ -23,6 +23,7 @@ public class ElevatorIOSpark extends ElevatorIO {
   private SparkBaseConfig eM2Config;
 
   // Digital input (limit switch) objects
+  private DigitalInput motorSwitch = new DigitalInput(Constants.motorSwitchID);
   private DigitalInput l1Switch = new DigitalInput(Constants.l1SwitchID);
   private DigitalInput l2Switch = new DigitalInput(Constants.l2SwitchID);
   private DigitalInput l3Switch = new DigitalInput(Constants.l3SwitchID);
@@ -30,11 +31,9 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Apply all necessary motor configs
   @Override
   public void configureMotors() {
-    // eM2 output will now mirror eM outpput
-    eM2Config.follow(eMotor, false);
-
     // Set Inversions & Ramp Rates
     eMConfig.inverted(false);
+    eM2Config.inverted(false);
     eMConfig.openLoopRampRate(0.2);
     eMConfig.closedLoopRampRate(0.2);
     eM2Config.openLoopRampRate(0.2);
@@ -60,12 +59,23 @@ public class ElevatorIOSpark extends ElevatorIO {
   @Override
   public void setLevel(double speed, int level) {
     speed = Math.abs(speed);
-    if (getLevel() > level) eMotor.set(-speed);
-    if (getLevel() < level) eMotor.set(speed);
-    if (getLevel() == level) eMotor.stopMotor();
+    if (getLevel() > level) {
+      if (motorSwitch.get()) {eMotor.stopMotor(); eMotor2.set(-speed);}
+      if (!motorSwitch.get()) {eMotor.set(-speed); eMotor2.stopMotor();}
+    }
+
+    if (getLevel() < level) {
+      if (motorSwitch.get()) {eMotor.stopMotor(); eMotor2.set(speed);}
+      if (!motorSwitch.get()) {eMotor.set(speed); eMotor2.stopMotor();}
+    }
+
+    if (getLevel() == level) {
+      eMotor.stopMotor();
+      eMotor2.stopMotor();
+    }
 
     if (level > 3) level = 3;
-    if (level < 1) level = 1;
+    if (level < 0) level = 0;
   }
 
   // Returns the current level of the elevator (0 means none)

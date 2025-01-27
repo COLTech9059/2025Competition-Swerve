@@ -100,11 +100,13 @@ public final class Constants {
   public static final int intakeID = 16;
   public static final int algaeID = 17;
 
-  public static final int l1SwitchID = 1;
-  public static final int l2SwitchID = 2;
-  public static final int l3SwitchID = 3;
+  public static final int motorSwitchID = 1;
+  public static final int l1SwitchID = 2;
+  public static final int l2SwitchID = 3;
+  public static final int l3SwitchID = 4;
 
   // Elevator setpoints
+  public static final double motorSwitch = 0;
   public static final double level1 = 0;
   public static final double level2 = 0;
   public static final double level3 = 0;
