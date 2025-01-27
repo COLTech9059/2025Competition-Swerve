@@ -19,11 +19,6 @@ public class Elevator extends RBSISubsystem {
     io.setLevel(speed, level);
   }
 
-  /* TEMPORARY. (TODO: delete/comment this out if you don't want it.)*/
-  public void runMotor(double speed) {
-    io.runMotor(speed);
-  }
-
   /** Returns the current "level" of the elevator */
   public int getLevel() {
     return io.getLevel();
@@ -73,5 +68,9 @@ public class Elevator extends RBSISubsystem {
   /** Stops the algae motor */
   public void stopAlgae() {
     io.stopAlgae();
+  }
+
+  public void runMotor(double speed) {
+    io.runMotor(speed);
   }
 }

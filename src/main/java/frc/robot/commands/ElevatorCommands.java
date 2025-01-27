@@ -109,13 +109,12 @@ public class ElevatorCommands {
         elevator);
   }
 
-  // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
-  // want it.)
-  public static Command moveElevator(Elevator elevator, double speed) {
+   // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't want it.)
+   public static Command moveElevator(Elevator elevator, double speed){
     return Commands.run(
-        () -> {
-          elevator.runMotor(speed);
-        },
-        elevator);
+      () -> {
+      elevator.runMotor(speed);
+    }, 
+    elevator);
   }
 }
