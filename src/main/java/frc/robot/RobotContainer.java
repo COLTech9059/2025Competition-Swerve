@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
@@ -283,7 +284,13 @@ public class RobotContainer {
         .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+
+    // SysID logging.
+    driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
+    driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
+    driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
+    driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
     // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you
     // don't want it.)
     driverController
