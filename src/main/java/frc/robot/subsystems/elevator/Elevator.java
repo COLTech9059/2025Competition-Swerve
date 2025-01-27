@@ -69,4 +69,8 @@ public class Elevator extends RBSISubsystem {
   public void stopAlgae() {
     io.stopAlgae();
   }
+
+  public void runMotor(double speed) {
+    io.runMotor(speed);
+  }
 }
