@@ -30,7 +30,5 @@ public interface GyroIO<T> {
 
   public default void updateInputs(GyroIOInputs inputs) {}
 
-  public default void zero() {}
-
   public abstract T getGyro();
 }

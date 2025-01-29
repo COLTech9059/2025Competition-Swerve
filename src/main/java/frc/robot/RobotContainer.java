@@ -26,7 +26,6 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -176,6 +175,7 @@ public class RobotContainer {
         autoChooserChoreo = null;
         autoFactoryChoreo = null;
         break;
+
       case CHOREO:
         autoFactoryChoreo =
             new AutoFactory(
@@ -191,18 +191,19 @@ public class RobotContainer {
         // Set the others to null
         autoChooserPathPlanner = null;
         break;
+
       default:
         // Then, throw the error
         throw new RuntimeException(
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
-    // Configure the trigger bindings
-    configureBindings();
     // Define Auto commands
     defineAutoCommands();
     // Define SysIs Routines
     definesysIdRoutines();
+    // Configure the button and trigger bindings
+    configureBindings();
   }
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
@@ -321,16 +322,15 @@ public class RobotContainer {
     operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
 
     // Press Y button --> Manually Re-Zero the Gyro
-    // driverController
-    //     .y()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     m_drivebase.setPose(
-    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
-    // Rotation2d())),
-    //                 m_drivebase)
-    //             .ignoringDisable(true));
+    driverController
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        m_drivebase.resetPose(
+                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+                    m_drivebase)
+                .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     // driverController
@@ -363,10 +363,6 @@ public class RobotContainer {
 
     // Schedule the selected auto during the autonomous period
     RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
-  }
-
-  public void setDriveMode() {
-    configureBindings();
   }
 
   /** Set the motor neutral mode to BRAKE / COAST for T/F */

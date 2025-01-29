@@ -27,11 +27,11 @@ import java.util.function.Consumer;
 public class ChoreoAutoController implements Consumer<SwerveSample> {
   private final Drive drive; // drive subsystem
   private final PIDController xController =
-      new PIDController(kAutoDrivePID.kP, 0.0, kAutoDrivePID.kD);
+      new PIDController(kChoreoDrivePID.kP, kChoreoDrivePID.kI, kChoreoDrivePID.kD);
   private final PIDController yController =
-      new PIDController(kAutoDrivePID.kP, 0.0, kAutoDrivePID.kD);
+      new PIDController(kChoreoDrivePID.kP, kChoreoDrivePID.kI, kChoreoDrivePID.kD);
   private final PIDController headingController =
-      new PIDController(kAutoSteerPID.kP, 0.0, kAutoSteerPID.kD);
+      new PIDController(kChoreoSteerPID.kP, kChoreoSteerPID.kI, kChoreoSteerPID.kD);
 
   public ChoreoAutoController(Drive drive) {
     this.drive = drive;

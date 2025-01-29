@@ -103,27 +103,27 @@ public class Vision extends SubsystemBase {
       }
 
       // Loop over pose observations
-      for (var observation : inputs[cameraIndex].poseObservations) {
+      for (var itobservation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
-            observation.tagCount() == 0 // Must have at least one tag
-                || (observation.tagCount() == 1
-                    && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
-                || Math.abs(observation.pose().getZ())
+            itobservation.tagCount() == 0 // Must have at least one tag
+                || (itobservation.tagCount() == 1
+                    && itobservation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                || Math.abs(itobservation.pose().getZ())
                     > maxZError // Must have realistic Z coordinate
 
                 // Must be within the field boundaries
-                || observation.pose().getX() < 0.0
-                || observation.pose().getX() > AprilTagConstants.aprilTagLayout.getFieldLength()
-                || observation.pose().getY() < 0.0
-                || observation.pose().getY() > AprilTagConstants.aprilTagLayout.getFieldWidth();
+                || itobservation.pose().getX() < 0.0
+                || itobservation.pose().getX() > AprilTagConstants.aprilTagLayout.getFieldLength()
+                || itobservation.pose().getY() < 0.0
+                || itobservation.pose().getY() > AprilTagConstants.aprilTagLayout.getFieldWidth();
 
         // Add pose to log
-        robotPoses.add(observation.pose());
+        robotPoses.add(itobservation.pose());
         if (rejectPose) {
-          robotPosesRejected.add(observation.pose());
+          robotPosesRejected.add(itobservation.pose());
         } else {
-          robotPosesAccepted.add(observation.pose());
+          robotPosesAccepted.add(itobservation.pose());
         }
 
         // Skip if rejected
@@ -133,10 +133,10 @@ public class Vision extends SubsystemBase {
 
         // Calculate standard deviations
         double stdDevFactor =
-            Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+            Math.pow(itobservation.averageTagDistance(), 2.0) / itobservation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
+        if (itobservation.type() == PoseObservationType.MEGATAG_2) {
           linearStdDev *= linearStdDevMegatag2Factor;
           angularStdDev *= angularStdDevMegatag2Factor;
         }
@@ -147,8 +147,8 @@ public class Vision extends SubsystemBase {
 
         // Send vision observation
         consumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
+            itobservation.pose().toPose2d(),
+            itobservation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 

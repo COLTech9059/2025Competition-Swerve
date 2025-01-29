@@ -33,6 +33,7 @@ public class SwerveConstants {
   public static final double kDriveGearRatio;
   public static final double kSteerGearRatio;
   public static final double kWheelRadiusInches;
+  public static final double kWheelRadiusMeters;
   public static final String kCANbusName;
   public static final int kPigeonId;
   public static final double kSteerInertia;
@@ -112,7 +113,8 @@ public class SwerveConstants {
         kCoupleRatio = TunerConstants.FrontLeft.CouplingGearRatio;
         kDriveGearRatio = TunerConstants.FrontLeft.DriveMotorGearRatio;
         kSteerGearRatio = TunerConstants.FrontLeft.SteerMotorGearRatio;
-        kWheelRadiusInches = TunerConstants.FrontLeft.WheelRadius;
+        kWheelRadiusMeters = TunerConstants.FrontLeft.WheelRadius;
+        kWheelRadiusInches = Units.metersToInches(kWheelRadiusMeters);
         kCANbusName = TunerConstants.DrivetrainConstants.CANBusName;
         kPigeonId = TunerConstants.DrivetrainConstants.Pigeon2Id;
         kSteerInertia = TunerConstants.FrontLeft.SteerInertia;
@@ -197,6 +199,7 @@ public class SwerveConstants {
         kDriveGearRatio = YagslConstants.kDriveGearRatio;
         kSteerGearRatio = YagslConstants.kSteerGearRatio;
         kWheelRadiusInches = YagslConstants.kWheelRadiusInches;
+        kWheelRadiusMeters = Units.inchesToMeters(kWheelRadiusInches);
         kCANbusName = YagslConstants.kCANbusName;
         kPigeonId = YagslConstants.kPigeonId;
         kSteerInertia = YagslConstants.kSteerInertia;
@@ -286,7 +289,6 @@ public class SwerveConstants {
           Math.max(
               Math.hypot(kBLXPosMeters, kBLYPosMeters), Math.hypot(kBRXPosMeters, kBRYPosMeters)));
   public static final double kDriveBaseRadiusInches = Units.metersToInches(kDriveBaseRadiusMeters);
-  public static final double kWheelRadiusMeters = Units.inchesToMeters(kWheelRadiusInches);
 
   // Are we on the CANivore or not?
   public static final double kOdometryFrequency =
