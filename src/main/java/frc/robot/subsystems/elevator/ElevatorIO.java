@@ -10,6 +10,10 @@ public class ElevatorIO extends Elevator {
     return 0;
   }
 
+  public int getExactLevel() {
+    return -1;
+  }
+
   // TEMPORARY; comment out or delete when done with use.
   public void runMotor(double speed) {}
 

@@ -24,6 +24,11 @@ public class Elevator extends RBSISubsystem {
     return io.getLevel();
   }
 
+  /** This method will return the "level" corresponding to whatever sensor is active. If no sensor is detecting, it will return a -1 */
+  public int getExactLevel() {
+    return io.getExactLevel();
+  }
+
   /** Stops the elevating mechanism */
   public void stop() {
     io.stop();
