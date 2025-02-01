@@ -41,11 +41,11 @@ import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
+// import frc.robot.commands.ElevatorCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
+// import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -76,7 +76,7 @@ public class RobotContainer {
   /** Declare the robot subsystems here ************************************ */
   // These are the "Active Subsystems" that the robot controlls
   private final Drive m_drivebase;
-  private final Elevator elevator;
+  // private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final Cage cage;
   // These are "Virtual Subsystems" that report information but have no motors
@@ -112,7 +112,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         cage = new Cage();
         m_vision =
@@ -138,7 +138,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         cage = new Cage();
         m_vision =
@@ -152,7 +152,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         cage = new Cage();
         m_vision =
@@ -263,7 +263,7 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press RIGHT BUMPER --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
+    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
 
     // Press LEFT TRIGGER --> Activate timed cage
     operatorController.leftTrigger().onTrue(CageCommands.timedRun(cage, 0.5, 2));
