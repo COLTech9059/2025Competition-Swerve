@@ -76,4 +76,9 @@ public class Elevator extends RBSISubsystem {
   public void runMotor(double speed) {
     io.runMotor(speed);
   }
+
+  @Override
+  public void periodic() {
+    io.encoderUpdates();
+  }
 }
