@@ -296,8 +296,7 @@ public class RobotContainer {
     driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
     driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
     driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
-    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you
-    // don't want it.)
+    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you don't want it.)
     driverController
         .rightTrigger()
         .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));

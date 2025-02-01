@@ -99,7 +99,6 @@ public final class Constants {
 
   // Device ID Constants
   public static final int eMotorID = 14;
-
   public static final int eMotor2ID = 15;
   public static final int intakeID = 16;
   public static final int algaeID = 17;
@@ -108,6 +107,9 @@ public final class Constants {
   public static final int l1SwitchID = 2;
   public static final int l2SwitchID = 3;
   public static final int l3SwitchID = 4;
+
+  public static final int pivotMotorID = 18;
+  public static final int backupIntakeID = 19;
 
   // Elevator setpoints
   public static final double motorSwitch = 0;
