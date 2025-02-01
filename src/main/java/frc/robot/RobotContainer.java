@@ -48,10 +48,12 @@ import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
 import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDsIOBlinkin;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -116,8 +118,8 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
-        elevator = new Elevator();
-        led = new LEDs();
+        elevator = new Elevator(new ElevatorIOSpark());
+        led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -142,8 +144,8 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
-        led = new LEDs();
+        elevator = new Elevator(new ElevatorIOSpark());
+        led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -156,8 +158,8 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
-        led = new LEDs();
+        elevator = new Elevator(new ElevatorIOSpark());
+        led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});

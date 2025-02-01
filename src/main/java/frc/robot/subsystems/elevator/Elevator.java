@@ -8,11 +8,14 @@ import frc.robot.util.RBSISubsystem;
  */
 public class Elevator extends RBSISubsystem {
 
-  public Elevator() {
-    io.configureMotors();
+  private final ElevatorIO io;
+
+  public Elevator(ElevatorIO io) {
+    this.io = io;
+    this.io.configureMotors();
   }
 
-  private ElevatorIO io = new ElevatorIO();
+  
 
   /** Moves the elevator to the indicated "level" at the given speed */
   public void setLevel(double speed, int level) {
