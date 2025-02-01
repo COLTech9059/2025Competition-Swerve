@@ -43,12 +43,12 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
+// import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.backupCoral.BackupCoral;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
+// import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -81,7 +81,7 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
 
-  private final Elevator elevator;
+  // private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final LEDs led;
   private final BackupCoral coral;
@@ -118,7 +118,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         coral = new BackupCoral();
@@ -145,7 +145,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         coral = new BackupCoral();
@@ -160,7 +160,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator();
+        // elevator = new Elevator();
         led = new LEDs();
         coral = new BackupCoral();
         m_flywheel = new Flywheel(new FlywheelIO() {});
@@ -221,25 +221,25 @@ public class RobotContainer {
     // Register Named Commands for use in PathPlanner autos
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
-    NamedCommands.registerCommand(
-        "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+    // NamedCommands.registerCommand(
+        // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
-    new EventTrigger("Collect Coral")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+    // new EventTrigger("Collect Coral")
+    //     .onTrue(
+    //         Commands.runOnce(
+                // () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
 
-    new EventTrigger("L3 Score")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+    // new EventTrigger("L3 Score")
+    //     .onTrue(
+            // Commands.runOnce(
+                // () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
 
-    new EventTrigger("Collect Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+    // new EventTrigger("Collect Algae")
+        // .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
 
-    new EventTrigger("Score Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+    // new EventTrigger("Score Algae")
+    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
 
   /**
@@ -302,32 +302,32 @@ public class RobotContainer {
     driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
     driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
     // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you don't want it.)
-    driverController
-        .rightTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
-    driverController
-        .leftTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
-    // Press RIGHT BUMPER --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
+    // driverController
+    //     .rightTrigger()
+    //     .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
+    // driverController
+    //     .leftTrigger()
+    //     .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
+    // // Press RIGHT BUMPER --> Move elevator up one level
+    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
 
-    // Press LEFT BUMPER --> Move elevator down one level
-    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
+    // // Press LEFT BUMPER --> Move elevator down one level
+    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
 
-    // Press LEFT TRIGGER --> intake Coral
-    operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
+    // // Press LEFT TRIGGER --> intake Coral
+    // operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
 
-    // Press RIGHT TRIGGER --> outtake Coral
-    operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
+    // // Press RIGHT TRIGGER --> outtake Coral
+    // operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
 
-    // Press B button --> intake Algae
-    operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
+    // // Press B button --> intake Algae
+    // operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
 
-    // Press A button --> outtake Algae
-    operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
+    // // Press A button --> outtake Algae
+    // operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
 
-    // Press X button --> level 3 Coral score
-    operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
+    // // Press X button --> level 3 Coral score
+    // operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
 
     // Press Y button --> Manually Re-Zero the Gyro
     driverController
