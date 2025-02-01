@@ -46,6 +46,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
+import frc.robot.subsystems.backupCoral.BackupCoral;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.flywheel_example.Flywheel;
@@ -83,6 +84,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final LEDs led;
+  private final BackupCoral coral;
   // These are "Virtual Subsystems" that report information but have no motors
   private final Accelerometer m_accel;
   private final Vision m_vision;
@@ -119,6 +121,7 @@ public class RobotContainer {
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
+        coral = new BackupCoral();
         m_vision =
             switch (Constants.getVisionType()) {
               case PHOTON ->
@@ -145,6 +148,7 @@ public class RobotContainer {
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
+        coral = new BackupCoral();
         m_vision =
             new Vision(
                 m_drivebase::addVisionMeasurement,
@@ -158,6 +162,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
+        coral = new BackupCoral();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
