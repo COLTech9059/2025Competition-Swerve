@@ -39,9 +39,11 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
+import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.flywheel_example.Flywheel;
@@ -76,6 +78,7 @@ public class RobotContainer {
   private final Drive m_drivebase;
   private final Elevator elevator;
   private final Flywheel m_flywheel;
+  private final Cage cage;
   // These are "Virtual Subsystems" that report information but have no motors
   private final Accelerometer m_accel;
   private final Vision m_vision;
@@ -111,6 +114,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
+        cage = new Cage();
         m_vision =
             switch (Constants.getVisionType()) {
               case PHOTON ->
@@ -136,6 +140,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
+        cage = new Cage();
         m_vision =
             new Vision(
                 m_drivebase::addVisionMeasurement,
@@ -149,6 +154,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator();
         m_flywheel = new Flywheel(new FlywheelIO() {});
+        cage = new Cage();
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         m_accel = new Accelerometer(m_drivebase.getGyro());
@@ -258,6 +264,12 @@ public class RobotContainer {
 
     // Press RIGHT BUMPER --> Move elevator up one level
     operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
+
+    // Press LEFT TRIGGER --> Activate timed cage
+    operatorController.leftTrigger().onTrue(CageCommands.timedRun(cage, 0.5, 2));
+
+    // Press Right Trigger --> Start running the cage
+    operatorController.rightTrigger().onTrue(CageCommands.run(cage, 0)); 
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController

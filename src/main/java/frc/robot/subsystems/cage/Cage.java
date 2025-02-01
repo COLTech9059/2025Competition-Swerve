@@ -36,5 +36,19 @@ public class Cage extends RBSISubsystem {
    * You may refer to other parts of the program if you need to, but try to figure things out on your own first.
    * I am also available as a resource to help you and explain anything you're confused about.
    */
+
+    private CageIO io = new CageIO();
+
+    public void run(double speed) {
+      io.run(speed);
+    }
+
+    public void rotate(double speed, double time) {
+      io.rotate(speed, time);
+    }
+
+    public void stop() {
+      io.stop();
+    }
  
 }
