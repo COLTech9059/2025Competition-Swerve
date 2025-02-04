@@ -26,8 +26,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Queue;
 
 /** IO implementation for Pigeon2 */
@@ -60,6 +58,7 @@ public class GyroIOPigeon2 implements GyroIO<Pigeon2> {
     inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions =
@@ -70,22 +69,22 @@ public class GyroIOPigeon2 implements GyroIO<Pigeon2> {
     yawPositionQueue.clear();
   }
 
-  /**
-   * Zero the Pigeon2
-   *
-   * <p>This method should always rezero the pigeon in ALWAYS-BLUE-ORIGIN orientation. Testing,
-   * however, shows that it's not doing what I think it should be doing. There is likely
-   * interference with something else in the odometry
-   */
-  @Override
-  public void zero() {
-    // With the Pigeon facing forward, forward depends on the alliance selected.
-    if (DriverStation.getAlliance().get() == Alliance.Blue) {
-      System.out.println("Alliance Blue: Setting YAW to 0");
-      pigeon.setYaw(0.0);
-    } else {
-      System.out.println("Alliance Red: Setting YAW to 180");
-      pigeon.setYaw(180.0);
-    }
-  }
+  // /**
+  //  * Zero the Pigeon2
+  //  *
+  //  * <p>This method should always rezero the pigeon in ALWAYS-BLUE-ORIGIN orientation. Testing,
+  //  * however, shows that it's not doing what I think it should be doing. There is likely
+  //  * interference with something else in the odometry
+  //  */
+  // @Override
+  // public void zero() {
+  //   // With the Pigeon facing forward, forward depends on the alliance selected.
+  //   if (DriverStation.getAlliance().get() == Alliance.Blue) {
+  //     System.out.println("Alliance Blue: Setting YAW to 0");
+  //     pigeon.setYaw(0.0);
+  //   } else {
+  //     System.out.println("Alliance Red: Setting YAW to 180");
+  //     pigeon.setYaw(180.0);
+  //   }
+  // }
 }

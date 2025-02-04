@@ -19,17 +19,21 @@ package frc.robot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.SwerveConstants;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
@@ -135,10 +139,6 @@ public final class Constants {
     public static final double kMaxLinearAccel = 4.0; // m/s/s
     public static final double kMaxAngularAccel = Units.degreesToRadians(720);
 
-    // Drive and Turn PID constants
-    public static final PIDConstants drivePID = new PIDConstants(0.05, 0.0, 0.0);
-    public static final PIDConstants steerPID = new PIDConstants(2.0, 0.0, 0.4);
-
     // Hold time on motor brakes when disabled
     public static final double kWheelLockTime = 10; // seconds
 
@@ -235,10 +235,30 @@ public final class Constants {
   /** Autonomous Action Constants ****************************************** */
   public static final class AutoConstants {
 
-    // PathPlanner Translation PID constants
-    public static final PIDConstants kAutoDrivePID = new PIDConstants(0.7, 0, 0);
-    // PathPlanner Rotation PID constants
-    public static final PIDConstants kAutoSteerPID = new PIDConstants(0.4, 0, 0.01);
+    // Drive and Turn PID constants used for PathPlanner
+    public static final PIDConstants kPPdrivePID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants kPPsteerPID = new PIDConstants(5.0, 0.0, 0.0);
+
+    // PathPlanner Config constants
+    public static final RobotConfig kPathPlannerConfig =
+        new RobotConfig(
+            PhysicalConstants.kRobotMassKg,
+            PhysicalConstants.kRobotMOI,
+            new ModuleConfig(
+                SwerveConstants.kWheelRadiusMeters,
+                DrivebaseConstants.kMaxLinearSpeed,
+                PhysicalConstants.kWheelCOF,
+                DCMotor.getKrakenX60Foc(1).withReduction(SwerveConstants.kDriveGearRatio),
+                SwerveConstants.kDriveSlipCurrent,
+                1),
+            Drive.getModuleTranslations());
+
+    // Alternatively, we can build this from the PathPlanner GUI:
+    // public static final RobotConfig kPathPlannerConfig = RobotConfig.fromGUISettings();
+
+    // Drive and Turn PID constants used for Chorep
+    public static final PIDConstants kChoreoDrivePID = new PIDConstants(10.0, 0.0, 0.0);
+    public static final PIDConstants kChoreoSteerPID = new PIDConstants(7.5, 0.0, 0.0);
   }
 
   /** Vision Constants (Assuming PhotonVision) ***************************** */
