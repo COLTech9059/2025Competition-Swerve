@@ -26,6 +26,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
@@ -226,9 +228,9 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value(),
-            () -> -driveStickX.value(),
-            () -> -turnStickX.value()));
+            () -> driveStickY.value() * .15,
+            () -> driveStickX.value() * .15,
+            () -> turnStickX.value() * .15));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
@@ -250,18 +252,34 @@ public class RobotContainer {
         .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press Y button --> Manually Re-Zero the Gyro
+    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
     driverController
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        m_drivebase.resetPose(
-                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
-                    m_drivebase)
-                .ignoringDisable(true));
+        .start()
+        .and(driverController.x())
+        .whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
+    driverController
+        .start()
+        .and(driverController.y())
+        .whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
+    driverController
+        .back()
+        .and(driverController.x())
+        .whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
+    driverController
+        .back()
+        .and(driverController.y())
+        .whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
+    // Press Y button --> Manually Re-Zero the Gyro
+    // driverController
+    //     .y()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     m_drivebase.setPose(
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
+    // Rotation2d())),
+    //                 m_drivebase)
+    //             .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     driverController

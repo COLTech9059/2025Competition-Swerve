@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -123,6 +124,7 @@ public class Robot extends LoggedRobot {
     m_robotContainer.setMotorBrake(true);
     m_disabledTimer.reset();
     m_disabledTimer.start();
+    SignalLogger.stop();
   }
 
   /** This function is called periodically when disabled. */
@@ -178,6 +180,7 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().cancelAll();
     }
     m_robotContainer.setMotorBrake(true);
+    SignalLogger.start();
   }
 
   /** This function is called periodically during operator control. */

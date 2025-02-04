@@ -19,6 +19,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.drive.SwerveConstants.*;
 
 import choreo.trajectory.SwerveSample;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -183,7 +184,7 @@ public class Drive extends SubsystemBase {
                 null,
                 Volts.of(4.0),
                 null,
-                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+                (state) -> SignalLogger.writeString("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
