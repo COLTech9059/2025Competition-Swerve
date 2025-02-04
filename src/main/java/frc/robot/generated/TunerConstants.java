@@ -89,7 +89,7 @@ public class TunerConstants {
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
-  public static final CANBus kCANBus = new CANBus("DriveTrain", "./logs/example.hoot");
+  public static final CANBus kCANBus = new CANBus("Drive Bus", "./logs/example.hoot");
 
   // Theoretical free speed (m/s) at 12 V applied output;
   // This needs to be tuned to your individual robot
@@ -106,7 +106,7 @@ public class TunerConstants {
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
 
-  private static final int kPigeonId = 13;
+  private static final int kPigeonId = 14;
 
   // These are only used for simulation
   private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
@@ -148,7 +148,7 @@ public class TunerConstants {
               .withDriveFrictionVoltage(kDriveFrictionVoltage);
 
   // Front Left
-  private static final int kFrontLeftDriveMotorId = 1;
+  private static final int kFrontLeftDriveMotorId = 9;
   private static final int kFrontLeftSteerMotorId = 2;
   private static final int kFrontLeftEncoderId = 10;
   private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.13330078125);
@@ -182,8 +182,8 @@ public class TunerConstants {
   private static final Distance kBackLeftYPos = Inches.of(10.375);
 
   // Back Right
-  private static final int kBackRightDriveMotorId = 10;
-  private static final int kBackRightSteerMotorId = 11;
+  private static final int kBackRightDriveMotorId = 5;
+  private static final int kBackRightSteerMotorId = 6;
   private static final int kBackRightEncoderId = 12;
 
   private static final Angle kBackRightEncoderOffset = Rotations.of(0.396484375);
