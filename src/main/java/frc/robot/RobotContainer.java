@@ -89,6 +89,8 @@ public class RobotContainer {
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
+  // Dynamic Drive Speed
+  private final LoggedTunableNumber driveSpeedInput = new LoggedTunableNumber("Drive Speed", 0);
 
   // Alerts
   private final Alert aprilTagLayoutAlert = new Alert("", AlertType.INFO);
@@ -98,7 +100,7 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
-
+    SmartDashboard.putNumber("Drive Speed", 0);
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
@@ -220,29 +222,40 @@ public class RobotContainer {
       driveStickX = driverController::getRightX;
       turnStickX = driverController::getLeftX;
     }
-
+    double speedCap = .25;
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> driveStickY.value() * .15,
-            () -> driveStickX.value() * .15,
-            () -> turnStickX.value() * .15));
+            () -> driveStickY.value() * SmartDashboard.getNumber("Drive Speed", 0),
+            () -> driveStickX.value() * SmartDashboard.getNumber("Drive Speed", 0),
+            () -> turnStickX.value() * SmartDashboard.getNumber("Drive Speed", 0)));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 DriveCommands.robotRelativeDrive(
+    //                     m_drivebase,
+    //                     () -> -driveStickY.value(),
+    //                     () -> -driveStickX.value(),
+    //                     () -> turnStickX.value()),
+    //             m_drivebase));
+
     driverController
         .b()
         .onTrue(
             Commands.runOnce(
                 () ->
-                    DriveCommands.robotRelativeDrive(
-                        m_drivebase,
-                        () -> -driveStickY.value(),
-                        () -> -driveStickX.value(),
-                        () -> turnStickX.value()),
+                    SmartDashboard.putNumber(
+                        "Drive Speed",
+                        (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+                            ? 0
+                            : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
                 m_drivebase));
-
     // Press A button -> BRAKE
     driverController
         .a()
