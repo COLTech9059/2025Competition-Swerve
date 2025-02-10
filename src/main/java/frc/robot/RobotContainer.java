@@ -89,9 +89,7 @@ public class RobotContainer {
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
-  // Dynamic Drive Speed
-  private final LoggedTunableNumber driveSpeedInput = new LoggedTunableNumber("Drive Speed", 0);
-
+  
   // Alerts
   private final Alert aprilTagLayoutAlert = new Alert("", AlertType.INFO);
 
@@ -222,7 +220,7 @@ public class RobotContainer {
       driveStickX = driverController::getRightX;
       turnStickX = driverController::getLeftX;
     }
-    double speedCap = .25;
+
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
@@ -245,6 +243,7 @@ public class RobotContainer {
     //                     () -> turnStickX.value()),
     //             m_drivebase));
 
+    // Press B Button --> INCREASE DRIVE SPEED
     driverController
         .b()
         .onTrue(
@@ -256,10 +255,24 @@ public class RobotContainer {
                             ? 0
                             : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
                 m_drivebase));
-    // Press A button -> BRAKE
-    driverController
+
+  // Press A Button --> REDUCE DRIVE SPEED
+  driverController
         .a()
-        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Drive Speed",
+                        (SmartDashboard.getNumber("Drive Speed", 0) - .1) < 0
+                            ? 1
+                            : (SmartDashboard.getNumber("Drive Speed", 0) - .1)),
+                m_drivebase));
+
+    // Press A button -> BRAKE
+    // driverController
+    //     .a()
+    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
