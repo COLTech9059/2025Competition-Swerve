@@ -72,7 +72,7 @@ public final class Constants {
   //       under strict caveat emptor -- and submit any error and bugfixes
   //       via GitHub issues.
   private static SwerveType swerveType = SwerveType.PHOENIX6; // PHOENIX6, YAGSL
-  private static CTREPro phoenixPro = CTREPro.UNLICENSED; // LICENSED, UNLICENSED
+  private static CTREPro phoenixPro = CTREPro.LICENSED; // LICENSED, UNLICENSED
   private static AutoType autoType = AutoType.PATHPLANNER; // PATHPLANNER, CHOREO
   private static VisionType visionType = VisionType.NONE; // PHOTON, LIMELIGHT, NONE
 

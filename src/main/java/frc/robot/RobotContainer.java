@@ -26,8 +26,6 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
@@ -90,7 +89,7 @@ public class RobotContainer {
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
-
+  
   // Alerts
   private final Alert aprilTagLayoutAlert = new Alert("", AlertType.INFO);
 
@@ -99,7 +98,7 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
-
+    SmartDashboard.putNumber("Drive Speed", 0);
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
@@ -226,42 +225,84 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value(),
-            () -> -driveStickX.value(),
-            () -> -turnStickX.value()));
+            () -> driveStickY.value() * SmartDashboard.getNumber("Drive Speed", 0),
+            () -> driveStickX.value() * SmartDashboard.getNumber("Drive Speed", 0),
+            () -> turnStickX.value() * SmartDashboard.getNumber("Drive Speed", 0)));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 DriveCommands.robotRelativeDrive(
+    //                     m_drivebase,
+    //                     () -> -driveStickY.value(),
+    //                     () -> -driveStickX.value(),
+    //                     () -> turnStickX.value()),
+    //             m_drivebase));
+
+    // Press B Button --> INCREASE DRIVE SPEED
     driverController
         .b()
         .onTrue(
             Commands.runOnce(
                 () ->
-                    DriveCommands.robotRelativeDrive(
-                        m_drivebase,
-                        () -> -driveStickY.value(),
-                        () -> -driveStickX.value(),
-                        () -> turnStickX.value()),
+                    SmartDashboard.putNumber(
+                        "Drive Speed",
+                        (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+                            ? 0
+                            : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
+                m_drivebase));
+
+  // Press A Button --> REDUCE DRIVE SPEED
+  driverController
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Drive Speed",
+                        (SmartDashboard.getNumber("Drive Speed", 0) - .1) < 0
+                            ? 1
+                            : (SmartDashboard.getNumber("Drive Speed", 0) - .1)),
                 m_drivebase));
 
     // Press A button -> BRAKE
-    driverController
-        .a()
-        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    // driverController
+    //     .a()
+    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press Y button --> Manually Re-Zero the Gyro
+    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
     driverController
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        m_drivebase.resetPose(
-                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
-                    m_drivebase)
-                .ignoringDisable(true));
+        .start()
+        .and(driverController.x())
+        .whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
+    driverController
+        .start()
+        .and(driverController.y())
+        .whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
+    driverController
+        .back()
+        .and(driverController.x())
+        .whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
+    driverController
+        .back()
+        .and(driverController.y())
+        .whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
+    // Press Y button --> Manually Re-Zero the Gyro
+    // driverController
+    //     .y()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     m_drivebase.setPose(
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
+    // Rotation2d())),
+    //                 m_drivebase)
+    //             .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     driverController
