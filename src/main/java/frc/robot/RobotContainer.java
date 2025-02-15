@@ -51,6 +51,7 @@ import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -113,13 +114,15 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
+    SmartDashboard.putNumber("Elevator Speed", 0);
+
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         // m_drivebase = new Drive();
-        elevator = new Elevator();
+        elevator = new Elevator(new ElevatorIOSparkTest());
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         // m_vision =
@@ -288,6 +291,29 @@ public class RobotContainer {
       turnStickX = driverController::getLeftX;
     }
 
+    // PRESS B BUTTON --> Increment Elevator speed by 0.1
+    driverController.b().onTrue(Commands.runOnce(
+      () ->
+          SmartDashboard.putNumber(
+              "Elevator Speed",
+              (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
+                  ? 0
+                  : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
+      elevator));
+
+      // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
+      driverController.a().onTrue(Commands.runOnce(
+        () ->
+            SmartDashboard.putNumber(
+                "Elevator Speed",
+                (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < 0
+                    ? 1
+                    : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
+        elevator));
+      
+      // PRESS X BUTTON --> Run the single motor speed test for the elevator
+      driverController.x().onTrue(ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     // m_drivebase.setDefaultCommand(
     //     DriveCommands.fieldRelativeDrive(
@@ -352,6 +378,8 @@ public class RobotContainer {
     //             () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
     //             m_flywheel::stop,
     //             m_flywheel));
+
+
   }
 
   /**

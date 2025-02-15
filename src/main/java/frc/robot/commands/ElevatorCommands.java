@@ -117,4 +117,12 @@ public class ElevatorCommands {
     }, 
     elevator);
   }
+
+  public static Command oneTest(Elevator elevator, double speed, double time) {
+    return Commands.sequence(
+      Commands.runOnce( () -> elevator.runMotor(speed), elevator),
+      Commands.waitSeconds(time),
+      Commands.runOnce( () -> elevator.stop(), elevator)
+    );
+  }
 }
