@@ -83,8 +83,9 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator m_PoseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
-  private StructPublisher<Pose2d> publisher = 
-    NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+  private StructPublisher<Pose2d> publisher =
+      NetworkTableInstance.getDefault().getStructTopic("Robot Pose", Pose2d.struct).publish();
+
   // Constructor
   public Drive() {
 

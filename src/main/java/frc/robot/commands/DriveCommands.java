@@ -53,6 +53,13 @@ public class DriveCommands {
 
   private DriveCommands() {}
 
+  public static Command setRotation(Drive drive, double rotationRate, double time) {
+    return Commands.sequence(
+        Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds(0, 0, rotationRate)), drive),
+        Commands.waitSeconds(time),
+        Commands.runOnce(() -> drive.runVelocity(new ChassisSpeeds()), drive));
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */

@@ -26,6 +26,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -89,7 +90,7 @@ public class RobotContainer {
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
-  
+
   // Alerts
   private final Alert aprilTagLayoutAlert = new Alert("", AlertType.INFO);
 
@@ -153,6 +154,11 @@ public class RobotContainer {
     // ``m_drivebase``, as that is automatically monitored.
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
+    // Define Auto commands
+    defineAutoCommands();
+
+    SmartDashboard.putData(m_drivebase);
+
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
@@ -185,8 +191,6 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
-    // Define Auto commands
-    defineAutoCommands();
     // Define SysIs Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
@@ -197,6 +201,8 @@ public class RobotContainer {
   private void defineAutoCommands() {
 
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    NamedCommands.registerCommand(
+        "Set Rotation", DriveCommands.setRotation(m_drivebase, Math.PI*2, 2));
   }
 
   /**
@@ -256,8 +262,8 @@ public class RobotContainer {
                             : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
                 m_drivebase));
 
-  // Press A Button --> REDUCE DRIVE SPEED
-  driverController
+    // Press A Button --> REDUCE DRIVE SPEED
+    driverController
         .a()
         .onTrue(
             Commands.runOnce(
@@ -276,10 +282,11 @@ public class RobotContainer {
 
     // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-    driverController
-        .start()
-        .and(driverController.x())
-        .whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
+    driverController.x().onTrue(DriveCommands.setRotation(m_drivebase, .5 * Math.PI, 2));
+    // driverController
+    //     .start()
+    //     .and(driverController.x())
+    //     .whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
     driverController
         .start()
         .and(driverController.y())

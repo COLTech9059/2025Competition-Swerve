@@ -64,7 +64,6 @@ public class TunerConstants {
   // This needs to be tuned to your individual robot
   private static final Current kSlipCurrent = Amps.of(120.0);
 
-
   // RAMP RATES!!!!
   private static final ClosedLoopRampsConfigs steerRampConfigs =
       new ClosedLoopRampsConfigs().withVoltageClosedLoopRampPeriod(0.05); // .05
