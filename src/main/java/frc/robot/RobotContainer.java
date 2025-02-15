@@ -27,6 +27,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -157,7 +158,9 @@ public class RobotContainer {
     // Define Auto commands
     defineAutoCommands();
 
+    // Push subsystems to the dashboard
     SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData((Sendable) m_drivebase.getGyro());
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -202,7 +205,7 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
     NamedCommands.registerCommand(
-        "Set Rotation", DriveCommands.setRotation(m_drivebase, Math.PI*2, 2));
+        "Set Rotation", DriveCommands.setRotation(m_drivebase, Math.PI * 2, 2));
   }
 
   /**
