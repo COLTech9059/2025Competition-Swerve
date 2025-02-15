@@ -81,14 +81,14 @@ public class RobotContainer {
 
   /** Declare the robot subsystems here ************************************ */
   // These are the "Active Subsystems" that the robot controls
-  private final Drive m_drivebase;
+  // private final Drive m_drivebase;
   private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final LEDs led;
   
   // These are "Virtual Subsystems" that report information but have no motors
-  private final Accelerometer m_accel;
-  private final Vision m_vision;
+  // private final Accelerometer m_accel;
+  // private final Vision m_vision;
   private final PowerMonitoring m_power;
 
   /** Dashboard inputs ***************************************************** */
@@ -96,7 +96,7 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
   private final AutoChooser autoChooserChoreo;
-  private final AutoFactory autoFactoryChoreo;
+  // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
       new LoggedTunableNumber("Battery Amp-Hours", 18.0);
@@ -118,52 +118,52 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
-        m_drivebase = new Drive();
+        // m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
-        m_vision =
-            switch (Constants.getVisionType()) {
-              case PHOTON ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement,
-                      new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                      new VisionIOPhotonVision(camera1Name, robotToCamera1));
-              case LIMELIGHT ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement,
-                      new VisionIOLimelight(camera0Name, m_drivebase::getRotation),
-                      new VisionIOLimelight(camera1Name, m_drivebase::getRotation));
-              case NONE ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-              default -> null;
-            };
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     switch (Constants.getVisionType()) {
+        //       case PHOTON ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement,
+        //               new VisionIOPhotonVision(camera0Name, robotToCamera0),
+        //               new VisionIOPhotonVision(camera1Name, robotToCamera1));
+        //       case LIMELIGHT ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement,
+        //               new VisionIOLimelight(camera0Name, m_drivebase::getRotation),
+        //               new VisionIOLimelight(camera1Name, m_drivebase::getRotation));
+        //       case NONE ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        //       default -> null;
+        //     };
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        m_drivebase = new Drive();
+        // m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
-        m_vision =
-            new Vision(
-                m_drivebase::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     new Vision(
+        //         m_drivebase::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
+        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
       default:
         // Replayed robot, disable IO implementations
-        m_drivebase = new Drive();
+        // m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIO() {});
-        m_vision =
-            new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
     }
 
@@ -176,10 +176,10 @@ public class RobotContainer {
     defineAutoCommands();
 
     // Push Subsystems to Dashboard
-    SmartDashboard.putData(m_drivebase);
-    SmartDashboard.putData((Sendable) m_drivebase.getGyro());
+    // SmartDashboard.putData(m_drivebase);
+    // SmartDashboard.putData((Sendable) m_drivebase.getGyro());
     SmartDashboard.putData(elevator);
-    SmartDashboard.putData(led);
+    // SmartDashboard.putData(led);
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -188,19 +188,19 @@ public class RobotContainer {
             new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
-        autoFactoryChoreo = null;
+        // autoFactoryChoreo = null;
         break;
 
       case CHOREO:
-        autoFactoryChoreo =
-            new AutoFactory(
-                m_drivebase::getPose, // A function that returns the current robot pose
-                m_drivebase::resetOdometry, // A function that resets the current robot pose to the
-                // provided Pose2d
-                m_drivebase::followTrajectory, // The drive subsystem trajectory follower
-                true, // If alliance flipping should be enabled
-                m_drivebase // The drive subsystem
-                );
+        // autoFactoryChoreo =
+        //     new AutoFactory(
+        //         m_drivebase::getPose, // A function that returns the current robot pose
+        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to the
+        //         // provided Pose2d
+        //         m_drivebase::followTrajectory, // The drive subsystem trajectory follower
+        //         true, // If alliance flipping should be enabled
+        //         m_drivebase // The drive subsystem
+        //         );
         autoChooserChoreo = new AutoChooser();
         // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
@@ -313,36 +313,36 @@ public class RobotContainer {
     //             m_drivebase));
 
     // Press B Button --> INCREASE DRIVE SPEED
-    driverController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    SmartDashboard.putNumber(
-                        "Drive Speed",
-                        (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
-                            ? 0
-                            : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
-                m_drivebase));
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 SmartDashboard.putNumber(
+    //                     "Drive Speed",
+    //                     (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+    //                         ? 0
+    //                         : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
+    //             m_drivebase));
 
     // Press A button -> BRAKE
-    driverController
-        .a()
-        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    // driverController
+    //     .a()
+    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
-    // Press X button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+    // // Press X button --> Stop with wheels in X-Lock position
+    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press Y button --> Manually Re-Zero the Gyro
-    driverController
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        m_drivebase.resetPose(
-                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
-                    m_drivebase)
-                .ignoringDisable(true));
+    // driverController
+    //     .y()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     m_drivebase.resetPose(
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+    //                 m_drivebase)
+    //             .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     // driverController
