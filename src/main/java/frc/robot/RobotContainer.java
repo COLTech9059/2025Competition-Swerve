@@ -31,6 +31,10 @@ import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import com.pathplanner.lib.events.EventTrigger;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -83,6 +87,7 @@ public class RobotContainer {
   private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final LEDs led;
+  private final Drive m_drivebase;
   // These are "Virtual Subsystems" that report information but have no motors
   // private final Accelerometer m_accel;
   // private final Vision m_vision;
@@ -115,7 +120,7 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
-        // m_drivebase = new Drive();
+        m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
@@ -141,7 +146,7 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        // m_drivebase = new Drive();
+        m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
@@ -154,7 +159,7 @@ public class RobotContainer {
         break;
       default:
         // Replayed robot, disable IO implementations
-        // m_drivebase = new Drive();
+        m_drivebase = new Drive();
         elevator = new Elevator();
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIO() {});
@@ -201,9 +206,7 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
-    // Define Auto commands
-    defineAutoCommands();
-    // Define SysIs Routines
+    // Define SysId Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
     configureBindings();
@@ -214,6 +217,26 @@ public class RobotContainer {
 
     // Register Named Commands for use in PathPlanner autos
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+
+    NamedCommands.registerCommand(
+        "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+
+    // Register Event Triggers for use in PathPlanner paths
+    new EventTrigger("Collect Coral")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+
+    new EventTrigger("L3 Score")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+
+    new EventTrigger("Collect Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+
+    new EventTrigger("Score Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
 
     NamedCommands.registerCommand(
         "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
@@ -282,58 +305,37 @@ public class RobotContainer {
     //                     () -> turnStickX.value()),
     //             m_drivebase));
 
+    // Press B Button --> INCREASE DRIVE SPEED
+    driverController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Drive Speed",
+                        (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+                            ? 0
+                            : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
+                m_drivebase));
+
     // Press A button -> BRAKE
-    // driverController
-    //     .a()
-    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    driverController
+        .a()
+        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
-    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // SysID logging.
-    // driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
-    // driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
-    // driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
-    // driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
-    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you
-    // don't want it.)
-    driverController
-        .rightTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
-    driverController
-        .leftTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
-    // Press RIGHT BUMPER --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
-
-    // Press LEFT BUMPER --> Move elevator down one level
-    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
-
-    // Press LEFT TRIGGER --> intake Coral
-    operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
-
-    // Press RIGHT TRIGGER --> outtake Coral
-    operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
-
-    // Press B button --> intake Algae
-    operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
-
-    // Press A button --> outtake Algae
-    operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
-
-    // Press X button --> level 3 Coral score
-    operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
+    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press Y button --> Manually Re-Zero the Gyro
-    // driverController
-    //     .y()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     m_drivebase.resetPose(
-    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
-    //                 m_drivebase)
-    //             .ignoringDisable(true));
+    driverController
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        m_drivebase.resetPose(
+                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+                    m_drivebase)
+                .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     // driverController
