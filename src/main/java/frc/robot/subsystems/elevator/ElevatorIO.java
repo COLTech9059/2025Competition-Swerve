@@ -36,5 +36,7 @@ public class ElevatorIO {
 
   public void stopAlgae() {}
 
+  public void runToSensor(double speed) {}
+
   public void periodicUpdates() {}
 }

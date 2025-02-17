@@ -88,6 +88,14 @@ public class Elevator extends RBSISubsystem {
     io.runMotor(speed);
   }
 
+  public void setVoltage(double volts) {
+    io.setVoltage(volts);
+  }
+
+  public void runToSensor(double speed) {
+    io.runToSensor(speed);
+  }
+
   @Override
   public void periodic() {
     io.periodicUpdates();

@@ -6,6 +6,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
@@ -15,6 +17,9 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   private RelativeEncoder eEncoder = eMotor.getEncoder();
   private SparkMaxConfig eConfig = new SparkMaxConfig();
+
+  // Define limit switch objects
+  private DigitalInput testSwitch = new DigitalInput(0);
 
   @Override
   public void configureMotors() {
@@ -34,6 +39,12 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   @Override
   public void setVoltage(double volts) {
     eMotor.setVoltage(volts);
+  }
+
+  @Override
+  public void runToSensor(double speed) {
+    eMotor.set(speed);
+    if (testSwitch.get()) eMotor.stopMotor();
   }
 
   @Override
