@@ -109,20 +109,24 @@ public class ElevatorCommands {
         elevator);
   }
 
-   // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't want it.)
-   public static Command moveElevator(Elevator elevator, double speed){
+  // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
+  // want it.)
+  public static Command moveElevator(Elevator elevator, double speed) {
     return Commands.run(
-      () -> {
-      elevator.runMotor(speed);
-    }, 
-    elevator);
+        () -> {
+          elevator.runMotor(speed);
+        },
+        elevator);
   }
 
   public static Command oneTest(Elevator elevator, double speed, double time) {
     return Commands.sequence(
-      Commands.runOnce( () -> elevator.runMotor(speed), elevator),
-      Commands.waitSeconds(time),
-      Commands.runOnce( () -> elevator.stop(), elevator)
-    );
+        Commands.runOnce(() -> elevator.runMotor(speed), elevator),
+        Commands.waitSeconds(time),
+        Commands.runOnce(() -> elevator.stop(), elevator));
+  }
+
+  public static Command runWithoutStop(Elevator elevator, double speed) {
+    return Commands.runOnce(() -> elevator.runMotor(speed), elevator);
   }
 }

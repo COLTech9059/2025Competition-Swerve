@@ -10,14 +10,14 @@ public class Elevator extends RBSISubsystem {
 
   private final ElevatorIO io;
 
-  public Elevator() {
-    io = new ElevatorIOSpark();
-    io.configureMotors();
-  }
+  // public Elevator() {
+  //   io = new ElevatorIOSpark();
+  //   io.configureMotors();
+  // }
 
   public Elevator(ElevatorIO io) {
-    io.configureMotors();
     this.io = io;
+    this.io.configureMotors();
   }
 
   /** Moves the elevator to the indicated "level" at the given speed */
@@ -30,7 +30,10 @@ public class Elevator extends RBSISubsystem {
     return io.getLevel();
   }
 
-  /** This method will return the "level" corresponding to whatever sensor is active. If no sensor is detecting, it will return a -1 */
+  /**
+   * This method will return the "level" corresponding to whatever sensor is active. If no sensor is
+   * detecting, it will return a -1
+   */
   public int getExactLevel() {
     return io.getExactLevel();
   }
@@ -83,5 +86,10 @@ public class Elevator extends RBSISubsystem {
 
   public void runMotor(double speed) {
     io.runMotor(speed);
+  }
+
+  @Override
+  public void periodic() {
+    io.periodicUpdates();
   }
 }

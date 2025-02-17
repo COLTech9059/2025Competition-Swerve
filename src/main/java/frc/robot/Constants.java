@@ -98,7 +98,7 @@ public final class Constants {
   /** General Constants **************************************************** */
 
   // Device ID Constants
-  public static final int eMotorID = 14;
+  public static final int eMotorID = 2;
 
   public static final int eMotor2ID = 15;
   public static final int intakeID = 16;

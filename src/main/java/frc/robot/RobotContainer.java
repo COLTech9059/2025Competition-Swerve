@@ -22,45 +22,24 @@ package frc.robot;
 import static frc.robot.Constants.Cameras.*;
 
 import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.util.sendable.Sendable;
-
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
-import frc.robot.subsystems.accelerometer.Accelerometer;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
 import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.GetJoystickValue;
@@ -68,7 +47,6 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -84,9 +62,10 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   // private final Drive m_drivebase;
   private final Elevator elevator;
+
   private final Flywheel m_flywheel;
   private final LEDs led;
-  
+
   // These are "Virtual Subsystems" that report information but have no motors
   // private final Accelerometer m_accel;
   // private final Vision m_vision;
@@ -94,9 +73,10 @@ public class RobotContainer {
 
   /** Dashboard inputs ***************************************************** */
   // AutoChoosers for both supported path planning types
-  private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
+  // private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
   private final AutoChooser autoChooserChoreo;
+
   // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
@@ -148,7 +128,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         // m_drivebase = new Drive();
-        elevator = new Elevator();
+        elevator = new Elevator(new ElevatorIOSparkTest());
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         // m_vision =
@@ -161,7 +141,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         // m_drivebase = new Drive();
-        elevator = new Elevator();
+        elevator = new Elevator(new ElevatorIOSparkTest());
         led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         // m_vision =
@@ -187,8 +167,8 @@ public class RobotContainer {
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
-        autoChooserPathPlanner =
-            new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        // autoChooserPathPlanner = null;
+        // new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
         // autoFactoryChoreo = null;
@@ -198,7 +178,8 @@ public class RobotContainer {
         // autoFactoryChoreo =
         //     new AutoFactory(
         //         m_drivebase::getPose, // A function that returns the current robot pose
-        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to the
+        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to
+        // the
         //         // provided Pose2d
         //         m_drivebase::followTrajectory, // The drive subsystem trajectory follower
         //         true, // If alliance flipping should be enabled
@@ -207,7 +188,7 @@ public class RobotContainer {
         autoChooserChoreo = new AutoChooser();
         // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
-        autoChooserPathPlanner = null;
+        // autoChooserPathPlanner = null;
         break;
 
       default:
@@ -291,28 +272,43 @@ public class RobotContainer {
       turnStickX = driverController::getLeftX;
     }
 
-    // PRESS B BUTTON --> Increment Elevator speed by 0.1
-    driverController.b().onTrue(Commands.runOnce(
-      () ->
-          SmartDashboard.putNumber(
-              "Elevator Speed",
-              (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
-                  ? 0
-                  : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
-      elevator));
+    driverController
+        .y()
+        .onTrue(
+            ElevatorCommands.runWithoutStop(
+                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2)));
 
-      // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
-      driverController.a().onTrue(Commands.runOnce(
-        () ->
-            SmartDashboard.putNumber(
-                "Elevator Speed",
-                (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < 0
-                    ? 1
-                    : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
-        elevator));
-      
-      // PRESS X BUTTON --> Run the single motor speed test for the elevator
-      driverController.x().onTrue(ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+    // PRESS B BUTTON --> Increment Elevator speed by 0.1
+    driverController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
+                            ? -1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
+                elevator));
+
+    // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
+    driverController
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < -1
+                            ? 1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
+                elevator));
+
+    // PRESS X BUTTON --> Run the single motor speed test for the elevator
+    driverController
+        .x()
+        .onTrue(
+            ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
 
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     // m_drivebase.setDefaultCommand(
@@ -366,7 +362,8 @@ public class RobotContainer {
     //         Commands.runOnce(
     //                 () ->
     //                     m_drivebase.resetPose(
-    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
+    // Rotation2d())),
     //                 m_drivebase)
     //             .ignoringDisable(true));
 
@@ -379,7 +376,6 @@ public class RobotContainer {
     //             m_flywheel::stop,
     //             m_flywheel));
 
-
   }
 
   /**
@@ -387,10 +383,10 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommandPathPlanner() {
-    // Use the ``autoChooser`` to define your auto path from the SmartDashboard
-    return autoChooserPathPlanner.get();
-  }
+  // public Command getAutonomousCommandPathPlanner() {
+  // Use the ``autoChooser`` to define your auto path from the SmartDashboard
+  // return autoChooserPathPlanner.get();
+  // }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -451,18 +447,18 @@ public class RobotContainer {
       //     m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
       // Example Flywheel SysId Characterization
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Forward)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Reverse)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Forward)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Reverse)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Quasistatic Forward)",
+      //     m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Quasistatic Reverse)",
+      //     m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Dynamic Forward)",
+      //     m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Dynamic Reverse)",
+      //     m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
   }
 
@@ -472,27 +468,27 @@ public class RobotContainer {
    * <p>NOTE: This would normally be in a spearate file.
    */
   // private AutoRoutine twoPieceAuto() {
-    // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
+  // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-    // Load the routine's trajectories
-    // AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
-    // AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+  // Load the routine's trajectories
+  // AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
+  // AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
 
-    // When the routine begins, reset odometry and start the first trajectory
-    // routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
+  // When the routine begins, reset odometry and start the first trajectory
+  // routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
 
-    // Starting at the event marker named "intake", run the intake
-    // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
+  // Starting at the event marker named "intake", run the intake
+  // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
 
-    // When the trajectory is done, start the next trajectory
-    // pickupTraj.done().onTrue(scoreTraj.cmd());
+  // When the trajectory is done, start the next trajectory
+  // pickupTraj.done().onTrue(scoreTraj.cmd());
 
-    // While the trajectory is active, prepare the scoring subsystem
-    // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
+  // While the trajectory is active, prepare the scoring subsystem
+  // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
 
-    // When the trajectory is done, score
-    // scoreTraj.done().onTrue(scoringSubsystem.score());
+  // When the trajectory is done, score
+  // scoreTraj.done().onTrue(scoringSubsystem.score());
 
-    // return routine;
+  // return routine;
   // }
 }

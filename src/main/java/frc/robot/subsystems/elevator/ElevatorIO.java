@@ -1,6 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-public class ElevatorIO extends Elevator {
+public class ElevatorIO {
 
   public void configureMotors() {}
 
@@ -33,4 +33,6 @@ public class ElevatorIO extends Elevator {
   public void timedAlgae(double speed, double time) {}
 
   public void stopAlgae() {}
+
+  public void periodicUpdates() {}
 }

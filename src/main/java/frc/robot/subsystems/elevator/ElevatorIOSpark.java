@@ -69,7 +69,7 @@ public class ElevatorIOSpark extends ElevatorIO {
     } else {
 
       if (getLevel() > level) {
-        
+
         if (!stage2Switch.get()) {
           eMotor.stopMotor();
           eMotor2.set(-speed);
@@ -125,7 +125,10 @@ public class ElevatorIOSpark extends ElevatorIO {
     return levelTracker;
   }
 
-  /** This method will return the "level" corresponding to whatever sensor is active. If no sensor is detecting, it will return a -1 */
+  /**
+   * This method will return the "level" corresponding to whatever sensor is active. If no sensor is
+   * detecting, it will return a -1
+   */
   @Override
   public int getExactLevel() {
     if (l0Switch.get()) return 0;
@@ -194,7 +197,7 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Updates encoder values according to elevator level
   @Override
-  public void periodic() {
+  public void periodicUpdates() {
     if (getLevel() == 1) setEncoders(Constants.level1);
     if (getLevel() == 2) setEncoders(Constants.level2);
     if (getLevel() == 3) setEncoders(Constants.level3);
