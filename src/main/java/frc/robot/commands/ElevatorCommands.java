@@ -109,24 +109,39 @@ public class ElevatorCommands {
         elevator);
   }
 
-  // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
-  // want it.)
-  public static Command moveElevator(Elevator elevator, double speed) {
-    return Commands.run(
-        () -> {
-          elevator.runMotor(speed);
-        },
-        elevator);
-  }
-
+  /**
+   * Run a timed test of the first stage motor
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @param time The time in seconds to run the motor
+   * @return The relevant code statements as a Command object
+   */
   public static Command oneTest(Elevator elevator, double speed, double time) {
     return Commands.sequence(
-        Commands.runOnce(() -> elevator.runMotor(speed), elevator),
+        Commands.runOnce( () -> elevator.runMotor(speed), elevator),
         Commands.waitSeconds(time),
-        Commands.runOnce(() -> elevator.stop(), elevator));
+        Commands.runOnce(elevator::stop, elevator));
   }
 
+  /**
+   * Set the first stage motor to run without stopping
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @return The relevant code statements as a Command object
+   */
   public static Command runWithoutStop(Elevator elevator, double speed) {
-    return Commands.runOnce(() -> elevator.runMotor(speed), elevator);
+    return Commands.runOnce( () -> elevator.runMotor(speed), elevator);
+  }
+
+  /**
+   * Stop the movement of the elevator, unconditionally
+   * 
+   * @param elevator The elevator subsystem
+   * @return The relevant code statements as a Command object
+   */
+  public static Command stopElevator(Elevator elevator) {
+    return Commands.runOnce(elevator::stop, elevator);
   }
 }
