@@ -126,4 +126,15 @@ public class ElevatorCommands {
   public static Command stopElevator(Elevator elevator) {
     return Commands.runOnce(elevator::stop, elevator);
   }
+
+  /**
+   * Runs the stage one motor until a sensor is triggered
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @return The relevant code statements as a Command object
+   */
+  public static Command runToSensor(Elevator elevator, double speed) {
+    return Commands.run( ()-> elevator.runToSensor(speed), elevator);
+  }
 }
