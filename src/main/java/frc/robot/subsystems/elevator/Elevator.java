@@ -15,8 +15,6 @@ public class Elevator extends RBSISubsystem {
     this.io.configureMotors();
   }
 
-  
-
   /** Moves the elevator to the indicated "level" at the given speed */
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);

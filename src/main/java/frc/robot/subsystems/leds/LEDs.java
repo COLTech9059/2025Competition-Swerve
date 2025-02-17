@@ -3,7 +3,7 @@ package frc.robot.subsystems.leds;
 import frc.robot.util.RBSISubsystem;
 
 public class LEDs extends RBSISubsystem {
-  
+
   private final LEDsIO io;
 
   public LEDs(LEDsIO io) {

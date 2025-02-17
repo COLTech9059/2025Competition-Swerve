@@ -21,45 +21,20 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
-import frc.robot.subsystems.accelerometer.Accelerometer;
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
 import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsIOBlinkin;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.GetJoystickValue;
@@ -67,7 +42,6 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -85,6 +59,7 @@ public class RobotContainer {
 
   // private final Elevator elevator;
   private final Flywheel m_flywheel;
+
   private final LEDs led;
   private final LEDRoutine routine1;
   // These are "Virtual Subsystems" that report information but have no motors
@@ -94,13 +69,14 @@ public class RobotContainer {
 
   /** Dashboard inputs ***************************************************** */
   // AutoChoosers for both supported path planning types
-  private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
+  // private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
-  private final AutoChooser autoChooserChoreo;
+  // private final AutoChooser autoChooserChoreo;
   // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
       new LoggedTunableNumber("Battery Amp-Hours", 18.0);
+
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
@@ -176,10 +152,10 @@ public class RobotContainer {
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
-        autoChooserPathPlanner =
-            new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+        // autoChooserPathPlanner =
+        // new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
-        autoChooserChoreo = null;
+        // autoChooserChoreo = null;
         // autoFactoryChoreo = null;
         break;
 
@@ -187,16 +163,17 @@ public class RobotContainer {
         // autoFactoryChoreo =
         //     new AutoFactory(
         //         m_drivebase::getPose, // A function that returns the current robot pose
-        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to the
+        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to
+        // the
         //         // provided Pose2d
         //         m_drivebase::followTrajectory, // The drive subsystem trajectory follower
         //         true, // If alliance flipping should be enabled
         //         m_drivebase // The drive subsystem
         //         );
-        autoChooserChoreo = new AutoChooser();
+        // autoChooserChoreo = new AutoChooser();
         // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
-        autoChooserPathPlanner = null;
+        // autoChooserPathPlanner = null;
         break;
 
       default:
@@ -205,7 +182,11 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
-    routine1 = new LEDRoutine(led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
+    routine1 =
+        new LEDRoutine(
+            led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
+
+    SmartDashboard.putData(led);
 
     // Define Auto commands
     defineAutoCommands();
@@ -222,7 +203,7 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
     // NamedCommands.registerCommand(
-        // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+    // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
     // new EventTrigger("Collect Coral")
@@ -236,10 +217,12 @@ public class RobotContainer {
     //             () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
 
     // new EventTrigger("Collect Algae")
-    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5),
+    // elevator));
 
     // new EventTrigger("Score Algae")
-    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5),
+    // elevator));
   }
 
   /**
@@ -272,11 +255,11 @@ public class RobotContainer {
     //         () -> -driveStickX.value() / 4,
     //         () -> -turnStickX.value()));
 
-    led.setDefaultCommand(LEDCommands.randomColor(led));
+    // led.setDefaultCommand(LEDCommands.randomColor(led));
 
     driverController.b().onTrue(LEDCommands.randomColor(led));
 
-    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, (int) Math.random() * 4));
+    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
 
     driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
@@ -311,10 +294,12 @@ public class RobotContainer {
     // don't want it.)
     // driverController
     //     .rightTrigger()
-    //     .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
+    //     .whileTrue(ElevatorCommands.moveElevator(elevator,
+    // driverController.getRightTriggerAxis()));
     // driverController
     //     .leftTrigger()
-    // //     .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
+    // //     .whileTrue(ElevatorCommands.moveElevator(elevator,
+    // -driverController.getLeftTriggerAxis()));
     // // Press RIGHT BUMPER --> Move elevator up one level
     // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
 
@@ -343,7 +328,8 @@ public class RobotContainer {
     //         Commands.runOnce(
     //                 () ->
     //                     m_drivebase.resetPose(
-    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
+    // Rotation2d())),
     //                 m_drivebase)
     //             .ignoringDisable(true));
 
@@ -357,15 +343,20 @@ public class RobotContainer {
     //             m_flywheel));
   }
 
+  public void randomizeLEDOnStartup() {
+    // Commands.runOnce(() -> LEDCommands.randomColor(led), led);
+    CommandScheduler.getInstance().schedule(LEDCommands.randomColor(led));
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommandPathPlanner() {
-    // Use the ``autoChooser`` to define your auto path from the SmartDashboard
-    return autoChooserPathPlanner.get();
-  }
+  // public Command getAutonomousCommandPathPlanner() {
+  // Use the ``autoChooser`` to define your auto path from the SmartDashboard
+  // return autoChooserPathPlanner.get();
+  // }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -374,10 +365,10 @@ public class RobotContainer {
    */
   public void getAutonomousCommandChoreo() {
     // Put the auto chooser on the dashboard
-    SmartDashboard.putData(autoChooserChoreo);
+    // SmartDashboard.putData(autoChooserChoreo);
 
     // Schedule the selected auto during the autonomous period
-    RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
+    // RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
   }
 
   /** Set the motor neutral mode to BRAKE / COAST for T/F */
@@ -426,18 +417,18 @@ public class RobotContainer {
       //     m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
       // Example Flywheel SysId Characterization
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Forward)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Quasistatic Reverse)",
-          m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Forward)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Flywheel SysId (Dynamic Reverse)",
-          m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Quasistatic Forward)",
+      //     m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Quasistatic Reverse)",
+      //     m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Dynamic Forward)",
+      //     m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Flywheel SysId (Dynamic Reverse)",
+      //     m_flywheel.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     }
   }
 

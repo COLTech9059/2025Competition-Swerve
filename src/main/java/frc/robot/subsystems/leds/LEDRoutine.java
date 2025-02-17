@@ -14,7 +14,8 @@ public class LEDRoutine {
    *
    * @param led the LED subsystem
    * @param delay the delay (in seconds) between pattern changes
-   * @param ids an array of integers representing the patterns from the REV Blinkin chart that you want to use
+   * @param ids an array of integers representing the patterns from the REV Blinkin chart that you
+   *     want to use
    */
   public LEDRoutine(LEDs led, int[] ids) {
     this.led = led;
@@ -23,6 +24,22 @@ public class LEDRoutine {
     for (int i = 0; i < ids.length; i++) {
       double num = -1.01 + ids[i] * 0.02;
       powers.add(num);
+    }
+  }
+
+  /**
+   * Custom class to store an LED routine. Powers start at -0.99, and count up by 0.02
+   *
+   * @param led The LED subsystem
+   * @param delay The delay (in seconds) between pattern changes
+   * @param powers An array of doubles representing the patterns from the REV Blinkin chart that you
+   *     want to use
+   */
+  public LEDRoutine(LEDs led, double[] powers) {
+    this.led = led;
+
+    for (int i = 0; i < powers.length; i++) {
+      this.powers.add(powers[i]);
     }
   }
 

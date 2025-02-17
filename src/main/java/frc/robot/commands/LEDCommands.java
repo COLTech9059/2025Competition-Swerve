@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -15,11 +16,7 @@ public class LEDCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command randomColor(LEDs led) {
-    return Commands.runOnce(
-        () -> {
-          led.shiftColor((int) (Math.random() * 21));
-        },
-        led);
+    return Commands.runOnce(() -> led.shiftColor((int) (Math.random() * 21) + 1), led);
   }
 
   /**
@@ -44,46 +41,25 @@ public class LEDCommands {
    * @param routine the ID of the routine you want (pulled from a switch case)
    * @return the relevant code statements as a Command object
    */
-  public static Command teamColorRoutine(LEDs led, int routine) {
-    return Commands.run(
-        () -> {
-          Timer time = new Timer();
-          time.start();
-          switch (routine) {
-            case 1:
-              time.reset();
-              if (time.get() < 2) led.setValue(0.37);
-              if (time.get() > 2 && time.get() < 4) led.setValue(0.39);
-              if (time.get() > 4 && time.get() < 6) led.setValue(0.41);
-              if (time.get() > 6 && time.get() < 8) led.setValue(0.45);
-              if (time.get() > 8 && time.get() < 10) led.setValue(0.51);
-              if (time.get() > 10 && time.get() < 12) led.setValue(0.53);
-              if (time.get() > 12 && time.get() < 14) led.setValue(0.55);
-              if (time.get() > 14) time.reset();
-              break;
-            case 2:
-              time.reset();
-              if (time.get() < 5) led.setValue(0.37);
-              if (time.get() > 5 && time.get() < 10) led.setValue(0.39);
-              if (time.get() > 10) time.reset();
-              break;
-            case 3:
-              time.reset();
-              if (time.get() < 4) led.setValue(0.45);
-              if (time.get() > 4 && time.get() < 8) led.setValue(0.41);
-              if (time.get() > 8 && time.get() < 12) led.setValue(0.47);
-              if (time.get() > 12) time.reset();
-              break;
-            case 4:
-              time.reset();
-              if (time.get() < 3) led.setValue(0.53);
-              if (time.get() > 3 && time.get() < 6) led.setValue(0.55);
-              if (time.get() > 6 && time.get() < 9) led.setValue(0.41);
-              if (time.get() > 9 && time.get() < 12) led.setValue(0.45);
-              if (time.get() > 12) time.reset();
-          }
-        },
-        led);
+  public static Command teamColorRoutine(LEDs led, int routineID) {
+    LEDRoutine routine;
+
+    switch (routineID) {
+      case 1:
+        routine = new LEDRoutine(led, new double[] {0.37, 0.39, 0.41, 0.45, 0.51, 0.53, 0.55});
+        return runRoutine(led, routine, 2);
+      case 2:
+        routine = new LEDRoutine(led, new double[] {0.37, 0.39});
+        return runRoutine(led, routine, 5);
+      case 3:
+        routine = new LEDRoutine(led, new double[] {0.45, 0.41, 0.47});
+        return runRoutine(led, routine, 4);
+      case 4:
+        routine = new LEDRoutine(led, new double[] {0.53, 0.55, 0.41, 0.45});
+        return runRoutine(led, routine, 3);
+      default:
+        return Commands.runOnce(() -> DriverStation.reportWarning("No LED sequence ran", false));
+    }
   }
 
   /**
@@ -113,7 +89,7 @@ public class LEDCommands {
 
   /**
    * Runs the pattern of an LEDRoutine object with a delay between pattern cycles
-   * 
+   *
    * @param led The LED subsystem
    * @param routine The LEDRoutine to run
    * @param delay The delay between pattern changes
