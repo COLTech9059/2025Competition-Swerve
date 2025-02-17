@@ -32,6 +32,11 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
+  public void setVoltage(double volts) {
+    eMotor.setVoltage(volts);
+  }
+
+  @Override
   public void stop() {
     DriverStation.reportWarning("Stopping Elevator Motor.", false);
     eMotor.stopMotor();

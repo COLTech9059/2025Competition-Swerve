@@ -17,6 +17,8 @@ public class ElevatorIO {
   // TEMPORARY; comment out or delete when done with use.
   public void runMotor(double speed) {}
 
+  public void setVoltage(double volts) {}
+
   public void stop() {}
 
   public void activeIntake(double speed) {}
