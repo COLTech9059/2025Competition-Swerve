@@ -124,7 +124,7 @@ public class LEDsIOBlinkin extends LEDsIO {
 
   @Override
   public void shiftColor(int shift) {
-    int colorDouble = shift;
+    double colorDouble = shift;
     while (colorDouble >= 21) {
       colorDouble -= 21;
     }
