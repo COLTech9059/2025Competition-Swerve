@@ -111,10 +111,21 @@ public class LEDCommands {
         led);
   }
 
+  /**
+   * Runs the pattern of an LEDRoutine object with a delay between pattern cycles
+   * 
+   * @param led The LED subsystem
+   * @param routine The LEDRoutine to run
+   * @param delay The delay between pattern changes
+   * @return The relevant code statements as a Command object
+   */
   public static Command runRoutine(LEDs led, LEDRoutine routine, double delay) {
+    Timer time = new Timer();
+    time.reset();
+    time.start();
+
     return Commands.run(
         () -> {
-          Timer time = new Timer();
           if (time.get() >= delay) {
             routine.iterate(0);
             time.reset();

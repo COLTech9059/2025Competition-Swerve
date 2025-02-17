@@ -52,6 +52,7 @@ import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
+import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsIOBlinkin;
 import frc.robot.subsystems.vision.Vision;
@@ -80,14 +81,15 @@ public class RobotContainer {
 
   /** Declare the robot subsystems here ************************************ */
   // These are the "Active Subsystems" that the robot controls
-  private final Drive m_drivebase;
+  // private final Drive m_drivebase;
 
-  private final Elevator elevator;
+  // private final Elevator elevator;
   private final Flywheel m_flywheel;
   private final LEDs led;
+  private final LEDRoutine routine1;
   // These are "Virtual Subsystems" that report information but have no motors
-  private final Accelerometer m_accel;
-  private final Vision m_vision;
+  // private final Accelerometer m_accel;
+  // private final Vision m_vision;
   private final PowerMonitoring m_power;
 
   /** Dashboard inputs ***************************************************** */
@@ -95,7 +97,7 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
   private final AutoChooser autoChooserChoreo;
-  private final AutoFactory autoFactoryChoreo;
+  // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
       new LoggedTunableNumber("Battery Amp-Hours", 18.0);
@@ -111,59 +113,58 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
-
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
-        m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
+        // m_drivebase = new Drive();
+        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
-        m_vision =
-            switch (Constants.getVisionType()) {
-              case PHOTON ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement,
-                      new VisionIOPhotonVision(camera0Name, robotToCamera0),
-                      new VisionIOPhotonVision(camera1Name, robotToCamera1));
-              case LIMELIGHT ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement,
-                      new VisionIOLimelight(camera0Name, m_drivebase::getRotation),
-                      new VisionIOLimelight(camera1Name, m_drivebase::getRotation));
-              case NONE ->
-                  new Vision(
-                      m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-              default -> null;
-            };
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     switch (Constants.getVisionType()) {
+        //       case PHOTON ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement,
+        //               new VisionIOPhotonVision(camera0Name, robotToCamera0),
+        //               new VisionIOPhotonVision(camera1Name, robotToCamera1));
+        //       case LIMELIGHT ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement,
+        //               new VisionIOLimelight(camera0Name, m_drivebase::getRotation),
+        //               new VisionIOLimelight(camera1Name, m_drivebase::getRotation));
+        //       case NONE ->
+        //           new Vision(
+        //               m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        //       default -> null;
+        //     };
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
+        // m_drivebase = new Drive();
+        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
-        m_vision =
-            new Vision(
-                m_drivebase::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     new Vision(
+        //         m_drivebase::addVisionMeasurement,
+        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
+        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
 
       default:
         // Replayed robot, disable IO implementations
-        m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
+        // m_drivebase = new Drive();
+        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         m_flywheel = new Flywheel(new FlywheelIO() {});
-        m_vision =
-            new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        m_accel = new Accelerometer(m_drivebase.getGyro());
+        // m_vision =
+        //     new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
     }
 
@@ -179,21 +180,21 @@ public class RobotContainer {
             new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
-        autoFactoryChoreo = null;
+        // autoFactoryChoreo = null;
         break;
 
       case CHOREO:
-        autoFactoryChoreo =
-            new AutoFactory(
-                m_drivebase::getPose, // A function that returns the current robot pose
-                m_drivebase::resetOdometry, // A function that resets the current robot pose to the
-                // provided Pose2d
-                m_drivebase::followTrajectory, // The drive subsystem trajectory follower
-                true, // If alliance flipping should be enabled
-                m_drivebase // The drive subsystem
-                );
+        // autoFactoryChoreo =
+        //     new AutoFactory(
+        //         m_drivebase::getPose, // A function that returns the current robot pose
+        //         m_drivebase::resetOdometry, // A function that resets the current robot pose to the
+        //         // provided Pose2d
+        //         m_drivebase::followTrajectory, // The drive subsystem trajectory follower
+        //         true, // If alliance flipping should be enabled
+        //         m_drivebase // The drive subsystem
+        //         );
         autoChooserChoreo = new AutoChooser();
-        autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
+        // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
         autoChooserPathPlanner = null;
         break;
@@ -203,6 +204,8 @@ public class RobotContainer {
         throw new RuntimeException(
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
+
+    routine1 = new LEDRoutine(led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
 
     // Define Auto commands
     defineAutoCommands();
@@ -218,25 +221,25 @@ public class RobotContainer {
     // Register Named Commands for use in PathPlanner autos
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
-    NamedCommands.registerCommand(
-        "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+    // NamedCommands.registerCommand(
+        // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
-    new EventTrigger("Collect Coral")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+    // new EventTrigger("Collect Coral")
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
 
-    new EventTrigger("L3 Score")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+    // new EventTrigger("L3 Score")
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
 
-    new EventTrigger("Collect Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+    // new EventTrigger("Collect Algae")
+    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
 
-    new EventTrigger("Score Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+    // new EventTrigger("Score Algae")
+    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
 
   /**
@@ -262,81 +265,87 @@ public class RobotContainer {
     }
 
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
-    m_drivebase.setDefaultCommand(
-        DriveCommands.fieldRelativeDrive(
-            m_drivebase,
-            () -> -driveStickY.value() / 4,
-            () -> -driveStickX.value() / 4,
-            () -> -turnStickX.value()));
+    // m_drivebase.setDefaultCommand(
+    //     DriveCommands.fieldRelativeDrive(
+    //         m_drivebase,
+    //         () -> -driveStickY.value() / 4,
+    //         () -> -driveStickX.value() / 4,
+    //         () -> -turnStickX.value()));
 
-    led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));
+    led.setDefaultCommand(LEDCommands.randomColor(led));
+
+    driverController.b().onTrue(LEDCommands.randomColor(led));
+
+    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, (int) Math.random() * 4));
+
+    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
-    driverController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    DriveCommands.robotRelativeDrive(
-                        m_drivebase,
-                        () -> -driveStickY.value(),
-                        () -> -driveStickX.value(),
-                        () -> turnStickX.value()),
-                m_drivebase));
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 DriveCommands.robotRelativeDrive(
+    //                     m_drivebase,
+    //                     () -> -driveStickY.value(),
+    //                     () -> -driveStickX.value(),
+    //                     () -> turnStickX.value()),
+    //             m_drivebase));
 
     // Press A button -> BRAKE
-    driverController
-        .a()
-        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    // driverController
+    //     .a()
+    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // SysID logging.
-    driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
-    driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
-    driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
-    driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
+    // driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
+    // driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
+    // driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
+    // driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
     // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you
     // don't want it.)
-    driverController
-        .rightTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
-    driverController
-        .leftTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
-    // Press RIGHT BUMPER --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
+    // driverController
+    //     .rightTrigger()
+    //     .whileTrue(ElevatorCommands.moveElevator(elevator, driverController.getRightTriggerAxis()));
+    // driverController
+    //     .leftTrigger()
+    // //     .whileTrue(ElevatorCommands.moveElevator(elevator, -driverController.getLeftTriggerAxis()));
+    // // Press RIGHT BUMPER --> Move elevator up one level
+    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
 
-    // Press LEFT BUMPER --> Move elevator down one level
-    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
+    // // Press LEFT BUMPER --> Move elevator down one level
+    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
 
-    // Press LEFT TRIGGER --> intake Coral
-    operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
+    // // Press LEFT TRIGGER --> intake Coral
+    // operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
 
-    // Press RIGHT TRIGGER --> outtake Coral
-    operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
+    // // Press RIGHT TRIGGER --> outtake Coral
+    // operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
 
-    // Press B button --> intake Algae
-    operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
+    // // Press B button --> intake Algae
+    // operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
 
-    // Press A button --> outtake Algae
-    operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
+    // // Press A button --> outtake Algae
+    // operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
 
-    // Press X button --> level 3 Coral score
-    operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
+    // // Press X button --> level 3 Coral score
+    // operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
 
     // Press Y button --> Manually Re-Zero the Gyro
-    driverController
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        m_drivebase.resetPose(
-                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
-                    m_drivebase)
-                .ignoringDisable(true));
+    // driverController
+    //     .y()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     m_drivebase.resetPose(
+    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+    //                 m_drivebase)
+    //             .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
     // driverController
@@ -373,7 +382,7 @@ public class RobotContainer {
 
   /** Set the motor neutral mode to BRAKE / COAST for T/F */
   public void setMotorBrake(boolean brake) {
-    m_drivebase.setMotorBrake(brake);
+    // m_drivebase.setMotorBrake(brake);
   }
 
   /** Updates the alerts. */
@@ -397,24 +406,24 @@ public class RobotContainer {
   private void definesysIdRoutines() {
     if (Constants.getAutoType() == RBSIEnum.AutoType.PATHPLANNER) {
       // Drivebase characterization
-      autoChooserPathPlanner.addOption(
-          "Drive Wheel Radius Characterization",
-          DriveCommands.wheelRadiusCharacterization(m_drivebase));
-      autoChooserPathPlanner.addOption(
-          "Drive Simple FF Characterization",
-          DriveCommands.feedforwardCharacterization(m_drivebase));
-      autoChooserPathPlanner.addOption(
-          "Drive SysId (Quasistatic Forward)",
-          m_drivebase.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Drive SysId (Quasistatic Reverse)",
-          m_drivebase.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-      autoChooserPathPlanner.addOption(
-          "Drive SysId (Dynamic Forward)",
-          m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kForward));
-      autoChooserPathPlanner.addOption(
-          "Drive SysId (Dynamic Reverse)",
-          m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive Wheel Radius Characterization",
+      //     DriveCommands.wheelRadiusCharacterization(m_drivebase));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive Simple FF Characterization",
+      //     DriveCommands.feedforwardCharacterization(m_drivebase));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive SysId (Quasistatic Forward)",
+      //     m_drivebase.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive SysId (Quasistatic Reverse)",
+      //     m_drivebase.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive SysId (Dynamic Forward)",
+      //     m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kForward));
+      // autoChooserPathPlanner.addOption(
+      //     "Drive SysId (Dynamic Reverse)",
+      //     m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
       // Example Flywheel SysId Characterization
       autoChooserPathPlanner.addOption(
@@ -437,28 +446,28 @@ public class RobotContainer {
    *
    * <p>NOTE: This would normally be in a spearate file.
    */
-  private AutoRoutine twoPieceAuto() {
-    AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
+  // private AutoRoutine twoPieceAuto() {
+  //   // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-    // Load the routine's trajectories
-    AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
-    AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+  //   // Load the routine's trajectories
+  //   // AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
+  //   // AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
 
-    // When the routine begins, reset odometry and start the first trajectory
-    routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
+  //   // // When the routine begins, reset odometry and start the first trajectory
+  //   // routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
 
-    // Starting at the event marker named "intake", run the intake
-    // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
+  //   // Starting at the event marker named "intake", run the intake
+  //   // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
 
-    // When the trajectory is done, start the next trajectory
-    pickupTraj.done().onTrue(scoreTraj.cmd());
+  //   // When the trajectory is done, start the next trajectory
+  //   pickupTraj.done().onTrue(scoreTraj.cmd());
 
-    // While the trajectory is active, prepare the scoring subsystem
-    // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
+  //   // While the trajectory is active, prepare the scoring subsystem
+  //   // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
 
-    // When the trajectory is done, score
-    // scoreTraj.done().onTrue(scoringSubsystem.score());
+  //   // When the trajectory is done, score
+  //   // scoreTraj.done().onTrue(scoringSubsystem.score());
 
-    return routine;
-  }
+  //   return routine;
+  // }
 }
