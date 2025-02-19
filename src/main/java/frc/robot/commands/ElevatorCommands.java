@@ -100,6 +100,7 @@ public class ElevatorCommands {
           elevator.runMotor(speed);
         },
         elevator);
+  }
 
   /**
    * Run a timed test of the first stage motor

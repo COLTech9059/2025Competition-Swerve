@@ -140,7 +140,6 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
@@ -167,7 +166,6 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
@@ -181,7 +179,6 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-        elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIO() {});
