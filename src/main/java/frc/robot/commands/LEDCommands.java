@@ -104,4 +104,10 @@ public class LEDCommands {
         },
         led);
   }
+
+  public static Command setIdlePattern(LEDs led, int id) {
+    if (id > 78) id = 1;
+    double power = -1.01 + 0.02 * id;
+    return Commands.runOnce( () -> led.setDefaultCommand(runPattern(led, power)));
+  }
 }

@@ -247,6 +247,7 @@ public class RobotContainer {
 
     // Define SysId Routines
     definesysIdRoutines();
+    
     // Configure the button and trigger bindings
     configureBindings();
   }
