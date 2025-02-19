@@ -21,6 +21,7 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -45,6 +46,21 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
+import choreo.auto.AutoChooser;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.LEDCommands;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
@@ -84,9 +100,10 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Flywheel m_flywheel;
-
   private final LEDs led;
+
   private final LEDRoutine routine1;
+
   // These are "Virtual Subsystems" that report information but have no motors
   private final Accelerometer m_accel;
   private final Vision m_vision;
@@ -114,6 +131,9 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
+
+    SmartDashboard.putNumber("Elevator Speed", 0);
+
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
@@ -122,6 +142,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -148,6 +169,7 @@ public class RobotContainer {
         m_drivebase = new Drive();
         elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -156,12 +178,12 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
         m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
-
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -173,6 +195,15 @@ public class RobotContainer {
     // the non-drivebase subsystems for which you wish to have power monitoring; DO NOT include
     // ``m_drivebase``, as that is automatically monitored.
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
+
+    // Define Auto Commands
+    defineAutoCommands();
+
+    // Push Subsystems to Dashboard
+    // SmartDashboard.putData(m_drivebase);
+    // SmartDashboard.putData((Sendable) m_drivebase.getGyro());
+    SmartDashboard.putData(elevator);
+    // SmartDashboard.putData(led);
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -206,15 +237,18 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
+    // Create LED routines
     routine1 =
         new LEDRoutine(
             led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
 
+    // Display LED subsystem on dashboard
     SmartDashboard.putData(led);
 
     // Define Auto commands
     defineAutoCommands();
-    // Define SysIs Routines
+
+    // Define SysId Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
     configureBindings();
@@ -234,7 +268,15 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+    new EventTrigger("Collect Coral")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
 
+    new EventTrigger("L3 Score")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
     new EventTrigger("L3 Score")
         .onTrue(
             Commands.runOnce(
@@ -287,6 +329,55 @@ public class RobotContainer {
 
     driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
+    driverController
+        .y()
+        .onTrue(
+            ElevatorCommands.runWithoutStop(
+                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2)));
+
+    // PRESS B BUTTON --> Increment Elevator speed by 0.1
+    driverController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
+                            ? -1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
+                elevator));
+
+    // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
+    driverController
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < -1
+                            ? 1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
+                elevator));
+
+    // PRESS X BUTTON --> Run the single motor speed test for the elevator
+    driverController
+        .x()
+        .onTrue(
+            ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+
+    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
+    // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
+    m_drivebase.setDefaultCommand(
+        DriveCommands.fieldRelativeDrive(
+            m_drivebase,
+            () -> -driveStickY.value() / 4,
+            () -> -driveStickX.value() / 4,
+            () -> -turnStickX.value()));
+
+    led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));
+
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
     // driverController
@@ -301,12 +392,25 @@ public class RobotContainer {
     //                     () -> turnStickX.value()),
     //             m_drivebase));
 
+    // Press B Button --> INCREASE DRIVE SPEED
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 SmartDashboard.putNumber(
+    //                     "Drive Speed",
+    //                     (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+    //                         ? 0
+    //                         : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
+    //             m_drivebase));
+
     // Press A button -> BRAKE
     // driverController
     //     .a()
     //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
-    // Press X button --> Stop with wheels in X-Lock position
+    // // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // SysID logging.
@@ -366,6 +470,7 @@ public class RobotContainer {
     //             () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
     //             m_flywheel::stop,
     //             m_flywheel));
+
   }
 
   public void randomizeLEDOnStartup() {
