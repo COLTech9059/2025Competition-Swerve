@@ -12,6 +12,9 @@ import frc.robot.Constants;
 
 public class ElevatorIOSpark extends ElevatorIO {
 
+  // Helper variable to track the relative position of the elevator when it isn't at a sensor
+  private int levelTracker = 0;
+
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   private RelativeEncoder eEncoder = eMotor.getEncoder();
@@ -23,10 +26,11 @@ public class ElevatorIOSpark extends ElevatorIO {
   private SparkBaseConfig eM2Config;
 
   // Digital input (limit switch) objects
-  private DigitalInput motorSwitch = new DigitalInput(Constants.motorSwitchID);
-  private DigitalInput l1Switch = new DigitalInput(Constants.l1SwitchID);
-  private DigitalInput l2Switch = new DigitalInput(Constants.l2SwitchID);
-  private DigitalInput l3Switch = new DigitalInput(Constants.l3SwitchID);
+  private DigitalInput l0Switch = new DigitalInput(Constants.level0ID);
+  private DigitalInput l1Switch = new DigitalInput(Constants.level1ID);
+  private DigitalInput l2Switch = new DigitalInput(Constants.level2ID);
+  private DigitalInput stage2Switch = new DigitalInput(Constants.stage2ID);
+  private DigitalInput l3Switch = new DigitalInput(Constants.level3ID);
 
   // Apply all necessary motor configs
   @Override
@@ -59,31 +63,38 @@ public class ElevatorIOSpark extends ElevatorIO {
   @Override
   public void setLevel(double speed, int level) {
     speed = Math.abs(speed);
-    if (getLevel() > level) {
-      if (motorSwitch.get()) {
-        eMotor.stopMotor();
-        eMotor2.set(-speed);
-      }
-      if (!motorSwitch.get()) {
-        eMotor.set(-speed);
-        eMotor2.stopMotor();
-      }
-    }
-
-    if (getLevel() < level) {
-      if (motorSwitch.get()) {
-        eMotor.stopMotor();
-        eMotor2.set(speed);
-      }
-      if (!motorSwitch.get()) {
-        eMotor.set(speed);
-        eMotor2.stopMotor();
-      }
-    }
-
-    if (getLevel() == level) {
+    if (getExactLevel() == level) {
       eMotor.stopMotor();
       eMotor2.stopMotor();
+    } else {
+
+      if (getLevel() > level) {
+
+        if (!stage2Switch.get()) {
+          eMotor.stopMotor();
+          eMotor2.set(-speed);
+        } else if (stage2Switch.get() && !l0Switch.get()) {
+          eMotor.set(-speed);
+          eMotor2.stopMotor();
+        } else {
+          eMotor.stopMotor();
+          eMotor2.stopMotor();
+        }
+      }
+
+      if (getLevel() < level) {
+
+        if (l2Switch.get() && !l3Switch.get()) {
+          eMotor.stopMotor();
+          eMotor2.set(speed);
+        } else if (!l2Switch.get()) {
+          eMotor.set(speed);
+          eMotor2.stopMotor();
+        } else {
+          eMotor.stopMotor();
+          eMotor2.stopMotor();
+        }
+      }
     }
 
     if (level > 3) level = 3;
@@ -107,10 +118,24 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
+    if (l0Switch.get()) levelTracker = 0;
+    if (l1Switch.get()) levelTracker = 1;
+    if (l2Switch.get() && stage2Switch.get()) levelTracker = 2;
+    if (l3Switch.get()) levelTracker = 3;
+    return levelTracker;
+  }
+
+  /**
+   * This method will return the "level" corresponding to whatever sensor is active. If no sensor is
+   * detecting, it will return a -1
+   */
+  @Override
+  public int getExactLevel() {
+    if (l0Switch.get()) return 0;
     if (l1Switch.get()) return 1;
-    if (l2Switch.get()) return 2;
+    if (l2Switch.get() && stage2Switch.get()) return 2;
     if (l3Switch.get()) return 3;
-    return 0;
+    return -1;
   }
 
   // Stops the elevator motors
@@ -172,7 +197,8 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Updates encoder values according to elevator level
   @Override
-  public void encoderUpdates() {
+
+  public void periodicUpdates() {
     if (getLevel() == 1) setEncoders(Constants.level1);
     if (getLevel() == 2) setEncoders(Constants.level2);
     if (getLevel() == 3) setEncoders(Constants.level3);

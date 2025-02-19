@@ -14,11 +14,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command upLevel(Elevator elevator, double speed) {
-    return Commands.run(
-        () -> {
-          elevator.setLevel(speed, elevator.getLevel() + 1);
-        },
-        elevator);
+    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
   /**
@@ -29,11 +25,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run(
-        () -> {
-          elevator.setLevel(speed, elevator.getLevel() - 1);
-        },
-        elevator);
+    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
   }
 
   /**
@@ -45,15 +37,11 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedIntake(Elevator elevator, double speed, double time) {
-    return Commands.run(
-        () -> {
-          elevator.timedIntake(speed, time);
-        },
-        elevator);
+    return Commands.run( () -> elevator.timedIntake(speed, time), elevator);
   }
 
   /**
-   * Runs the algae intake for a speicfied speed and time
+   * Runs the algae intake for the specified speed and time
    *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decicmal percentage) at which the algae motor will run
@@ -61,15 +49,11 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedAlgae(Elevator elevator, double speed, double time) {
-    return Commands.run(
-        () -> {
-          elevator.timedAlgae(speed, time);
-        },
-        elevator);
+    return Commands.run( () -> elevator.timedAlgae(speed, time), elevator);
   }
 
   /**
-   * Scores a coral gamepiece at the specified level
+   * Scores a coral gamepiece at the specified level, then goes down to level 0
    *
    * @param elevator the elevator subsystem
    * @param speed the speed (as a decimal percentage) at which the elevator will move
@@ -79,14 +63,12 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command coralScore(
-      Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
-    return Commands.run(
-        () -> {
-          elevator.setLevel(speed, level);
-          elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime);
-          elevator.setLevel(speed, 1);
-        },
-        elevator);
+    Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
+    return Commands.sequence(
+          Commands.run( () -> elevator.setLevel(speed, level)),
+          Commands.run( () -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
+          Commands.run( () -> elevator.setLevel(speed, 0))
+        );
   }
 
   /**
@@ -109,6 +91,7 @@ public class ElevatorCommands {
         elevator);
   }
 
+
   // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
   // want it.)
   public static Command moveElevator(Elevator elevator, double speed) {
@@ -117,5 +100,51 @@ public class ElevatorCommands {
           elevator.runMotor(speed);
         },
         elevator);
+
+  /**
+   * Run a timed test of the first stage motor
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @param time The time in seconds to run the motor
+   * @return The relevant code statements as a Command object
+   */
+  public static Command oneTest(Elevator elevator, double speed, double time) {
+    return Commands.sequence(
+        Commands.runOnce( () -> elevator.runMotor(speed), elevator),
+        Commands.waitSeconds(time),
+        Commands.runOnce(elevator::stop, elevator));
+  }
+
+  /**
+   * Set the first stage motor to run without stopping
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @return The relevant code statements as a Command object
+   */
+  public static Command runWithoutStop(Elevator elevator, double speed) {
+    return Commands.runOnce( () -> elevator.runMotor(speed), elevator);
+  }
+
+  /**
+   * Stop the movement of the elevator, unconditionally
+   * 
+   * @param elevator The elevator subsystem
+   * @return The relevant code statements as a Command object
+   */
+  public static Command stopElevator(Elevator elevator) {
+    return Commands.runOnce(elevator::stop, elevator);
+  }
+
+  /**
+   * Runs the stage one motor until a sensor is triggered
+   * 
+   * @param elevator The elevator subsystem
+   * @param speed The speed to run the motor (as a decimal percentage)
+   * @return The relevant code statements as a Command object
+   */
+  public static Command runToSensor(Elevator elevator, double speed) {
+    return Commands.run( ()-> elevator.runToSensor(speed), elevator);
   }
 }

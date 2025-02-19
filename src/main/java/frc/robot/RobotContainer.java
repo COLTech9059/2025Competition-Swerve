@@ -21,6 +21,7 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,6 +30,21 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.LEDCommands;
+import choreo.auto.AutoChooser;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ElevatorCommands;
+import frc.robot.commands.LEDCommands;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -56,12 +72,12 @@ public class RobotContainer {
   /** Declare the robot subsystems here ************************************ */
   // These are the "Active Subsystems" that the robot controls
   // private final Drive m_drivebase;
-
-  // private final Elevator elevator;
+  private final Elevator elevator;
   private final Flywheel m_flywheel;
-
   private final LEDs led;
+
   private final LEDRoutine routine1;
+
   // These are "Virtual Subsystems" that report information but have no motors
   // private final Accelerometer m_accel;
   // private final Vision m_vision;
@@ -71,7 +87,9 @@ public class RobotContainer {
   // AutoChoosers for both supported path planning types
   // private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
+
   // private final AutoChooser autoChooserChoreo;
+
   // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
@@ -89,14 +107,17 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
+
+    SmartDashboard.putNumber("Elevator Speed", 0);
+
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         // m_drivebase = new Drive();
-        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         // m_vision =
         //     switch (Constants.getVisionType()) {
@@ -121,8 +142,8 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         // m_drivebase = new Drive();
-        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         // m_vision =
         //     new Vision(
@@ -131,12 +152,11 @@ public class RobotContainer {
         //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
         // m_accel = new Accelerometer(m_drivebase.getGyro());
         break;
-
       default:
         // Replayed robot, disable IO implementations
         // m_drivebase = new Drive();
-        // elevator = new Elevator(new ElevatorIOSpark());
         led = new LEDs(new LEDsIOBlinkin());
+        elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         // m_vision =
         //     new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -149,13 +169,23 @@ public class RobotContainer {
     // ``m_drivebase``, as that is automatically monitored.
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
+    // Define Auto Commands
+    defineAutoCommands();
+
+    // Push Subsystems to Dashboard
+    // SmartDashboard.putData(m_drivebase);
+    // SmartDashboard.putData((Sendable) m_drivebase.getGyro());
+    SmartDashboard.putData(elevator);
+    // SmartDashboard.putData(led);
+
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
-        // autoChooserPathPlanner =
+        // autoChooserPathPlanner = null;
         // new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
-        // autoChooserChoreo = null;
+        autoChooserChoreo = null
+"/
         // autoFactoryChoreo = null;
         break;
 
@@ -170,7 +200,7 @@ public class RobotContainer {
         //         true, // If alliance flipping should be enabled
         //         m_drivebase // The drive subsystem
         //         );
-        // autoChooserChoreo = new AutoChooser();
+        autoChooserChoreo = new AutoChooser();
         // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
         // autoChooserPathPlanner = null;
@@ -182,15 +212,18 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
+    // Create LED routines
     routine1 =
         new LEDRoutine(
             led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
 
+    // Display LED subsystem on dashboard
     SmartDashboard.putData(led);
 
     // Define Auto commands
     defineAutoCommands();
-    // Define SysIs Routines
+
+    // Define SysId Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
     configureBindings();
@@ -206,23 +239,41 @@ public class RobotContainer {
     // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
-    // new EventTrigger("Collect Coral")
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+    new EventTrigger("Collect Coral")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
 
-    // new EventTrigger("L3 Score")
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+    new EventTrigger("L3 Score")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
 
-    // new EventTrigger("Collect Algae")
-    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5),
-    // elevator));
+    new EventTrigger("Collect Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
 
-    // new EventTrigger("Score Algae")
-    //     .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5),
-    // elevator));
+    new EventTrigger("Score Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+
+    NamedCommands.registerCommand(
+        "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+
+    // Register Event Triggers for use in PathPlanner paths
+    new EventTrigger("Collect Coral")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+
+    new EventTrigger("L3 Score")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+
+    new EventTrigger("Collect Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+
+    new EventTrigger("Score Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
 
   /**
@@ -247,6 +298,51 @@ public class RobotContainer {
       turnStickX = driverController::getLeftX;
     }
 
+    driverController.b().onTrue(LEDCommands.randomColor(led));
+
+    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
+
+    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
+
+    driverController
+        .y()
+        .onTrue(
+            ElevatorCommands.runWithoutStop(
+                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2)));
+
+    // PRESS B BUTTON --> Increment Elevator speed by 0.1
+    driverController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
+                            ? -1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
+                elevator));
+
+    // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
+    driverController
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    SmartDashboard.putNumber(
+                        "Elevator Speed",
+                        (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < -1
+                            ? 1
+                            : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
+                elevator));
+
+    // PRESS X BUTTON --> Run the single motor speed test for the elevator
+    driverController
+        .x()
+        .onTrue(
+            ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+
+    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     // m_drivebase.setDefaultCommand(
     //     DriveCommands.fieldRelativeDrive(
@@ -255,13 +351,7 @@ public class RobotContainer {
     //         () -> -driveStickX.value() / 4,
     //         () -> -turnStickX.value()));
 
-    // led.setDefaultCommand(LEDCommands.randomColor(led));
-
-    driverController.b().onTrue(LEDCommands.randomColor(led));
-
-    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
-
-    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
+    led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
@@ -277,49 +367,26 @@ public class RobotContainer {
     //                     () -> turnStickX.value()),
     //             m_drivebase));
 
+    // Press B Button --> INCREASE DRIVE SPEED
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () ->
+    //                 SmartDashboard.putNumber(
+    //                     "Drive Speed",
+    //                     (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
+    //                         ? 0
+    //                         : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
+    //             m_drivebase));
+
     // Press A button -> BRAKE
     // driverController
     //     .a()
     //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
-    // Press X button --> Stop with wheels in X-Lock position
+    // // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // SysID logging.
-    // driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
-    // driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
-    // driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
-    // driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
-    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you
-    // don't want it.)
-    // driverController
-    //     .rightTrigger()
-    //     .whileTrue(ElevatorCommands.moveElevator(elevator,
-    // driverController.getRightTriggerAxis()));
-    // driverController
-    //     .leftTrigger()
-    // //     .whileTrue(ElevatorCommands.moveElevator(elevator,
-    // -driverController.getLeftTriggerAxis()));
-    // // Press RIGHT BUMPER --> Move elevator up one level
-    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
-
-    // // Press LEFT BUMPER --> Move elevator down one level
-    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
-
-    // // Press LEFT TRIGGER --> intake Coral
-    // operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
-
-    // // Press RIGHT TRIGGER --> outtake Coral
-    // operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
-
-    // // Press B button --> intake Algae
-    // operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
-
-    // // Press A button --> outtake Algae
-    // operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
-
-    // // Press X button --> level 3 Coral score
-    // operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
 
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController
@@ -341,6 +408,7 @@ public class RobotContainer {
     //             () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
     //             m_flywheel::stop,
     //             m_flywheel));
+
   }
 
   public void randomizeLEDOnStartup() {
@@ -438,27 +506,28 @@ public class RobotContainer {
    * <p>NOTE: This would normally be in a spearate file.
    */
   // private AutoRoutine twoPieceAuto() {
-  //   // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-  //   // Load the routine's trajectories
-  //   // AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
-  //   // AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+  // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-  //   // // When the routine begins, reset odometry and start the first trajectory
-  //   // routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
+  // Load the routine's trajectories
+  // AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
+  // AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
 
-  //   // Starting at the event marker named "intake", run the intake
-  //   // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
+  // When the routine begins, reset odometry and start the first trajectory
+  // routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
 
-  //   // When the trajectory is done, start the next trajectory
-  //   pickupTraj.done().onTrue(scoreTraj.cmd());
+  // Starting at the event marker named "intake", run the intake
+  // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
 
-  //   // While the trajectory is active, prepare the scoring subsystem
-  //   // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
+  // When the trajectory is done, start the next trajectory
+  // pickupTraj.done().onTrue(scoreTraj.cmd());
 
-  //   // When the trajectory is done, score
-  //   // scoreTraj.done().onTrue(scoringSubsystem.score());
+  // While the trajectory is active, prepare the scoring subsystem
+  // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
 
-  //   return routine;
+  // When the trajectory is done, score
+  // scoreTraj.done().onTrue(scoringSubsystem.score());
+
+  // return routine;
   // }
 }

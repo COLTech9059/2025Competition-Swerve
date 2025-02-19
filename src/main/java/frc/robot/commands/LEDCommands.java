@@ -38,7 +38,7 @@ public class LEDCommands {
    * Apply a custom LED routine using the team color patterns
    *
    * @param led the LED subsystem
-   * @param routine the ID of the routine you want (pulled from a switch case)
+   * @param routineID the ID of the routine you want (pulled from a switch case)
    * @return the relevant code statements as a Command object
    */
   public static Command teamColorRoutine(LEDs led, int routineID) {
@@ -58,7 +58,7 @@ public class LEDCommands {
         routine = new LEDRoutine(led, new double[] {0.53, 0.55, 0.41, 0.45});
         return runRoutine(led, routine, 3);
       default:
-        return Commands.runOnce(() -> DriverStation.reportWarning("No LED sequence ran", false));
+        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
     }
   }
 
@@ -66,27 +66,21 @@ public class LEDCommands {
    * Apply a custom LED routine using the palette patterns
    *
    * @param led the LED subsystem
-   * @param routine the ID of the routine you want (pulled from a switch case)
+   * @param routineID the ID of the routine you want (pulled from a switch case)
    * @return the relevant code statements as a Command object
    */
-  public static Command patternRoutine(LEDs led, int routine) {
-    return Commands.run(
-        () -> {
-          Timer time = new Timer();
-          time.start();
-          switch (routine) {
-            case 1:
-              time.reset();
-              if (time.get() < 5) led.setValue(-0.99);
-              if (time.get() > 5 && time.get() < 10) led.setValue(-0.97);
-              if (time.get() > 10 && time.get() < 15) led.setValue(-0.89);
-              if (time.get() > 15 && time.get() < 20) led.setValue(-0.79);
-              if (time.get() > 20) time.reset();
-          }
-        },
-        led);
+  public static Command patternRoutine(LEDs led, int routineID) {
+    LEDRoutine routine;
+    
+    switch (routineID) {
+      case 1:
+        routine = new LEDRoutine(led, new double[] {-0.99, -0.97, -0.89, -0.79});
+        return runRoutine(led, routine, 5);
+      default:
+        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
+    }
   }
-
+ 
   /**
    * Runs the pattern of an LEDRoutine object with a delay between pattern cycles
    *
