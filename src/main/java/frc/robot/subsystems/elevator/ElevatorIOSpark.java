@@ -197,6 +197,7 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Updates encoder values according to elevator level
   @Override
+
   public void periodicUpdates() {
     if (getLevel() == 1) setEncoders(Constants.level1);
     if (getLevel() == 2) setEncoders(Constants.level2);

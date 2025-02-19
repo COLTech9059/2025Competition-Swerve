@@ -21,6 +21,15 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
+
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.LEDCommands;
 import choreo.auto.AutoChooser;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
@@ -39,7 +48,9 @@ import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
+import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
+import frc.robot.subsystems.leds.LEDsIOBlinkin;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.GetJoystickValue;
@@ -62,9 +73,10 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   // private final Drive m_drivebase;
   private final Elevator elevator;
-
   private final Flywheel m_flywheel;
   private final LEDs led;
+
+  private final LEDRoutine routine1;
 
   // These are "Virtual Subsystems" that report information but have no motors
   // private final Accelerometer m_accel;
@@ -75,12 +87,14 @@ public class RobotContainer {
   // AutoChoosers for both supported path planning types
   // private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
-  private final AutoChooser autoChooserChoreo;
+
+  // private final AutoChooser autoChooserChoreo;
 
   // private final AutoFactory autoFactoryChoreo;
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
       new LoggedTunableNumber("Battery Amp-Hours", 18.0);
+
   // EXAMPLE TUNABLE FLYWHEEL SPEED INPUT FROM DASHBOARD
   private final LoggedTunableNumber flywheelSpeedInput =
       new LoggedTunableNumber("Flywheel Speed", 1500.0);
@@ -102,8 +116,8 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         // m_drivebase = new Drive();
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
-        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         // m_vision =
         //     switch (Constants.getVisionType()) {
@@ -128,8 +142,8 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         // m_drivebase = new Drive();
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
-        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         // m_vision =
         //     new Vision(
@@ -141,8 +155,8 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         // m_drivebase = new Drive();
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
-        led = new LEDs();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         // m_vision =
         //     new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -170,7 +184,8 @@ public class RobotContainer {
         // autoChooserPathPlanner = null;
         // new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
-        autoChooserChoreo = null;
+        autoChooserChoreo = null
+"/
         // autoFactoryChoreo = null;
         break;
 
@@ -197,6 +212,17 @@ public class RobotContainer {
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
+    // Create LED routines
+    routine1 =
+        new LEDRoutine(
+            led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
+
+    // Display LED subsystem on dashboard
+    SmartDashboard.putData(led);
+
+    // Define Auto commands
+    defineAutoCommands();
+
     // Define SysId Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
@@ -209,8 +235,8 @@ public class RobotContainer {
     // Register Named Commands for use in PathPlanner autos
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
-    NamedCommands.registerCommand(
-        "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+    // NamedCommands.registerCommand(
+    // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
     new EventTrigger("Collect Coral")
@@ -271,6 +297,12 @@ public class RobotContainer {
       driveStickX = driverController::getRightX;
       turnStickX = driverController::getLeftX;
     }
+
+    driverController.b().onTrue(LEDCommands.randomColor(led));
+
+    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
+
+    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
     driverController
         .y()
@@ -379,6 +411,11 @@ public class RobotContainer {
 
   }
 
+  public void randomizeLEDOnStartup() {
+    // Commands.runOnce(() -> LEDCommands.randomColor(led), led);
+    CommandScheduler.getInstance().schedule(LEDCommands.randomColor(led));
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -396,10 +433,10 @@ public class RobotContainer {
    */
   public void getAutonomousCommandChoreo() {
     // Put the auto chooser on the dashboard
-    SmartDashboard.putData(autoChooserChoreo);
+    // SmartDashboard.putData(autoChooserChoreo);
 
     // Schedule the selected auto during the autonomous period
-    RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
+    // RobotModeTriggers.autonomous().whileTrue(autoChooserChoreo.selectedCommandScheduler());
   }
 
   /** Set the motor neutral mode to BRAKE / COAST for T/F */
@@ -469,6 +506,7 @@ public class RobotContainer {
    * <p>NOTE: This would normally be in a spearate file.
    */
   // private AutoRoutine twoPieceAuto() {
+
   // AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
   // Load the routine's trajectories
