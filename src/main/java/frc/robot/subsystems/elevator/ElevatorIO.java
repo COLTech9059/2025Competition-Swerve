@@ -10,8 +10,14 @@ public class ElevatorIO {
     return 0;
   }
 
+  public int getExactLevel() {
+    return -1;
+  }
+
   // TEMPORARY; comment out or delete when done with use.
   public void runMotor(double speed) {}
+
+  public void setVoltage(double volts) {}
 
   public void stop() {}
 
@@ -30,5 +36,7 @@ public class ElevatorIO {
 
   public void stopAlgae() {}
 
-  public void encoderUpdates() {}
+  public void runToSensor(double speed) {}
+
+  public void periodicUpdates() {}
 }
