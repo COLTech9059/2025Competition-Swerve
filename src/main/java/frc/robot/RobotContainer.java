@@ -100,7 +100,7 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Flywheel m_flywheel;
-  private final LEDs led;
+  private final LEDs led = new LEDs(new LEDsIOBlinkin());
 
   private final LEDRoutine routine1;
 
@@ -140,7 +140,6 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
-        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
@@ -166,7 +165,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-        led = new LEDs(new LEDsIOBlinkin());
+
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
@@ -179,7 +178,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-        led = new LEDs(new LEDsIOBlinkin());
+
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
@@ -247,7 +246,7 @@ public class RobotContainer {
 
     // Define SysId Routines
     definesysIdRoutines();
-    
+
     // Configure the button and trigger bindings
     configureBindings();
   }
@@ -331,7 +330,7 @@ public class RobotContainer {
         .y()
         .onTrue(
             ElevatorCommands.runWithoutStop(
-                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2)));
+                elevator, led, SmartDashboard.getNumber("Elevator Speed", 0.2)));
 
     // PRESS B BUTTON --> Increment Elevator speed by 0.1
     driverController
@@ -365,7 +364,7 @@ public class RobotContainer {
         .onTrue(
             ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
 
-    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
+    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, SmartDashboard.getNumber("Elevator Speed", 0)));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(

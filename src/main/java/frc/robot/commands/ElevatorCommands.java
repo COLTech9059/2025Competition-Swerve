@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.leds.LEDs;
 
 public class ElevatorCommands {
 
@@ -121,11 +122,18 @@ public class ElevatorCommands {
    * Set the first stage motor to run without stopping
    * 
    * @param elevator The elevator subsystem
+   * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
-  public static Command runWithoutStop(Elevator elevator, double speed) {
-    return Commands.runOnce( () -> elevator.runMotor(speed), elevator);
+  public static Command runWithoutStop(Elevator elevator, LEDs led, double speed) {
+    return Commands.startEnd( 
+      () -> {
+        LEDCommands.runPattern(led, 0.31);
+        elevator.runMotor(speed);
+      },
+      () -> LEDCommands.interrupt(led),
+      elevator);
   }
 
   /**
@@ -142,10 +150,17 @@ public class ElevatorCommands {
    * Runs the stage one motor until a sensor is triggered
    * 
    * @param elevator The elevator subsystem
+   * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
-  public static Command runToSensor(Elevator elevator, double speed) {
-    return Commands.run( ()-> elevator.runToSensor(speed), elevator);
+  public static Command runToSensor(Elevator elevator, LEDs led, double speed) {
+    return Commands.runEnd( 
+      ()-> {
+        elevator.runToSensor(speed);
+        LEDCommands.runPattern(led, speed);
+      },
+      () -> LEDCommands.interrupt(led),
+       elevator);
   }
 }

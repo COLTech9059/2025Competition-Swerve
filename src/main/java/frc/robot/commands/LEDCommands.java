@@ -3,7 +3,9 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
 
@@ -43,7 +45,6 @@ public class LEDCommands {
    */
   public static Command teamColorRoutine(LEDs led, int routineID) {
     LEDRoutine routine;
-
     switch (routineID) {
       case 1:
         routine = new LEDRoutine(led, new double[] {0.37, 0.39, 0.41, 0.45, 0.51, 0.53, 0.55});
@@ -109,5 +110,10 @@ public class LEDCommands {
     if (id > 78) id = 1;
     double power = -1.01 + 0.02 * id;
     return Commands.runOnce( () -> led.setDefaultCommand(runPattern(led, power)));
+  }
+
+  public static Command interrupt(LEDs led) {
+    CommandScheduler cmd = CommandScheduler.getInstance();
+    return Commands.runOnce( () -> cmd.cancel(cmd.requiring(led)));
   }
 }
