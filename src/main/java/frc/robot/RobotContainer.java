@@ -258,26 +258,26 @@ public class RobotContainer {
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
     NamedCommands.registerCommand(
-    "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
+    "L3 Score", ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
     new EventTrigger("Collect Coral")
         .onTrue(
             Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+                () -> ElevatorCommands.coralCollect(elevator, led, 0.35, 0.5, 1.5), elevator));
     new EventTrigger("Collect Coral")
         .onTrue(
             Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, 0.35, 0.5, 1.5), elevator));
+                () -> ElevatorCommands.coralCollect(elevator, led, 0.35, 0.5, 1.5), elevator));
 
     new EventTrigger("L3 Score")
         .onTrue(
             Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
     new EventTrigger("L3 Score")
         .onTrue(
             Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
+                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
 
     new EventTrigger("Collect Algae")
         .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5),
@@ -362,7 +362,7 @@ public class RobotContainer {
     driverController
         .x()
         .onTrue(
-            ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+            ElevatorCommands.oneTest(elevator, led, SmartDashboard.getNumber("Elevator Speed", 0), 1));
 
     SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, SmartDashboard.getNumber("Elevator Speed", 0)));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE

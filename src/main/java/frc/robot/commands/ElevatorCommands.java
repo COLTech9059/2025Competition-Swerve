@@ -56,42 +56,47 @@ public class ElevatorCommands {
   /**
    * Scores a coral gamepiece at the specified level, then goes down to level 0
    *
-   * @param elevator the elevator subsystem
-   * @param speed the speed (as a decimal percentage) at which the elevator will move
-   * @param level the "level" the elevator will move to
-   * @param outtakeSpeed the speed (as a decimal percentage) at which the intake motor will run
-   * @param outtakeTime the amount of time (in seconds) that the intake motor will run for
-   * @return the relevant code statements as a Command object
+   * @param elevator The elevator subsystem
+   * @param led The LED subsystem
+   * @param speed The speed (as a decimal percentage) at which the elevator will move
+   * @param level The "level" the elevator will move to
+   * @param outtakeSpeed The speed (as a decimal percentage) at which the intake motor will run
+   * @param outtakeTime The amount of time (in seconds) that the intake motor will run for
+   * @return The relevant code statements as a Command object
    */
-  public static Command coralScore(
-    Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
+  public static Command coralScore(Elevator elevator, LEDs led, double speed, int level, double outtakeSpeed, double outtakeTime) {
     return Commands.sequence(
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
           Commands.run( () -> elevator.setLevel(speed, level)),
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.27)),
           Commands.run( () -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
-          Commands.run( () -> elevator.setLevel(speed, 0))
-        );
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.29)),
+          Commands.run( () -> elevator.setLevel(speed, 0)),
+          Commands.runOnce( () -> LEDCommands.interrupt(led))
+    );
   }
 
   /**
    * Collects a coral gamepiece from the supply station
    *
    * @param elevator the elevator subsystem
+   * @param led The LED subsystem
    * @param speed the speed (as a decimal percentage) at which the elevator will move
    * @param intakeSpeed the speed (as a decimal percentage) at which the intake motor will run
    * @param intakeTime the amount of time (in seconds) that the intake motor will run for
    * @return the relevant code statements as a Command object
    */
-  public static Command coralCollect(
-      Elevator elevator, double speed, double intakeSpeed, double intakeTime) {
-    return Commands.run(
-        () -> {
-          elevator.setLevel(speed, 2);
-          elevator.timedIntake(intakeSpeed, intakeTime);
-          elevator.setLevel(speed, 1);
-        },
-        elevator);
+  public static Command coralCollect(Elevator elevator, LEDs led, double speed, double intakeSpeed, double intakeTime) {
+    return Commands.sequence(
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
+          Commands.run( () -> elevator.setLevel(speed, 2)),
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.27)),
+          Commands.run( () -> elevator.timedIntake(intakeSpeed, intakeTime)),
+          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.29)),
+          Commands.run( () -> elevator.setLevel(speed, 1)),
+          Commands.runOnce( () -> LEDCommands.interrupt(led))
+    );
   }
-
 
   // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
   // want it.)
@@ -107,15 +112,19 @@ public class ElevatorCommands {
    * Run a timed test of the first stage motor
    * 
    * @param elevator The elevator subsystem
+   * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @param time The time in seconds to run the motor
    * @return The relevant code statements as a Command object
    */
-  public static Command oneTest(Elevator elevator, double speed, double time) {
+  public static Command oneTest(Elevator elevator, LEDs led, double speed, double time) {
     return Commands.sequence(
+        Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
         Commands.runOnce( () -> elevator.runMotor(speed), elevator),
         Commands.waitSeconds(time),
-        Commands.runOnce(elevator::stop, elevator));
+        Commands.runOnce(elevator::stop, elevator),
+        Commands.runOnce( () -> LEDCommands.interrupt(led))
+    );
   }
 
   /**
