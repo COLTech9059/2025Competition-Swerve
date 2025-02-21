@@ -24,6 +24,10 @@ public class LEDCommands {
     return Commands.runOnce(() -> led.shiftColor((int) (Math.random() * 21) + 1), led);
   }
 
+  public static Command setColor(LEDs led, String color) {
+    return Commands.run( () -> led.setPattern(color));
+  }
+
   /**
    * Set the LEDs to a specific pattern
    *
@@ -34,7 +38,7 @@ public class LEDCommands {
   public static Command runPattern(LEDs led, double power) {
     return Commands.runOnce(
         () -> {
-          led.setValue(power);
+          led.setPattern(power);
         },
         led);
   }

@@ -121,7 +121,7 @@ public class LEDsIOBlinkin extends LEDsIO {
   }
 
   @Override
-  public void setValue(double power) {
+  public void setPattern(double power) {
     blinkin.set(power);
   }
 

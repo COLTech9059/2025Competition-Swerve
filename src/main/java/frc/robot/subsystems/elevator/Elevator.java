@@ -11,75 +11,107 @@ public class Elevator extends RBSISubsystem {
 
   private final ElevatorIO io;
 
+  /**
+   * Constructs an Elevator object, which controls a suite of game piece manipulation mechanisms on the robot
+   * @param io The ElevatorIO object for the program to interface with
+   */
   public Elevator(ElevatorIO io) {
     this.io = io;
     this.io.configureMotors();
   }
 
-  /** Moves the elevator to the indicated "level" at the given speed */
+  /**
+   * Moves the elevator to a specific "level"
+   * @param speed The speed at which to move the elevator, as a decimal percentage
+   * @param level The "level" to move the elevator to
+   */
   public void setLevel(double speed, int level) {
     io.setLevel(speed, level);
   }
 
-  /** Returns the current "level" of the elevator */
+  /**
+   * Gets the last reached "level" of the elevator
+   * @return The level of the elevator, as an integer
+   */
   public int getLevel() {
     return io.getLevel();
   }
 
   /**
-   * This method will return the "level" corresponding to whatever sensor is active. If no sensor is
-   * detecting, it will return a -1
-   */
+   * Gets the exact level of the elevator, for use with internal logic
+   * @return The level of the elevator as an integer, defaulting to -1 if it is not at any exact level  
+   */ 
   public int getExactLevel() {
     return io.getExactLevel();
   }
 
-  /** Stops the elevating mechanism */
+  /**
+   * Stops the motion of the elevator
+   */
   public void stop() {
     io.stop();
   }
 
   /**
-   * Runs the coral intake at the given speed. This method DOES NOT stop the intake motor at any
-   * point
+   * Runs the intake without a built-in stop
+   * @param speed The speed at which to run the intake motor, as a decimal percentage
    */
   public void activeIntake(double speed) {
     io.activeIntake(speed);
   }
 
-  /** Runs the coral intake at the given speed for the given amount of time in seconds */
+  /**
+   * Runs the intake for a set amount of time before stopping
+   * @param speed The speed at which to run the intake motor, as a decimal percentage
+   * @param time The time to run the intake motor for, in seconds
+   */
   public void timedIntake(double speed, double time) {
     io.timedIntake(speed, time);
   }
 
-  /** Currently empty; will only be used if a sensor is added to the intake */
+  /**
+   * CURRENTLY EMPTY; Runs the intake until a sensor is triggered
+   * @param speed The speed at which to run the intake motor, as a decimal percentage
+   */
   public void sensorIntake(double speed) {
     io.sensorIntake(speed);
   }
 
-  /** Stops the intake motor */
+  /** 
+   * Stops the intake motor 
+   */
   public void stopIntake() {
     io.stopIntake();
   }
 
-  /**
-   * Runs the algae intake at the given speed. This method DOES NOT stop the algae motor at any
-   * point
+ /**
+   * Runs the algae intake without a built-in stop
+   * @param speed The speed at which to run the algae intake motor, as a decimal percentage
    */
   public void algaeIntake(double speed) {
     io.algaeIntake(speed);
   }
 
-  /** Runs the algae intake at the given speed for the given amount of time in seconds */
+  /**
+   * Runs the algae intake for a set amount of time before stopping
+   * @param speed The speed at which to run the algae intake motor, as a decimal percentage
+   * @param time The time to run the algae intake for, in seconds
+   */
   public void timedAlgae(double speed, double time) {
     io.timedAlgae(speed, time);
   }
 
-  /** Stops the algae motor */
+  /**
+   * Stops the algae intake motor
+   */
   public void stopAlgae() {
     io.stopAlgae();
   }
 
+  /**
+  * Temporary method for testing elevator movement
+  * @param speed The speed at which the elevator will move
+  */
   public void runMotor(double speed) {
     io.runMotor(speed);
   }
@@ -94,6 +126,10 @@ public class Elevator extends RBSISubsystem {
     io.setVoltage(volts);
   }
 
+  /**
+   * Runs the elevator until it reaches a specific sensor
+   * @param speed The speed at which to run the elevator, as a decimal percentage
+   */
   public void runToSensor(double speed) {
     io.runToSensor(speed);
   }
