@@ -178,7 +178,7 @@ public class Drive extends SubsystemBase {
         new SysIdRoutine(
             new SysIdRoutine.Config(
                 null,
-                Volts.of(4.0),
+                null,
                 null,
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(

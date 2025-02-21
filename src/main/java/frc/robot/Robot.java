@@ -94,6 +94,8 @@ public class Robot extends LoggedRobot {
     // Create a timer to disable motor brake a few seconds after disable. This will let the robot
     // stop immediately when disabled, but then also let it be pushed more
     m_disabledTimer = new Timer();
+
+    m_robotContainer.randomizeLEDOnStartup();
   }
 
   /** This function is called periodically during all modes. */
@@ -123,6 +125,8 @@ public class Robot extends LoggedRobot {
     m_robotContainer.setMotorBrake(true);
     m_disabledTimer.reset();
     m_disabledTimer.start();
+
+    m_robotContainer.randomizeLEDOnStartup();
   }
 
   /** This function is called periodically when disabled. */
@@ -159,6 +163,8 @@ public class Robot extends LoggedRobot {
         throw new RuntimeException(
             "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
+
+    m_robotContainer.randomizeLEDOnStartup();
   }
 
   /** This function is called periodically during autonomous. */
@@ -178,6 +184,8 @@ public class Robot extends LoggedRobot {
       CommandScheduler.getInstance().cancelAll();
     }
     m_robotContainer.setMotorBrake(true);
+
+    m_robotContainer.randomizeLEDOnStartup();
   }
 
   /** This function is called periodically during operator control. */
@@ -189,6 +197,8 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    m_robotContainer.randomizeLEDOnStartup();
   }
 
   /** This function is called periodically during test mode. */

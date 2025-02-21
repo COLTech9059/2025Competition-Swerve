@@ -10,11 +10,6 @@ public class Elevator extends RBSISubsystem {
 
   private final ElevatorIO io;
 
-  // public Elevator() {
-  //   io = new ElevatorIOSpark();
-  //   io.configureMotors();
-  // }
-
   public Elevator(ElevatorIO io) {
     this.io = io;
     this.io.configureMotors();
@@ -88,6 +83,11 @@ public class Elevator extends RBSISubsystem {
     io.runMotor(speed);
   }
 
+
+  @Override
+  public void periodic() {
+    io.encoderUpdates();
+
   public void setVoltage(double volts) {
     io.setVoltage(volts);
   }
@@ -95,9 +95,5 @@ public class Elevator extends RBSISubsystem {
   public void runToSensor(double speed) {
     io.runToSensor(speed);
   }
-
-  @Override
-  public void periodic() {
-    io.periodicUpdates();
   }
 }
