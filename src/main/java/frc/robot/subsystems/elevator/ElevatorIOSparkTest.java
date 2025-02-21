@@ -11,6 +11,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
+/**
+ * Alternative hardware class for Elevator which uses SparkMaxes for a testbed setup
+ * @author DevAspen
+ */
 public class ElevatorIOSparkTest extends ElevatorIO {
 
   // Define motor objects

@@ -10,6 +10,10 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 
+/**
+ * Hardware class for Elevator which uses SparkMaxes 
+ * @author DevAspen & SomnolentStone
+ */
 public class ElevatorIOSpark extends ElevatorIO {
 
   // Helper variable to track the relative position of the elevator when it isn't at a sensor

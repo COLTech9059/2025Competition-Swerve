@@ -5,10 +5,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.leds.LEDRoutine;
 import frc.robot.subsystems.leds.LEDs;
 
+/**
+ * Contains all the commands used to interface with an LEDs subsystem
+ * @author DevAspen
+ */
 public class LEDCommands {
 
   /**

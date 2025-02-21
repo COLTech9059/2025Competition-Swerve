@@ -5,6 +5,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.leds.LEDs;
 
+/**
+ * Contains all the commands used to interface with an elevator subsystem.
+ * @author DevAspen & SomnolentStone
+ */
 public class ElevatorCommands {
 
   /**

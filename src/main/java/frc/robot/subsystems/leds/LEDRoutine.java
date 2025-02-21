@@ -2,6 +2,10 @@ package frc.robot.subsystems.leds;
 
 import java.util.ArrayList;
 
+/**
+ * Stores an array of pattern ids from the Blinkin pattern chart and facilitates the usage of said patterns in a full routine
+ * @author DevAspen
+ */
 public class LEDRoutine {
 
   private LEDs led;

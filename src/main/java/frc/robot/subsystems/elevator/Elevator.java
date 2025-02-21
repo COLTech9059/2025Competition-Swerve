@@ -3,8 +3,9 @@ package frc.robot.subsystems.elevator;
 import frc.robot.util.RBSISubsystem;
 
 /**
- * This class encompasses all the hardware on the physical elevator subsystem: the elevating
+ * Encompasses all the hardware on the physical elevator subsystem: the elevating
  * mechanism, the coral mechanism, and the algae mechanism
+ * @author DevAspen & SomnolentStone
  */
 public class Elevator extends RBSISubsystem {
 

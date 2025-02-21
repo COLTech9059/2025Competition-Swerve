@@ -1,5 +1,9 @@
 package frc.robot.subsystems.elevator;
 
+/**
+ * Architecture class which allows the use of multiple hardware classes
+ * @author DevAspen & SomnolentStone
+ */
 public class ElevatorIO {
 
   public void configureMotors() {}
