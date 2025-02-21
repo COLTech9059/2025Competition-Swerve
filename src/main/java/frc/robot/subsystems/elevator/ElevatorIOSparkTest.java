@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
@@ -44,7 +43,11 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   @Override
   public void runToSensor(double speed) {
     eMotor.set(speed);
-    if (testSwitch.get()) eMotor.stopMotor();
+    DriverStation.reportWarning("Running Elevator Motor", false);
+    if (testSwitch.get()) {
+      eMotor.stopMotor();
+      DriverStation.reportWarning("Stopping Elevator Motor", false);
+    }
   }
 
   @Override

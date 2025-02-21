@@ -310,7 +310,8 @@ public class RobotContainer {
         .onTrue(
             ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
 
-    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
+    SmartDashboard.putData(
+        ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     // m_drivebase.setDefaultCommand(
     //     DriveCommands.fieldRelativeDrive(

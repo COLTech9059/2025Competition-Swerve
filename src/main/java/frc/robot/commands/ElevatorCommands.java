@@ -14,7 +14,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command upLevel(Elevator elevator, double speed) {
-    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
+    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
   /**
@@ -25,7 +25,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
+    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
   }
 
   /**
@@ -37,7 +37,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedIntake(Elevator elevator, double speed, double time) {
-    return Commands.run( () -> elevator.timedIntake(speed, time), elevator);
+    return Commands.run(() -> elevator.timedIntake(speed, time), elevator);
   }
 
   /**
@@ -49,7 +49,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedAlgae(Elevator elevator, double speed, double time) {
-    return Commands.run( () -> elevator.timedAlgae(speed, time), elevator);
+    return Commands.run(() -> elevator.timedAlgae(speed, time), elevator);
   }
 
   /**
@@ -63,12 +63,11 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command coralScore(
-    Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
+      Elevator elevator, double speed, int level, double outtakeSpeed, double outtakeTime) {
     return Commands.sequence(
-          Commands.run( () -> elevator.setLevel(speed, level)),
-          Commands.run( () -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
-          Commands.run( () -> elevator.setLevel(speed, 0))
-        );
+        Commands.run(() -> elevator.setLevel(speed, level)),
+        Commands.run(() -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
+        Commands.run(() -> elevator.setLevel(speed, 0)));
   }
 
   /**
@@ -93,7 +92,7 @@ public class ElevatorCommands {
 
   /**
    * Run a timed test of the first stage motor
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @param time The time in seconds to run the motor
@@ -101,25 +100,25 @@ public class ElevatorCommands {
    */
   public static Command oneTest(Elevator elevator, double speed, double time) {
     return Commands.sequence(
-        Commands.runOnce( () -> elevator.runMotor(speed), elevator),
+        Commands.runOnce(() -> elevator.runMotor(speed), elevator),
         Commands.waitSeconds(time),
         Commands.runOnce(elevator::stop, elevator));
   }
 
   /**
    * Set the first stage motor to run without stopping
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
   public static Command runWithoutStop(Elevator elevator, double speed) {
-    return Commands.runOnce( () -> elevator.runMotor(speed), elevator);
+    return Commands.runOnce(() -> elevator.runMotor(speed), elevator);
   }
 
   /**
    * Stop the movement of the elevator, unconditionally
-   * 
+   *
    * @param elevator The elevator subsystem
    * @return The relevant code statements as a Command object
    */
@@ -129,12 +128,12 @@ public class ElevatorCommands {
 
   /**
    * Runs the stage one motor until a sensor is triggered
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
   public static Command runToSensor(Elevator elevator, double speed) {
-    return Commands.run( ()-> elevator.runToSensor(speed), elevator);
+    return Commands.run(() -> elevator.runToSensor(speed), elevator);
   }
 }
