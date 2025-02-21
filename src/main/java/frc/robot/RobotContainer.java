@@ -184,8 +184,8 @@ public class RobotContainer {
         // autoChooserPathPlanner = null;
         // new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
-        autoChooserChoreo = null
-"/
+        // autoChooserChoreo = null;
+
         // autoFactoryChoreo = null;
         break;
 
@@ -200,7 +200,7 @@ public class RobotContainer {
         //         true, // If alliance flipping should be enabled
         //         m_drivebase // The drive subsystem
         //         );
-        autoChooserChoreo = new AutoChooser();
+        // autoChooserChoreo = new AutoChooser();
         // autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
         // autoChooserPathPlanner = null;
