@@ -344,7 +344,7 @@ public class RobotContainer {
     //         () -> -driveStickX.value() / 4,
     //         () -> -turnStickX.value()));
 
-    led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));
+    led.setDefaultCommand(LEDCommands.randomColor(led));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
