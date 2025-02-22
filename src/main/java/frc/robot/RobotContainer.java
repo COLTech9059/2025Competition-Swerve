@@ -21,24 +21,14 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
-
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.LEDCommands;
-import choreo.auto.AutoChooser;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.ElevatorCommands;
@@ -73,6 +63,7 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   // private final Drive m_drivebase;
   private final Elevator elevator;
+
   private final Flywheel m_flywheel;
   private final LEDs led;
 
@@ -86,7 +77,6 @@ public class RobotContainer {
   /** Dashboard inputs ***************************************************** */
   // AutoChoosers for both supported path planning types
   // private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
-
 
   // private final AutoChooser autoChooserChoreo;
 
@@ -298,17 +288,18 @@ public class RobotContainer {
       turnStickX = driverController::getLeftX;
     }
 
-    driverController.b().onTrue(LEDCommands.randomColor(led));
+    // driverController.b().onTrue(LEDCommands.randomColor(led));
 
-    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
+    // driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) +
+    // 1));
 
-    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
+    // driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
     driverController
         .y()
         .onTrue(
-            ElevatorCommands.runWithoutStop(
-                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2)));
+            ElevatorCommands.runToSensor(
+                elevator, SmartDashboard.getNumber("Elevator Speed", 0.2), false));
 
     // PRESS B BUTTON --> Increment Elevator speed by 0.1
     driverController
@@ -343,7 +334,8 @@ public class RobotContainer {
             ElevatorCommands.oneTest(elevator, SmartDashboard.getNumber("Elevator Speed", 0), 1));
 
     SmartDashboard.putData(
-        ElevatorCommands.runToSensor(elevator, SmartDashboard.getNumber("Elevator Speed", 0)));
+        ElevatorCommands.runToSensor(
+            elevator, SmartDashboard.getNumber("Elevator Speed", 0), true));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     // m_drivebase.setDefaultCommand(
     //     DriveCommands.fieldRelativeDrive(

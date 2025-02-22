@@ -58,7 +58,8 @@ public class LEDCommands {
         routine = new LEDRoutine(led, new double[] {0.53, 0.55, 0.41, 0.45});
         return runRoutine(led, routine, 3);
       default:
-        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
+        return Commands.runOnce(
+            () -> DriverStation.reportWarning("Invalid LED routine selected", false));
     }
   }
 
@@ -71,16 +72,17 @@ public class LEDCommands {
    */
   public static Command patternRoutine(LEDs led, int routineID) {
     LEDRoutine routine;
-    
+
     switch (routineID) {
       case 1:
         routine = new LEDRoutine(led, new double[] {-0.99, -0.97, -0.89, -0.79});
         return runRoutine(led, routine, 5);
       default:
-        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
+        return Commands.runOnce(
+            () -> DriverStation.reportWarning("Invalid LED routine selected", false));
     }
   }
- 
+
   /**
    * Runs the pattern of an LEDRoutine object with a delay between pattern cycles
    *

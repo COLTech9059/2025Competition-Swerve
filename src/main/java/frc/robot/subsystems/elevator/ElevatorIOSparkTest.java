@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class ElevatorIOSparkTest extends ElevatorIO {
@@ -18,7 +19,8 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   private SparkMaxConfig eConfig = new SparkMaxConfig();
 
   // Define limit switch objects
-  private DigitalInput testSwitch = new DigitalInput(0);
+  private DigitalInput bottomSwitch = new DigitalInput(0);
+  private DigitalInput topSwitch = new DigitalInput(2);
 
   @Override
   public void configureMotors() {
@@ -41,12 +43,20 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
-  public void runToSensor(double speed) {
-    eMotor.set(speed);
+  public void runToSensor(double speed, boolean top) {
     DriverStation.reportWarning("Running Elevator Motor", false);
-    if (testSwitch.get()) {
-      eMotor.stopMotor();
-      DriverStation.reportWarning("Stopping Elevator Motor", false);
+    if (top) {
+      if (!topSwitch.get()) {
+        eMotor.stopMotor();
+        DriverStation.reportWarning("Stopping Elevator Motor", false);
+        return;
+      } else eMotor.set(speed);
+    } else {
+      if (!bottomSwitch.get()) {
+        eMotor.stopMotor();
+        DriverStation.reportWarning("Stopping Elevator Motor", false);
+        return;
+      } else eMotor.set(speed);
     }
   }
 
@@ -54,5 +64,11 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   public void stop() {
     DriverStation.reportWarning("Stopping Elevator Motor.", false);
     eMotor.stopMotor();
+  }
+
+  @Override
+  public void periodicUpdates() {
+    SmartDashboard.putBoolean("Top Sensor", !topSwitch.get());
+    SmartDashboard.putBoolean("Bottom Sensor", !bottomSwitch.get());
   }
 }
