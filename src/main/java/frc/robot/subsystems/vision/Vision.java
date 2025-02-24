@@ -35,6 +35,7 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
@@ -68,6 +69,14 @@ public class Vision extends SubsystemBase {
    */
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
+  }
+
+  /**
+   * Returns the best PhotonTrackedTarget in view of the specified camera
+   * @param cameraIndex The index of the camera to use
+   */
+  public PhotonTrackedTarget getBestTarget(int cameraIndex) {
+    return inputs[cameraIndex].bestTarget;
   }
 
   @Override

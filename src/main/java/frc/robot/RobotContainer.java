@@ -32,6 +32,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -181,10 +183,10 @@ public class RobotContainer {
     defineAutoCommands();
 
     // Push Subsystems to Dashboard
-    // SmartDashboard.putData(m_drivebase);
-    // SmartDashboard.putData((Sendable) m_drivebase.getGyro());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData((Sendable) m_drivebase.getGyro());
     SmartDashboard.putData(elevator);
-    // SmartDashboard.putData(led);
+    SmartDashboard.putData(led);
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -299,8 +301,8 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() / 4,
-            () -> -driveStickX.value() / 4,
+            () -> -driveStickY.value() / 2,
+            () -> -driveStickX.value() / 2,
             () -> -turnStickX.value()));
 
     // led.setDefaultCommand(LEDCommands.randomColor(led));
@@ -313,9 +315,7 @@ public class RobotContainer {
 
     driverController
         .y()
-        .onTrue(
-            ElevatorCommands.runWithoutStop(
-                elevator, led, SmartDashboard.getNumber("Elevator Speed", 0.2)));
+        .onTrue(DriveCommands.targetAlignment(m_drivebase, m_vision.getBestTarget(0), Constants.Cameras.robotToCamera0, new Transform2d(1, 0, null)));
 
     // PRESS B BUTTON --> Increment Elevator speed by 0.1
     driverController

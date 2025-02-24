@@ -323,6 +323,7 @@ public final class Constants {
 
     // Robot to camera transforms
     // (ONLY USED FOR PHOTONVISION -- Limelight: configure in web UI instead)
+    // TODO: Configure the camera offsets
     public static Transform3d robotToCamera0 =
         new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
     public static Transform3d robotToCamera1 =

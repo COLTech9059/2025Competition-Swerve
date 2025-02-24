@@ -21,6 +21,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -29,18 +30,24 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.SwerveConstants;
+import frc.robot.subsystems.vision.Vision;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class DriveCommands {
 
@@ -110,6 +117,49 @@ public class DriveCommands {
                   omega * drive.getMaxAngularSpeedRadPerSec()));
         },
         drive);
+  }
+
+  /**
+   * Calculates the DoubleSupplier values to be plugged into robotRelativeDrive so the robot can line up with a target april tag
+   * @param target The target april tag
+   * @param cOffset The offset of the camera from the center of the robot
+   * @param rOffset The offset of the robot from the april tag
+   * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
+   */
+  public static DoubleSupplier[] alignmentCalculation(PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
+
+      double yaw = target.getYaw();
+      Transform3d tOffset = target.bestCameraToTarget;
+      double totalOffset = tOffset.getY() + cOffset.getY() - rOffset.getY();
+      double xOffset = -Math.abs(rOffset.getX());
+      DoubleSupplier xSupply = () -> 0;
+      DoubleSupplier ySupply = () -> 0;
+      DoubleSupplier omegaSupply = () -> 0;
+
+      if (Math.abs(yaw) >= 10) {
+        xSupply = () -> 0;
+        ySupply = () -> 0;
+        omegaSupply = () -> yaw * 0.1;
+      } else if (Math.abs(totalOffset) >= 3 && Math.abs(xOffset) >= 3) {
+        xSupply = () -> 0.1 * xOffset;
+        ySupply = () -> 0.5 * totalOffset;
+        omegaSupply = () -> 0;
+      } 
+
+      return new DoubleSupplier[] {xSupply, ySupply, omegaSupply};
+  }
+
+  /**
+   * Constructs and returns a robotRelativeDrive command with the required values to line up with the target april tag
+   * @param drive The Drive subsystem
+   * @param target The target april tag
+   * @param cOffset The offset of the camera from the center of the robot
+   * @param rOffset The offset of the robot from the april tag
+   * @return The robotRelativeDrive Command
+   */
+  public static Command targetAlignment(Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
+    DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
+    return robotRelativeDrive(drive, list[0], list[1], list[2]);
   }
 
   /**
