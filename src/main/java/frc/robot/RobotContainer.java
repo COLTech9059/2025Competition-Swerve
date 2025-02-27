@@ -74,6 +74,9 @@ import frc.robot.util.RBSIEnum;
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
+  // Helper variables
+  private double elevatorSpeed = 0;
+
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
@@ -119,7 +122,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    SmartDashboard.putNumber("Elevator Speed", 0);
+    SmartDashboard.putNumber("Elevator Speed", elevatorSpeed);
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
@@ -322,12 +325,7 @@ public class RobotContainer {
         .b()
         .onTrue(
             Commands.runOnce(
-                () ->
-                    SmartDashboard.putNumber(
-                        "Elevator Speed",
-                        (SmartDashboard.getNumber("Elevator Speed", 0) + .1) > 1
-                            ? -1
-                            : (SmartDashboard.getNumber("Elevator Speed", 0) + .1)),
+                () -> elevatorSpeed += ((elevatorSpeed + 0.1) > 1) ? -elevatorSpeed : 0.1,
                 elevator));
 
     // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
@@ -335,27 +333,22 @@ public class RobotContainer {
         .a()
         .onTrue(
             Commands.runOnce(
-                () ->
-                    SmartDashboard.putNumber(
-                        "Elevator Speed",
-                        (SmartDashboard.getNumber("Elevator Speed", 0) - .1) < -1
-                            ? 1
-                            : (SmartDashboard.getNumber("Elevator Speed", 0) - .1)),
+                () -> elevatorSpeed -= ((elevatorSpeed - 0.1) < 1) ? -elevatorSpeed : 0.1,
                 elevator));
 
     // PRESS X BUTTON --> Run the single motor speed test for the elevator
     driverController
         .x()
         .onTrue(
-            ElevatorCommands.oneTest(elevator, led, SmartDashboard.getNumber("Elevator Speed", 0), 1));
+            ElevatorCommands.oneTest(elevator, led, elevatorSpeed, 1));
 
-    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, SmartDashboard.getNumber("Elevator Speed", 0)));
+    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevatorSpeed));
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() / 4,
-            () -> -driveStickX.value() / 4,
+            () -> -driveStickY.value() / 2,
+            () -> -driveStickX.value() / 2,
             () -> -turnStickX.value()));
 
     led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));

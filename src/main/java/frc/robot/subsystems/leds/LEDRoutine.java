@@ -1,6 +1,5 @@
 package frc.robot.subsystems.leds;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 public class LEDRoutine {
 
   private LEDs led;
-  private int[] ids;
   private ArrayList<Double> powers = new ArrayList<Double>();
   private double length = 0;
 
@@ -24,7 +22,6 @@ public class LEDRoutine {
    */
   public LEDRoutine(LEDs led, int[] ids) {
     this.led = led;
-    this.ids = ids;
     length = ids.length;
 
     for (int i = 0; i < ids.length; i++) {
