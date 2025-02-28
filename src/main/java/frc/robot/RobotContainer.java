@@ -350,8 +350,8 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() / 4,
-            () -> -driveStickX.value() / 4,
+            () -> -driveStickY.value() / 2,
+            () -> -driveStickX.value() / 2,
             () -> -turnStickX.value()));
 
     // led.setDefaultCommand(LEDCommands.randomColor(led));
