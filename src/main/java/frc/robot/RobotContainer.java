@@ -21,7 +21,6 @@ package frc.robot;
 
 import static frc.robot.Constants.Cameras.*;
 
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -32,7 +31,6 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -48,10 +46,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
-import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -74,9 +72,6 @@ import frc.robot.util.RBSIEnum;
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
-  // Helper variables
-  private double elevatorSpeed = 0;
-
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
@@ -87,10 +82,10 @@ public class RobotContainer {
   /** Declare the robot subsystems here ************************************ */
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
-
   private final Elevator elevator;
+
   private final Flywheel m_flywheel;
-  private final LEDs led = new LEDs(new LEDsIOBlinkin());
+  private final LEDs led;
 
   private final LEDRoutine routine1;
 
@@ -104,7 +99,9 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooserPathPlanner;
 
   private final AutoChooser autoChooserChoreo;
+
   private final AutoFactory autoFactoryChoreo;
+
   // Input estimated battery capacity (if full, use printed value)
   private final LoggedTunableNumber batteryCapacity =
       new LoggedTunableNumber("Battery Amp-Hours", 18.0);
@@ -122,14 +119,13 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    SmartDashboard.putNumber("Elevator Speed", elevatorSpeed);
-
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
@@ -155,7 +151,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
-
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
@@ -168,7 +164,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
-
+        led = new LEDs(new LEDsIOBlinkin());
         elevator = new Elevator(new ElevatorIOSparkTest());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
@@ -194,10 +190,11 @@ public class RobotContainer {
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
-        autoChooserPathPlanner =
+        autoChooserPathPlanner = null;
         new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
+
         autoFactoryChoreo = null;
         break;
 
@@ -205,8 +202,7 @@ public class RobotContainer {
         autoFactoryChoreo =
             new AutoFactory(
                 m_drivebase::getPose, // A function that returns the current robot pose
-                m_drivebase::resetOdometry, // A function that resets the current robot pose to the
-                // provided Pose2d
+                m_drivebase::resetOdometry, // A function that resets the current robot pose to the provided Pose2d
                 m_drivebase::followTrajectory, // The drive subsystem trajectory follower
                 true, // If alliance flipping should be enabled
                 m_drivebase // The drive subsystem
@@ -236,7 +232,6 @@ public class RobotContainer {
 
     // Define SysId Routines
     definesysIdRoutines();
-
     // Configure the button and trigger bindings
     configureBindings();
   }
@@ -247,14 +242,30 @@ public class RobotContainer {
     // Register Named Commands for use in PathPlanner autos
     // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
 
-    NamedCommands.registerCommand(
-    "L3 Score", ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5));
+    // NamedCommands.registerCommand(
+    // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
     // Register Event Triggers for use in PathPlanner paths
     new EventTrigger("Collect Coral")
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralCollect(elevator, led, 0.35, 0.5, 1.5), elevator));
+
+    new EventTrigger("L3 Score")
+        .onTrue(
+            Commands.runOnce(
+                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
+
+    new EventTrigger("Collect Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
+
+    new EventTrigger("Score Algae")
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
+
+    NamedCommands.registerCommand(
+        "L3 Score", ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5));
+
+    // Register Event Triggers for use in PathPlanner paths
     new EventTrigger("Collect Coral")
         .onTrue(
             Commands.runOnce(
@@ -264,18 +275,12 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
-    new EventTrigger("L3 Score")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
 
     new EventTrigger("Collect Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5),
-    elevator));
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
 
     new EventTrigger("Score Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5),
-    elevator));
+        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
 
   /**
@@ -300,32 +305,25 @@ public class RobotContainer {
       turnStickX = driverController::getLeftX;
     }
 
-    // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
-    m_drivebase.setDefaultCommand(
-        DriveCommands.fieldRelativeDrive(
-            m_drivebase,
-            () -> -driveStickY.value() / 2,
-            () -> -driveStickX.value() / 2,
-            () -> -turnStickX.value()));
+    // driverController.b().onTrue(LEDCommands.randomColor(led));
 
-    // led.setDefaultCommand(LEDCommands.randomColor(led));
+    // driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) +
+    // 1));
 
-    driverController.b().onTrue(LEDCommands.randomColor(led));
-
-    driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) + 1));
-
-    driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
+    // driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
     driverController
         .y()
-        .onTrue(DriveCommands.targetAlignment(m_drivebase, m_vision.getBestTarget(0), Constants.Cameras.robotToCamera0, new Transform2d(1, 0, null)));
+        .onTrue(
+            ElevatorCommands.runToSensor(
+                elevator, led, elevator.getSpeed()));
 
     // PRESS B BUTTON --> Increment Elevator speed by 0.1
     driverController
         .b()
         .onTrue(
             Commands.runOnce(
-                () -> elevatorSpeed += ((elevatorSpeed + 0.1) > 1) ? -elevatorSpeed : 0.1,
+                () -> elevator.incrementSpeed(0.1),
                 elevator));
 
     // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
@@ -333,25 +331,28 @@ public class RobotContainer {
         .a()
         .onTrue(
             Commands.runOnce(
-                () -> elevatorSpeed -= ((elevatorSpeed - 0.1) < 1) ? -elevatorSpeed : 0.1,
+                () -> elevator.decrementSpeed(0.1),
                 elevator));
 
     // PRESS X BUTTON --> Run the single motor speed test for the elevator
     driverController
         .x()
         .onTrue(
-            ElevatorCommands.oneTest(elevator, led, elevatorSpeed, 1));
+            ElevatorCommands.oneTest(elevator, led, elevator.getSpeed(), 1));
 
-    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevatorSpeed));
+    SmartDashboard.putData(
+        ElevatorCommands.runToSensor(
+            elevator, led, elevator.getSpeed()));
+
     // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() / 2,
-            () -> -driveStickX.value() / 2,
+            () -> -driveStickY.value() / 4,
+            () -> -driveStickX.value() / 4,
             () -> -turnStickX.value()));
 
-    led.setDefaultCommand(Commands.runOnce(() -> LEDCommands.randomColor(led), led));
+    led.setDefaultCommand(LEDCommands.randomColor(led));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
@@ -388,43 +389,6 @@ public class RobotContainer {
     // // Press X button --> Stop with wheels in X-Lock position
     // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
-    // SysID logging.
-    // driverController.start().and(driverController.x()).whileTrue(m_drivebase.sysIdDynamic(Direction.kForward));
-    // driverController.start().and(driverController.y()).whileTrue(m_drivebase.sysIdDynamic(Direction.kReverse));
-    // driverController.back().and(driverController.x()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kForward));
-    // driverController.back().and(driverController.y()).whileTrue(m_drivebase.sysIdQuasistatic(Direction.kReverse));
-    
-    // Left + Right trigger --> control elevator arm (TODO: temporary addition, comment out if you don't want it.)
-    driverController
-        .rightTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator,
-    driverController.getRightTriggerAxis()));
-    driverController
-        .leftTrigger()
-        .whileTrue(ElevatorCommands.moveElevator(elevator,
-    -driverController.getLeftTriggerAxis()));
-
-    // // Press RIGHT BUMPER --> Move elevator up one level
-    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.35));
-
-    // // Press LEFT BUMPER --> Move elevator down one level
-    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.35));
-
-    // // Press LEFT TRIGGER --> intake Coral
-    // operatorController.leftTrigger().onTrue(ElevatorCommands.timedIntake(elevator, 0.5, 1));
-
-    // // Press RIGHT TRIGGER --> outtake Coral
-    // operatorController.rightTrigger().onTrue(ElevatorCommands.timedIntake(elevator, -0.5, 1.25));
-
-    // // Press B button --> intake Algae
-    // operatorController.b().onTrue(ElevatorCommands.timedAlgae(elevator, 0.5, 1.5));
-
-    // // Press A button --> outtake Algae
-    // operatorController.a().onTrue(ElevatorCommands.timedAlgae(elevator, -0.5, 1.75));
-
-    // // Press X button --> level 3 Coral score
-    // operatorController.x().onTrue(ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.25));
-
     // Press Y button --> Manually Re-Zero the Gyro
     // driverController
     //     .y()
@@ -449,6 +413,7 @@ public class RobotContainer {
   }
 
   public void randomizeLEDOnStartup() {
+    // Commands.runOnce(() -> LEDCommands.randomColor(led), led);
     CommandScheduler.getInstance().schedule(LEDCommands.randomColor(led));
   }
 
@@ -500,7 +465,7 @@ public class RobotContainer {
    */
   private void definesysIdRoutines() {
     if (Constants.getAutoType() == RBSIEnum.AutoType.PATHPLANNER) {
-      // Drivebase characterization
+    //   Drivebase characterization
       autoChooserPathPlanner.addOption(
           "Drive Wheel Radius Characterization",
           DriveCommands.wheelRadiusCharacterization(m_drivebase));
@@ -520,7 +485,7 @@ public class RobotContainer {
           "Drive SysId (Dynamic Reverse)",
           m_drivebase.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-      // Example Flywheel SysId Characterization
+    //   Example Flywheel SysId Characterization
       autoChooserPathPlanner.addOption(
           "Flywheel SysId (Quasistatic Forward)",
           m_flywheel.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
@@ -542,27 +507,28 @@ public class RobotContainer {
    * <p>NOTE: This would normally be in a spearate file.
    */
   private AutoRoutine twoPieceAuto() {
-    AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-    // Load the routine's trajectories
-    AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
-    AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
+  AutoRoutine routine = autoFactoryChoreo.newRoutine("twoPieceAuto");
 
-    // // When the routine begins, reset odometry and start the first trajectory
-    routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
+//   Load the routine's trajectories
+  AutoTrajectory pickupTraj = routine.trajectory("pickupGamepiece");
+  AutoTrajectory scoreTraj = routine.trajectory("scoreGamepiece");
 
-    // Starting at the event marker named "intake", run the intake
-    // pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
+//   When the routine begins, reset odometry and start the first trajectory
+  routine.active().onTrue(Commands.sequence(pickupTraj.resetOdometry(), pickupTraj.cmd()));
 
-    // When the trajectory is done, start the next trajectory
-    pickupTraj.done().onTrue(scoreTraj.cmd());
+//   Starting at the event marker named "intake", run the intake
+//   pickupTraj.atTime("intake").onTrue(intakeSubsystem.intake());
 
-    // While the trajectory is active, prepare the scoring subsystem
-    // scoreTraj.active().whileTrue(scoringSubsystem.getReady());
+//   When the trajectory is done, start the next trajectory
+  pickupTraj.done().onTrue(scoreTraj.cmd());
 
-    // When the trajectory is done, score
-    // scoreTraj.done().onTrue(scoringSubsystem.score());
+//   While the trajectory is active, prepare the scoring subsystem
+//   scoreTraj.active().whileTrue(scoringSubsystem.getReady());
 
-    return routine;
+//   When the trajectory is done, score
+//   scoreTraj.done().onTrue(scoringSubsystem.score());
+
+  return routine;
   }
 }

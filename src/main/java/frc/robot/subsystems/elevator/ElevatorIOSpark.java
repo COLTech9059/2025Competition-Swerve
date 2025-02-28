@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 /**
@@ -16,8 +17,9 @@ import frc.robot.Constants;
  */
 public class ElevatorIOSpark extends ElevatorIO {
 
-  // Helper variable to track the relative position of the elevator when it isn't at a sensor
+  // Helper variables
   private int levelTracker = 0;
+  private double elevatorSpeed = 0;
 
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
@@ -199,10 +201,30 @@ public class ElevatorIOSpark extends ElevatorIO {
     algae.stopMotor();
   }
 
+  @Override
+  public double getSpeed() {
+    return elevatorSpeed;
+  }
+
+  // Increments the elevator speed
+  @Override
+  public void incrementSpeed(double value) {
+    elevatorSpeed += Math.abs(value);
+    if (elevatorSpeed > 1) elevatorSpeed = 1;
+  }
+
+  // Decrements the elevator speed
+  @Override
+  public void decrementSpeed(double value) {
+    elevatorSpeed -= Math.abs(value);
+    if (elevatorSpeed < -1) elevatorSpeed = -1;
+  }
+
   // Updates encoder values according to elevator level
   @Override
-
   public void periodicUpdates() {
+    SmartDashboard.putNumber("Elevator Speed", elevatorSpeed);
+
     if (getLevel() == 1) setEncoders(Constants.level1);
     if (getLevel() == 2) setEncoders(Constants.level2);
     if (getLevel() == 3) setEncoders(Constants.level3);

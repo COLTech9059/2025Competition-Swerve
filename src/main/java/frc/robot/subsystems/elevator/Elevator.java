@@ -127,6 +127,29 @@ public class Elevator extends RBSISubsystem {
   }
 
   /**
+   * Returns the speed of the elevator
+   */
+  public double getSpeed() {
+    return io.getSpeed();
+  }
+
+  /**
+   * Increases the elevator speed by the given amount
+   * @param value The double value to increase the speed by
+   */
+  public void incrementSpeed(double value) {
+    io.incrementSpeed(value);
+  }
+
+  /**
+   * Decreases the elevator speed by the given amount
+   * @param value The double value to decrease the speed by
+   */
+  public void decrementSpeed(double value) {
+    io.decrementSpeed(value);
+  }
+
+  /**
    * Runs the elevator until it reaches a specific sensor
    * @param speed The speed at which to run the elevator, as a decimal percentage
    */

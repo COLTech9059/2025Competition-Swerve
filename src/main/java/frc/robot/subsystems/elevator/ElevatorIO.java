@@ -96,6 +96,25 @@ public class ElevatorIO {
   public void runToSensor(double speed) {}
 
   /**
+   * Returns the speed of the elevator
+   */
+  public double getSpeed() {
+    return 0; 
+  }
+
+  /**
+   * Increases the elevator speed by the given amount
+   * @param value The double value to increase the speed by
+   */
+  public void incrementSpeed(double value) {}
+
+  /**
+   * Decreases the elevator speed by the given amount
+   * @param value The double value to decrease the speed by
+   */
+  public void decrementSpeed(double value) {}
+
+  /**
    * Updates values that need to be changed every period
    */
   public void periodicUpdates() {}
