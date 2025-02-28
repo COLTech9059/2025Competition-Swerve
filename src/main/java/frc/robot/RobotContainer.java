@@ -31,6 +31,8 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -352,7 +354,10 @@ public class RobotContainer {
             () -> -driveStickX.value() / 4,
             () -> -turnStickX.value()));
 
-    led.setDefaultCommand(LEDCommands.randomColor(led));
+    // led.setDefaultCommand(LEDCommands.randomColor(led));
+
+    // PRESS B BUTTON --> Align with an april tag
+    driverController.b().onTrue(DriveCommands.targetAlignment(m_drivebase, m_vision.getBestTarget(0), robotToCamera0, new Transform2d(0, 0, new Rotation2d())));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
