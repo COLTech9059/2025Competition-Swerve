@@ -104,11 +104,11 @@ public final class Constants {
   /** General Constants **************************************************** */
 
   // Device ID Constants
-  public static final int eMotorID = 2;
-
+  public static final int eMotorID = 14;
   public static final int eMotor2ID = 15;
   public static final int intakeID = 16;
   public static final int algaeID = 17;
+  public static final int cageID = 18;
 
   public static final int level0ID = 1;
   public static final int level1ID = 2;

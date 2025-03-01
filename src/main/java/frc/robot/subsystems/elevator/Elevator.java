@@ -150,6 +150,13 @@ public class Elevator extends RBSISubsystem {
   }
 
   /**
+   * Returns the status of the limit switch
+   */
+  public boolean getSwitch() {
+    return io.getSwitch();
+  }
+
+  /**
    * Runs the elevator until it reaches a specific sensor
    * @param speed The speed at which to run the elevator, as a decimal percentage
    */

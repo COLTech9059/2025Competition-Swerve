@@ -115,6 +115,11 @@ public class ElevatorIO {
   public void decrementSpeed(double value) {}
 
   /**
+   * Returns the status of the limit switch
+   */
+  public boolean getSwitch() {return false;}
+
+  /**
    * Updates values that need to be changed every period
    */
   public void periodicUpdates() {}

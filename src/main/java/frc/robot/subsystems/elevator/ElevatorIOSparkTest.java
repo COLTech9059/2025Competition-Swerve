@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 /**
@@ -52,8 +53,18 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
+  public boolean getSwitch() {
+    return testSwitch.get();
+  }
+
+  @Override
   public void stop() {
     DriverStation.reportWarning("Stopping Elevator Motor.", false);
     eMotor.stopMotor();
+  }
+
+  @Override
+  public void periodicUpdates() {
+    SmartDashboard.putBoolean("Limit Switch", testSwitch.get());
   }
 }

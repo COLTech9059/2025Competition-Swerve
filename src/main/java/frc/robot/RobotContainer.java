@@ -45,10 +45,13 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
+import frc.robot.subsystems.cage.Cage;
+import frc.robot.subsystems.cage.CageIOSpark;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
@@ -85,6 +88,7 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
   private final Elevator elevator;
+  private final Cage cage = new Cage(new CageIOSpark());
 
   private final Flywheel m_flywheel;
   private final LEDs led;
@@ -314,23 +318,17 @@ public class RobotContainer {
 
     // driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
 
+    // Press Right Bumper --> Increment Elevator speed by 0.1
     driverController
-        .y()
-        .onTrue(
-            ElevatorCommands.runToSensor(
-                elevator, led, elevator.getSpeed()));
-
-    // PRESS B BUTTON --> Increment Elevator speed by 0.1
-    driverController
-        .b()
+        .rightBumper()
         .onTrue(
             Commands.runOnce(
                 () -> elevator.incrementSpeed(0.1),
                 elevator));
 
-    // PRESS A BUTTON --> Decrement Elevator Speed by 0.1
+    // Press Left Bumper --> Decrement Elevator Speed by 0.1
     driverController
-        .a()
+        .leftBumper()
         .onTrue(
             Commands.runOnce(
                 () -> elevator.decrementSpeed(0.1),
@@ -342,6 +340,9 @@ public class RobotContainer {
         .onTrue(
             ElevatorCommands.oneTest(elevator, led, elevator.getSpeed(), 1));
 
+    // Press A Button --> Run the cage mechanism for a set amount of time
+    driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
+
     SmartDashboard.putData(
         ElevatorCommands.runToSensor(
             elevator, led, elevator.getSpeed()));
@@ -350,8 +351,8 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() / 2,
-            () -> -driveStickX.value() / 2,
+            () -> -driveStickY.value(),
+            () -> -driveStickX.value(),
             () -> -turnStickX.value()));
 
     // led.setDefaultCommand(LEDCommands.randomColor(led));
@@ -372,48 +373,6 @@ public class RobotContainer {
     //                     () -> -driveStickX.value(),
     //                     () -> turnStickX.value()),
     //             m_drivebase));
-
-    // Press B Button --> INCREASE DRIVE SPEED
-    // driverController
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () ->
-    //                 SmartDashboard.putNumber(
-    //                     "Drive Speed",
-    //                     (SmartDashboard.getNumber("Drive Speed", 0) + .1) > 1
-    //                         ? 0
-    //                         : (SmartDashboard.getNumber("Drive Speed", 0) + .1)),
-    //             m_drivebase));
-
-    // Press A button -> BRAKE
-    // driverController
-    //     .a()
-    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
-
-    // // Press X button --> Stop with wheels in X-Lock position
-    // driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press Y button --> Manually Re-Zero the Gyro
-    // driverController
-    //     .y()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     m_drivebase.resetPose(
-    //                         new Pose2d(m_drivebase.getPose().getTranslation(), new
-    // Rotation2d())),
-    //                 m_drivebase)
-    //             .ignoringDisable(true));
-
-    // Press RIGHT BUMPER --> Run the example flywheel
-    // driverController
-    //     .rightBumper()
-    //     .whileTrue(
-    //         Commands.startEnd(
-    //             () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
-    //             m_flywheel::stop,
-    //             m_flywheel));
 
   }
 
