@@ -26,11 +26,8 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -63,14 +60,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
-
-  // Define PathPlanner paths for use in teleop
-  private PathPlannerPath path;
-
-  // Create the constraints to use while pathfinding. The constraints defined in the path will only be used for the path.
-  private PathConstraints constraints = new PathConstraints(
-        3.0, 4.0,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
@@ -110,10 +99,6 @@ public class RobotContainer {
    * devices, and commands.
    */
   public RobotContainer() {
-
-    try {
-        path = PathPlannerPath.fromPathFile("Corner Test");        
-    } catch (Exception e) {}
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
@@ -223,9 +208,6 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    // Build pathfinding commands
-    Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(path, constraints);
-
     // Send the proper joystick input based on driver preference -- Set this in `Constants.java`
     GetJoystickValue driveStickY;
     GetJoystickValue driveStickX;
@@ -244,40 +226,31 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() * m_drivebase.getSpeed(),
-            () -> -driveStickX.value() * m_drivebase.getSpeed(),
-            () -> -turnStickX.value() * m_drivebase.getSpeed()));
+            () -> -driveStickY.value(),
+            () -> -driveStickX.value(),
+            () -> -turnStickX.value()));
 
     // ** Example Commands -- Remap, remove, or change as desired **
     // Press B button while driving --> ROBOT-CENTRIC
-    // driverController
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () ->
-    //                 DriveCommands.robotRelativeDrive(
-    //                     m_drivebase,
-    //                     () -> -driveStickY.value(),
-    //                     () -> -driveStickX.value(),
-    //                     () -> turnStickX.value()),
-    //             m_drivebase));
+    driverController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    DriveCommands.robotRelativeDrive(
+                        m_drivebase,
+                        () -> -driveStickY.value(),
+                        () -> -driveStickX.value(),
+                        () -> turnStickX.value()),
+                m_drivebase));
 
     // Press A button -> BRAKE
-    // driverController
-    //     .a()
-    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
+    driverController
+        .a()
+        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
-    // Press A button --> Stop with wheels in X-Lock position
-    driverController.a().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press B button --> increment the drive speed
-    driverController.rightBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
-
-    // Press X button --> decrement the drive speed
-    driverController.leftBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
-
-    // Press B Button --> Pathfind to path
-    driverController.b().onTrue(pathfindingCommand);
+    // Press X button --> Stop with wheels in X-Lock position
+    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press Y button --> Manually Re-Zero the Gyro
     driverController
