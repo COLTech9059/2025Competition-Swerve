@@ -27,7 +27,7 @@ public class ElevatorIOSpark extends ElevatorIO {
   private SparkMax eMotor2 = new SparkMax(Constants.eMotor2ID, MotorType.kBrushless);
   private RelativeEncoder eEncoder2 = eMotor2.getEncoder();
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
-  private SparkMax algae = new SparkMax(Constants.algaeID, MotorType.kBrushless);
+  // private SparkMax algae = new SparkMax(Constants.algaeID, MotorType.kBrushless);
   private SparkBaseConfig eMConfig;
   private SparkBaseConfig eM2Config;
 
@@ -176,29 +176,6 @@ public class ElevatorIOSpark extends ElevatorIO {
   @Override
   public void stopIntake() {
     intake.stopMotor();
-  }
-
-  // Set the algae motor to the given speed
-  @Override
-  public void algaeIntake(double speed) {
-    algae.set(speed);
-  }
-
-  // Set the algae motor to the given speed for a given amount of time
-  @Override
-  public void timedAlgae(double speed, double time) {
-    Timer timer = new Timer();
-    timer.reset();
-    timer.start();
-
-    algae.set(speed);
-    if (timer.get() >= time) algae.stopMotor();
-  }
-
-  // Stops the algae motor
-  @Override
-  public void stopAlgae() {
-    algae.stopMotor();
   }
 
   @Override
