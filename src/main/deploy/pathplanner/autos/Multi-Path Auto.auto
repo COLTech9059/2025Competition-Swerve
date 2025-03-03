@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Corner Test"
+            "pathName": "Multi-Path 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Multi-Path 2"
           }
         }
       ]
