@@ -41,18 +41,6 @@ public class ElevatorCommands {
   }
 
   /**
-   * Runs the algae intake for the specified speed and time
-   *
-   * @param elevator the elevator subsystem
-   * @param speed the speed (as a decicmal percentage) at which the algae motor will run
-   * @param time the amount of time (in seconds) that the motor will run for
-   * @return the relevant code statements as a Command object
-   */
-  public static Command timedAlgae(Elevator elevator, double speed, double time) {
-    return Commands.run(() -> elevator.timedAlgae(speed, time), elevator);
-  }
-
-  /**
    * Scores a coral gamepiece at the specified level, then goes down to level 0
    *
    * @param elevator the elevator subsystem

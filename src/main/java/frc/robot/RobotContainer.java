@@ -239,12 +239,6 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
 
-    new EventTrigger("Collect Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
-
-    new EventTrigger("Score Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
-
     NamedCommands.registerCommand(
         "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
 
@@ -258,12 +252,6 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5), elevator));
-
-    new EventTrigger("Collect Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, 0.5, 1.5), elevator));
-
-    new EventTrigger("Score Algae")
-        .onTrue(Commands.runOnce(() -> ElevatorCommands.timedAlgae(elevator, -0.5, 1.5), elevator));
   }
 
   /**
