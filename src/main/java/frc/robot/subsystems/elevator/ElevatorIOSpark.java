@@ -25,8 +25,8 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   private RelativeEncoder eEncoder = eMotor.getEncoder();
-  private SparkMax eMotor2 = new SparkMax(Constants.eMotor2ID, MotorType.kBrushless);
-  private RelativeEncoder eEncoder2 = eMotor2.getEncoder();
+  // private SparkMax eMotor2 = new SparkMax(Constants.eMotor2ID, MotorType.kBrushless);
+  // private RelativeEncoder eEncoder2 = eMotor2.getEncoder();
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
   // private SparkMax algae = new SparkMax(Constants.algaeID, MotorType.kBrushless);
   private SparkBaseConfig eMConfig;
@@ -51,19 +51,19 @@ public class ElevatorIOSpark extends ElevatorIO {
     eM2Config.closedLoopRampRate(0.2);
 
     // Apply configuration
-    eMotor2.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // eMotor2.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     eMotor.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   // Get the average between the two encoders
   private double getEncoderAverage() {
-    return (eEncoder.getPosition() + eEncoder2.getPosition()) / 2;
+    return (eEncoder.getPosition() /*+ eEncoder2.getPosition()/* */) / 2;
   }
 
   // Set the encoders to a specific position
   private void setEncoders(double pos) {
     eEncoder.setPosition(pos);
-    eEncoder2.setPosition(pos);
+    // eEncoder2.setPosition(pos);
   }
 
   // Move the elevator to the given level at the given speed
@@ -72,20 +72,20 @@ public class ElevatorIOSpark extends ElevatorIO {
     speed = Math.abs(speed);
     if (getExactLevel() == level) {
       eMotor.stopMotor();
-      eMotor2.stopMotor();
+      // eMotor2.stopMotor();
     } else {
 
       if (getLevel() > level) {
 
         if (!stage2Switch.get()) {
           eMotor.stopMotor();
-          eMotor2.set(-speed);
+          // eMotor2.set(-speed);
         } else if (stage2Switch.get() && !l0Switch.get()) {
           eMotor.set(-speed);
-          eMotor2.stopMotor();
+          // eMotor2.stopMotor();
         } else {
           eMotor.stopMotor();
-          eMotor2.stopMotor();
+          // eMotor2.stopMotor();
         }
       }
 
@@ -93,13 +93,13 @@ public class ElevatorIOSpark extends ElevatorIO {
 
         if (l2Switch.get() && !l3Switch.get()) {
           eMotor.stopMotor();
-          eMotor2.set(speed);
+          // eMotor2.set(speed);
         } else if (!l2Switch.get()) {
           eMotor.set(speed);
-          eMotor2.stopMotor();
+          // eMotor2.stopMotor();
         } else {
           eMotor.stopMotor();
-          eMotor2.stopMotor();
+          // eMotor2.stopMotor();
         }
       }
     }
