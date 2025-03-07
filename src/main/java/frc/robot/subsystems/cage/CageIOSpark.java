@@ -1,8 +1,8 @@
 package frc.robot.subsystems.cage;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 public class CageIOSpark extends CageIO {
 

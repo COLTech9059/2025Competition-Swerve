@@ -73,6 +73,7 @@ public class Vision extends SubsystemBase {
 
   /**
    * Returns the best PhotonTrackedTarget in view of the specified camera
+   *
    * @param cameraIndex The index of the camera to use
    */
   public PhotonTrackedTarget getBestTarget(int cameraIndex) {

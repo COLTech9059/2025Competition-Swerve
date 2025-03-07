@@ -10,6 +10,7 @@ import frc.robot.subsystems.leds.LEDs;
 
 /**
  * Contains all the commands used to interface with an LEDs subsystem
+ *
  * @author DevAspen
  */
 public class LEDCommands {
@@ -25,7 +26,7 @@ public class LEDCommands {
   }
 
   public static Command setColor(LEDs led, String color) {
-    return Commands.run( () -> led.setPattern(color));
+    return Commands.run(() -> led.setPattern(color));
   }
 
   /**
@@ -66,7 +67,8 @@ public class LEDCommands {
         routine = new LEDRoutine(led, new double[] {0.53, 0.55, 0.41, 0.45});
         return runRoutine(led, routine, 3);
       default:
-        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
+        return Commands.runOnce(
+            () -> DriverStation.reportWarning("Invalid LED routine selected", false));
     }
   }
 
@@ -79,16 +81,17 @@ public class LEDCommands {
    */
   public static Command patternRoutine(LEDs led, int routineID) {
     LEDRoutine routine;
-    
+
     switch (routineID) {
       case 1:
         routine = new LEDRoutine(led, new double[] {-0.99, -0.97, -0.89, -0.79});
         return runRoutine(led, routine, 5);
       default:
-        return Commands.runOnce( () -> DriverStation.reportWarning("Invalid LED routine selected", false));
+        return Commands.runOnce(
+            () -> DriverStation.reportWarning("Invalid LED routine selected", false));
     }
   }
- 
+
   /**
    * Runs the pattern of an LEDRoutine object with a delay between pattern cycles
    *
@@ -116,11 +119,11 @@ public class LEDCommands {
   public static Command setIdlePattern(LEDs led, int id) {
     if (id > 78) id = 1;
     double power = -1.01 + 0.02 * id;
-    return Commands.runOnce( () -> led.setDefaultCommand(runPattern(led, power)));
+    return Commands.runOnce(() -> led.setDefaultCommand(runPattern(led, power)));
   }
 
   public static Command interrupt(LEDs led) {
     CommandScheduler cmd = CommandScheduler.getInstance();
-    return Commands.runOnce( () -> cmd.cancel(cmd.requiring(led)));
+    return Commands.runOnce(() -> cmd.cancel(cmd.requiring(led)));
   }
 }

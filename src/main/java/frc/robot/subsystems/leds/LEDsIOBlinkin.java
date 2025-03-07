@@ -2,9 +2,7 @@ package frc.robot.subsystems.leds;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
-/**
- * Hardware class for LEDs which uses a REV Blinkin
- */
+/** Hardware class for LEDs which uses a REV Blinkin */
 public class LEDsIOBlinkin extends LEDsIO {
 
   private Spark blinkin = new Spark(0);

@@ -8,6 +8,7 @@ import frc.robot.subsystems.leds.LEDs;
 
 /**
  * Contains all the commands used to interface with an elevator subsystem.
+ *
  * @author DevAspen & SomnolentStone
  */
 public class ElevatorCommands {
@@ -20,7 +21,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command upLevel(Elevator elevator, double speed) {
-    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
+    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
   /**
@@ -31,7 +32,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run( () -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
+    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
   }
 
   /**
@@ -43,7 +44,7 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedIntake(Elevator elevator, double speed, double time) {
-    return Commands.run( () -> elevator.timedIntake(speed, time), elevator);
+    return Commands.run(() -> elevator.timedIntake(speed, time), elevator);
   }
 
   /**
@@ -57,16 +58,21 @@ public class ElevatorCommands {
    * @param outtakeTime The amount of time (in seconds) that the intake motor will run for
    * @return The relevant code statements as a Command object
    */
-  public static Command coralScore(Elevator elevator, LEDs led, double speed, int level, double outtakeSpeed, double outtakeTime) {
+  public static Command coralScore(
+      Elevator elevator,
+      LEDs led,
+      double speed,
+      int level,
+      double outtakeSpeed,
+      double outtakeTime) {
     return Commands.sequence(
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
-          Commands.run( () -> elevator.setLevel(speed, level)),
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.27)),
-          Commands.run( () -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.29)),
-          Commands.run( () -> elevator.setLevel(speed, 0)),
-          Commands.runOnce( () -> LEDCommands.interrupt(led))
-    );
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.31)),
+        Commands.run(() -> elevator.setLevel(speed, level)),
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.27)),
+        Commands.run(() -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.29)),
+        Commands.run(() -> elevator.setLevel(speed, 0)),
+        Commands.runOnce(() -> LEDCommands.interrupt(led)));
   }
 
   /**
@@ -79,16 +85,16 @@ public class ElevatorCommands {
    * @param intakeTime the amount of time (in seconds) that the intake motor will run for
    * @return the relevant code statements as a Command object
    */
-  public static Command coralCollect(Elevator elevator, LEDs led, double speed, double intakeSpeed, double intakeTime) {
+  public static Command coralCollect(
+      Elevator elevator, LEDs led, double speed, double intakeSpeed, double intakeTime) {
     return Commands.sequence(
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
-          Commands.run( () -> elevator.setLevel(speed, 2)),
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.27)),
-          Commands.run( () -> elevator.timedIntake(intakeSpeed, intakeTime)),
-          Commands.runOnce( () -> LEDCommands.runPattern(led, 0.29)),
-          Commands.run( () -> elevator.setLevel(speed, 1)),
-          Commands.runOnce( () -> LEDCommands.interrupt(led))
-    );
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.31)),
+        Commands.run(() -> elevator.setLevel(speed, 2)),
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.27)),
+        Commands.run(() -> elevator.timedIntake(intakeSpeed, intakeTime)),
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.29)),
+        Commands.run(() -> elevator.setLevel(speed, 1)),
+        Commands.runOnce(() -> LEDCommands.interrupt(led)));
   }
 
   // TEMPORARY; can comment out if you want (TODO: temporary, comment out or delete if you don't
@@ -103,7 +109,7 @@ public class ElevatorCommands {
 
   /**
    * Run a timed test of the first stage motor
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
@@ -112,35 +118,34 @@ public class ElevatorCommands {
    */
   public static Command oneTest(Elevator elevator, LEDs led, double speed, double time) {
     return Commands.sequence(
-        Commands.runOnce( () -> LEDCommands.runPattern(led, 0.31)),
-        Commands.runOnce( () -> elevator.runMotor(speed), elevator),
+        Commands.runOnce(() -> LEDCommands.runPattern(led, 0.31)),
+        Commands.runOnce(() -> elevator.runMotor(speed), elevator),
         Commands.waitSeconds(time),
         Commands.runOnce(elevator::stop, elevator),
-        Commands.runOnce( () -> LEDCommands.interrupt(led))
-    );
+        Commands.runOnce(() -> LEDCommands.interrupt(led)));
   }
 
   /**
    * Set the first stage motor to run without stopping
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
   public static Command runWithoutStop(Elevator elevator, LEDs led, double speed) {
-    return Commands.startEnd( 
-      () -> {
-        LEDCommands.runPattern(led, 0.31);
-        elevator.runMotor(speed);
-      },
-      () -> LEDCommands.interrupt(led),
-      elevator);
+    return Commands.startEnd(
+        () -> {
+          LEDCommands.runPattern(led, 0.31);
+          elevator.runMotor(speed);
+        },
+        () -> LEDCommands.interrupt(led),
+        elevator);
   }
 
   /**
    * Stop the movement of the elevator, unconditionally
-   * 
+   *
    * @param elevator The elevator subsystem
    * @return The relevant code statements as a Command object
    */
@@ -154,19 +159,19 @@ public class ElevatorCommands {
 
   /**
    * Runs the stage one motor until a sensor is triggered
-   * 
+   *
    * @param elevator The elevator subsystem
    * @param led The LED subsystem
    * @param speed The speed to run the motor (as a decimal percentage)
    * @return The relevant code statements as a Command object
    */
   public static Command runToSensor(Elevator elevator, LEDs led, double speed) {
-    return Commands.runEnd( 
-      ()-> {
-        elevator.runMotor(speed);
-        if (elevator.getSwitch()) interrupt(elevator);
-      },
-      () -> LEDCommands.interrupt(led),
-       elevator);
+    return Commands.runEnd(
+        () -> {
+          elevator.runMotor(speed);
+          if (elevator.getSwitch()) interrupt(elevator);
+        },
+        () -> LEDCommands.interrupt(led),
+        elevator);
   }
 }

@@ -3,8 +3,9 @@ package frc.robot.subsystems.cage;
 import frc.robot.util.RBSISubsystem;
 
 /**
- * Uses a single motor to drive a deep cage lifting mechanism. This mechanism takes
- * inspiration from Penn State's Robot In 3 Days team
+ * Uses a single motor to drive a deep cage lifting mechanism. This mechanism takes inspiration from
+ * Penn State's Robot In 3 Days team
+ *
  * @author DevAspen & monkeyboy1052608
  */
 public class Cage extends RBSISubsystem {

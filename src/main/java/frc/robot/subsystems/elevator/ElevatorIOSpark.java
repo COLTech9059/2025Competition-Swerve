@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 /**
- * Hardware class for Elevator which uses SparkMaxes 
+ * Hardware class for Elevator which uses SparkMaxes
+ *
  * @author DevAspen & SomnolentStone
  */
 public class ElevatorIOSpark extends ElevatorIO {

@@ -3,7 +3,9 @@ package frc.robot.subsystems.leds;
 import java.util.ArrayList;
 
 /**
- * Stores an array of pattern ids from the Blinkin pattern chart and facilitates the usage of said patterns in a full routine
+ * Stores an array of pattern ids from the Blinkin pattern chart and facilitates the usage of said
+ * patterns in a full routine
+ *
  * @author DevAspen
  */
 public class LEDRoutine {
@@ -48,7 +50,9 @@ public class LEDRoutine {
 
   /**
    * Cycles the array of powers and sets the LEDs to the next value in the array
-   * @param index The index to start at. (NOTE: If this value is anything other than 0, it will disrupt the initial order of patterns)
+   *
+   * @param index The index to start at. (NOTE: If this value is anything other than 0, it will
+   *     disrupt the initial order of patterns)
    * @return The value that was selected for iteration
    */
   public double iterate(int index) {
@@ -63,6 +67,7 @@ public class LEDRoutine {
 
   /**
    * Returns the array list containing the Blinkin pattern values
+   *
    * @return An ArrayList<Double> object
    */
   public ArrayList<Double> getPowers() {

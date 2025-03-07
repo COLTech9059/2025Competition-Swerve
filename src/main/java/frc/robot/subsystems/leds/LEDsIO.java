@@ -1,7 +1,8 @@
 package frc.robot.subsystems.leds;
 
-/** 
+/**
  * Architecture class which allows the use of multiple hardware classes
+ *
  * @author DevAspen
  */
 public class LEDsIO {
