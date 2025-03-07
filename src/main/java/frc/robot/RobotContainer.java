@@ -67,10 +67,10 @@ public class RobotContainer {
   // Define PathPlanner paths for use in teleop
   private PathPlannerPath path;
 
-  // Create the constraints to use while pathfinding. The constraints defined in the path will only be used for the path.
-  private PathConstraints constraints = new PathConstraints(
-        3.0, 4.0,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
+  // Create the constraints to use while pathfinding. The constraints defined in the path will only
+  // be used for the path.
+  private PathConstraints constraints =
+      new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
@@ -112,8 +112,9 @@ public class RobotContainer {
   public RobotContainer() {
 
     try {
-        path = PathPlannerPath.fromPathFile("Multi-Path 1");        
-    } catch (Exception e) {}
+      path = PathPlannerPath.fromPathFile("Multi-Path 1");
+    } catch (Exception e) {
+    }
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
@@ -271,10 +272,14 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press B button --> increment the drive speed
-    driverController.rightBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+    driverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
 
     // Press X button --> decrement the drive speed
-    driverController.leftBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    driverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
     // Press B Button --> Pathfind to path
     driverController.b().onTrue(pathfindingCommand);

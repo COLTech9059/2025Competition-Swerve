@@ -191,15 +191,14 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
-  /**
-   * Returns the drive speed
-   */
+  /** Returns the drive speed */
   public double getSpeed() {
     return driveSpeed;
   }
 
   /**
    * Sets the drive speed to the given value
+   *
    * @param value Double value to set the drive speed to
    */
   public void setSpeed(double value) {
