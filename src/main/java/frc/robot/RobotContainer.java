@@ -282,7 +282,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
     // Press B Button --> Pathfind to path
-    driverController.b().onTrue(pathfindingCommand);
+    // driverController.b().onTrue(pathfindingCommand);
 
     // Press Y button --> Manually Re-Zero the Gyro
     driverController
@@ -296,13 +296,13 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Press RIGHT BUMPER --> Run the example flywheel
-    driverController
-        .rightBumper()
-        .whileTrue(
-            Commands.startEnd(
-                () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
-                m_flywheel::stop,
-                m_flywheel));
+    // driverController
+    //     .rightBumper()
+    //     .whileTrue(
+    //         Commands.startEnd(
+    //             () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
+    //             m_flywheel::stop,
+    //             m_flywheel));
   }
 
   /**
