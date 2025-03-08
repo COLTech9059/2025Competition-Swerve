@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,13 +19,17 @@ import frc.robot.Constants;
  */
 public class ElevatorIOSparkTest extends ElevatorIO {
 
+  private int levelTracker = 0;
+  private double elevatorSpeed = 0.35;
+
   // Define motor objects
-  private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
-  private RelativeEncoder eEncoder = eMotor.getEncoder();
-  private SparkMaxConfig eConfig = new SparkMaxConfig();
+  private final SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
+  private final RelativeEncoder eEncoder = eMotor.getEncoder();
+  private final SparkMaxConfig eConfig = new SparkMaxConfig();
 
   // Define limit switch objects
-  private DigitalInput testSwitch = new DigitalInput(0);
+  private final DigitalInput l0Switch = new DigitalInput(0);
+  private final DigitalInput stopSwitch = new DigitalInput(1);
 
   @Override
   public void configureMotors() {
@@ -42,6 +47,20 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
+  public void setLevel(double speed, int level) {
+    speed = Math.abs(speed);
+    if (getExactLevel() == level) {
+      eMotor.stopMotor();
+      return;
+    }
+    if (getLevel() < level) {
+      eMotor.set(speed);
+    } else {
+      eMotor.set(-speed);
+    }
+  }
+
+  @Override
   public void setVoltage(double volts) {
     eMotor.setVoltage(volts);
   }
@@ -49,12 +68,12 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   @Override
   public void runToSensor(double speed) {
     eMotor.set(speed);
-    if (testSwitch.get()) eMotor.stopMotor();
+    if (l0Switch.get()) eMotor.stopMotor();
   }
 
   @Override
   public boolean getSwitch() {
-    return testSwitch.get();
+    return l0Switch.get();
   }
 
   @Override
@@ -64,7 +83,25 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
+  public int getLevel() {
+    if (l0Switch.get()) levelTracker = 0;
+    if (stopSwitch.get()) levelTracker = 2;
+    return levelTracker;
+  }
+
+  @Override
+  public int getExactLevel() {
+    if (l0Switch.get()) return 0;
+    if (stopSwitch.get()) return 2;
+    return -1;
+  }
+
+  @Override
   public void periodicUpdates() {
-    SmartDashboard.putBoolean("Limit Switch", testSwitch.get());
+    SmartDashboard.putBoolean("Bottom Switch", l0Switch.get());
+    SmartDashboard.putBoolean("Top Switch", stopSwitch.get());
+
+    if (l0Switch.get()) eEncoder.setPosition(Constants.level0);
+    if (stopSwitch.get()) eEncoder.setPosition(Constants.level2);
   }
 }

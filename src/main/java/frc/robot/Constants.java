@@ -17,11 +17,15 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,8 +48,6 @@ import frc.robot.util.RBSIEnum.MotorIdleMode;
 import frc.robot.util.RBSIEnum.SwerveType;
 import frc.robot.util.RBSIEnum.VisionType;
 import frc.robot.util.RobotDeviceId;
-import java.io.IOException;
-import java.nio.file.Path;
 import lombok.Getter;
 import swervelib.math.Matter;
 

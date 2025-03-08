@@ -356,7 +356,7 @@ public class RobotContainer {
                 new Transform2d(0, 0, new Rotation2d())));
 
     // ** Example Commands -- Remap, remove, or change as desired **
-    // Press B button while driving --> ROBOT-CENTRIC
+    // Press B button while driving --> Robot-Centric
     // driverController
     //     .b()
     //     .onTrue(
