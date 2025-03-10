@@ -19,23 +19,23 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Cameras.camera0Name;
-import static frc.robot.Constants.Cameras.camera1Name;
-import static frc.robot.Constants.Cameras.robotToCamera0;
-import static frc.robot.Constants.Cameras.robotToCamera1;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.events.EventTrigger;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -49,6 +49,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
@@ -78,8 +82,6 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -307,13 +309,6 @@ public class RobotContainer {
             .withPosition(5, 4)
             .withSize(2, 1);
 
-    // driverController.b().onTrue(LEDCommands.randomColor(led));
-
-    // driverController.a().onTrue(LEDCommands.teamColorRoutine(led, ((int) Math.random() * 4) +
-    // 1));
-
-    // driverController.x().onTrue(LEDCommands.runRoutine(led, routine1, 3));
-
     // Press Right Bumper --> Increment Elevator speed by 0.1
     driverController
         .rightBumper()
@@ -336,11 +331,10 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value(),
+            () -> -driveStickY.value() * m_drivebase.getSpeed(),
             () -> -driveStickX.value(),
             () -> -turnStickX.value()));
 
-    // led.setDefaultCommand(LEDCommands.randomColor(led));
 
     // PRESS B BUTTON --> Align with an april tag
     driverController
@@ -351,21 +345,6 @@ public class RobotContainer {
                 m_vision.getBestTarget(0),
                 robotToCamera0,
                 new Transform2d(0, 0, new Rotation2d())));
-
-    // ** Example Commands -- Remap, remove, or change as desired **
-    // Press B button while driving --> Robot-Centric
-    // driverController
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () ->
-    //                 DriveCommands.robotRelativeDrive(
-    //                     m_drivebase,
-    //                     () -> -driveStickY.value(),
-    //                     () -> -driveStickX.value(),
-    //                     () -> turnStickX.value()),
-    //             m_drivebase));
-
   }
 
   public void randomizeLEDOnStartup() {
