@@ -70,6 +70,15 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
+  /**
+   * Returns the best PhotonTrackedTarget in view of the specified camera
+   *
+   * @param cameraIndex The index of the camera to use
+   */
+  // public PhotonTrackedTarget getBestTarget(int cameraIndex) {
+  //   return inputs[cameraIndex].bestTarget;
+  // }
+
   @Override
   public void periodic() {
     for (int i = 0; i < io.length; i++) {

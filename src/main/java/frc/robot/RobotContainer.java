@@ -19,13 +19,19 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Cameras.*;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -60,6 +66,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
+
+  // Define PathPlanner paths for use in teleop
+  private PathPlannerPath path;
+
+  // Create the constraints to use while pathfinding. The constraints defined in the path will only
+  // be used for the path.
+  private PathConstraints constraints =
+      new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
@@ -98,15 +112,17 @@ public class RobotContainer {
    * Constructor for the Robot Container. This container holds subsystems, opertator interface
    * devices, and commands.
    */
+  @SuppressWarnings("UseSpecificCatch")
   public RobotContainer() {
 
     try {
-        path = PathPlannerPath.fromPathFile("Multi-Path 1");        
-    } catch (Exception e) {}
+      path = PathPlannerPath.fromPathFile("Multi-Path 1");
+    } catch (Exception e) {
+    }
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
-      case REAL:
+      case REAL -> {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
@@ -129,9 +145,9 @@ public class RobotContainer {
               default -> null;
             };
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
+      }
 
-      case SIM:
+      case SIM -> {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
@@ -141,16 +157,16 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
+      }
 
-      default:
+      default -> {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
+      }
     }
 
     // In addition to the initial battery capacity from the Dashbaord, ``PowerMonitoring`` takes all
@@ -160,15 +176,15 @@ public class RobotContainer {
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
-      case PATHPLANNER:
+      case PATHPLANNER -> {
         autoChooserPathPlanner =
             new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
         autoFactoryChoreo = null;
-        break;
+      }
 
-      case CHOREO:
+      case CHOREO -> {
         autoFactoryChoreo =
             new AutoFactory(
                 m_drivebase::getPose, // A function that returns the current robot pose
@@ -182,12 +198,11 @@ public class RobotContainer {
         autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
         autoChooserPathPlanner = null;
-        break;
+      }
 
-      default:
-        // Then, throw the error
-        throw new RuntimeException(
-            "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
+      default -> // Then, throw the error
+          throw new RuntimeException(
+              "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
     // Define Auto commands
@@ -201,7 +216,13 @@ public class RobotContainer {
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
 
-    // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
+    NamedCommands.registerCommand(
+        "Zero",
+        Commands.runOnce(
+            () ->
+                m_drivebase.resetPose(
+                    new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+            m_drivebase));
   }
 
   /**
@@ -230,38 +251,33 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value(),
-            () -> -driveStickX.value(),
-            () -> -turnStickX.value()));
+            () -> driveStickY.value() * m_drivebase.getSpeed(),
+            () -> driveStickX.value() * m_drivebase.getSpeed(),
+            () -> turnStickX.value() * m_drivebase.getSpeed()));
 
-    // ** Example Commands -- Remap, remove, or change as desired **
-    // Press B button while driving --> ROBOT-CENTRIC
-    driverController
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    DriveCommands.robotRelativeDrive(
-                        m_drivebase,
-                        () -> -driveStickY.value(),
-                        () -> -driveStickX.value(),
-                        () -> turnStickX.value()),
-                m_drivebase));
 
     // Press A button -> BRAKE
     // driverController
     //     .a()
     //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
-    // Press A button --> Stop with wheels in X-Lock position
+    // Press X button --> Stop with wheels in X-Lock position
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press B button --> increment the drive speed
-    driverController.rightBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+    driverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
 
     // Press X button --> decrement the drive speed
-    driverController.leftBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    driverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
+
+    // Press B Button --> Pathfind to path
+    // driverController.b().onTrue(pathfindingCommand);
+   
     // Press X button --> Stop with wheels in X-Lock position
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
@@ -276,14 +292,15 @@ public class RobotContainer {
                     m_drivebase)
                 .ignoringDisable(true));
 
-    // Press RIGHT BUMPER --> Run the example flywheel
-    driverController
-        .rightBumper()
-        .whileTrue(
-            Commands.startEnd(
-                () -> m_flywheel.runVelocity(flywheelSpeedInput.get()),
-                m_flywheel::stop,
-                m_flywheel));
+    // Press B Button --> Align with best April Tag
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         DriveCommands.targetAlignment(
+    //             m_drivebase,
+    //             m_vision.getBestTarget(0),
+    //             robotToCamera0,
+    //             new Transform2d(6, 0, new Rotation2d())));
   }
 
   /**

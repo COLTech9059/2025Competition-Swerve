@@ -57,6 +57,7 @@ import swervelib.math.Matter;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+@SuppressWarnings("FieldMayBeFinal")
 public final class Constants {
 
   /***************************************************************************/
@@ -72,7 +73,7 @@ public final class Constants {
   //       under strict caveat emptor -- and submit any error and bugfixes
   //       via GitHub issues.
   private static SwerveType swerveType = SwerveType.PHOENIX6; // PHOENIX6, YAGSL
-  private static CTREPro phoenixPro = CTREPro.UNLICENSED; // LICENSED, UNLICENSED
+  private static CTREPro phoenixPro = CTREPro.LICENSED; // LICENSED, UNLICENSED
   private static AutoType autoType = AutoType.PATHPLANNER; // PATHPLANNER, CHOREO
   private static VisionType visionType = VisionType.NONE; // PHOTON, LIMELIGHT, NONE
 
@@ -109,7 +110,7 @@ public final class Constants {
   /** Physical Constants for Robot Operation ******************************* */
   public static final class PhysicalConstants {
 
-    public static final double kRobotMassKg = Units.lbsToKilograms(100.);
+    public static final double kRobotMassKg = Units.lbsToKilograms(120.0);
     public static final Matter kChassis =
         new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), kRobotMassKg);
     // Robot moment of intertial; this can be obtained from a CAD model of your drivetrain. Usually,
