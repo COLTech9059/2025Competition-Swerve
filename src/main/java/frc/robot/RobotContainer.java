@@ -19,13 +19,19 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Cameras.*;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -78,6 +84,14 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
+  // Define PathPlanner paths for use in teleop
+  private PathPlannerPath path;
+
+  // Create the constraints to use while pathfinding. The constraints defined in the path will only
+  // be used for the path.
+  private PathConstraints constraints =
+      new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
@@ -125,11 +139,17 @@ public class RobotContainer {
    * Constructor for the Robot Container. This container holds subsystems, opertator interface
    * devices, and commands.
    */
+  @SuppressWarnings("UseSpecificCatch")
   public RobotContainer() {
+
+    try {
+      path = PathPlannerPath.fromPathFile("Multi-Path 1");
+    } catch (Exception e) {
+    }
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
-      case REAL:
+      case REAL -> {
         // Real robot, instantiate hardware IO implementations
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
@@ -154,9 +174,9 @@ public class RobotContainer {
               default -> null;
             };
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
+      }
 
-      case SIM:
+      case SIM -> {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
@@ -168,8 +188,9 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, m_drivebase::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, m_drivebase::getPose));
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
-      default:
+      }
+
+      default -> {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
@@ -178,7 +199,7 @@ public class RobotContainer {
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         m_accel = new Accelerometer(m_drivebase.getGyro());
-        break;
+      }
     }
 
     // In addition to the initial battery capacity from the Dashbaord, ``PowerMonitoring`` takes all
@@ -197,16 +218,16 @@ public class RobotContainer {
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
-      case PATHPLANNER:
-        autoChooserPathPlanner = null;
-        new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+      case PATHPLANNER -> {
+        autoChooserPathPlanner =
+            new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
         // Set the others to null
         autoChooserChoreo = null;
 
         autoFactoryChoreo = null;
-        break;
+      }
 
-      case CHOREO:
+      case CHOREO -> {
         autoFactoryChoreo =
             new AutoFactory(
                 m_drivebase::getPose, // A function that returns the current robot pose
@@ -220,12 +241,11 @@ public class RobotContainer {
         autoChooserChoreo.addRoutine("twoPieceAuto", this::twoPieceAuto);
         // Set the others to null
         autoChooserPathPlanner = null;
-        break;
+      }
 
-      default:
-        // Then, throw the error
-        throw new RuntimeException(
-            "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
+      default -> // Then, throw the error
+          throw new RuntimeException(
+              "Incorrect AUTO type selected in Constants: " + Constants.getAutoType());
     }
 
     // Create LED routines
@@ -248,36 +268,13 @@ public class RobotContainer {
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
 
-    // Register Named Commands for use in PathPlanner autos
-    // NamedCommands.registerCommand("Zero", Commands.runOnce(() -> m_drivebase.zero()));
-
-    // NamedCommands.registerCommand(
-    // "L3 Score", ElevatorCommands.coralScore(elevator, 0.35, 3, 0.5, 1.5));
-
-    // Register Event Triggers for use in PathPlanner paths
-    new EventTrigger("Collect Coral")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, led, 0.35, 0.5, 1.5), elevator));
-
-    new EventTrigger("L3 Score")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
-
     NamedCommands.registerCommand(
-        "L3 Score", ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5));
-
-    // Register Event Triggers for use in PathPlanner paths
-    new EventTrigger("Collect Coral")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralCollect(elevator, led, 0.35, 0.5, 1.5), elevator));
-
-    new EventTrigger("L3 Score")
-        .onTrue(
-            Commands.runOnce(
-                () -> ElevatorCommands.coralScore(elevator, led, 0.35, 3, 0.5, 1.5), elevator));
+        "Zero",
+        Commands.runOnce(
+            () ->
+                m_drivebase.resetPose(
+                    new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+            m_drivebase));
   }
 
   /**

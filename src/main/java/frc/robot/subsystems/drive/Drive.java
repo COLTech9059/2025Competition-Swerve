@@ -15,8 +15,17 @@
 
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.drive.SwerveConstants.*;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.subsystems.drive.SwerveConstants.kBLXPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kBLYPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kBRXPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kBRYPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kDriveBaseRadiusMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kFLXPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kFLYPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kFRXPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kFRYPosMeters;
+import static frc.robot.subsystems.drive.SwerveConstants.kImuType;
 
 import choreo.trajectory.SwerveSample;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -185,6 +194,21 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
   }
 
+  /** Returns the drive speed */
+  public double getSpeed() {
+    return driveSpeed;
+  }
+
+  /**
+   * Sets the drive speed to the given value
+   *
+   * @param value Double value to set the drive speed to
+   */
+  public void setSpeed(double value) {
+    if (value < 0) value = 1;
+    else if (value > 1) value = 0;
+    driveSpeed = value;
+  }
   /** Periodic function that is called each robot cycle by the command scheduler */
   @Override
   public void periodic() {
