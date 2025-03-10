@@ -100,10 +100,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
 
-    try {
-        path = PathPlannerPath.fromPathFile("Multi-Path 1");        
-    } catch (Exception e) {}
-
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
       case REAL:
@@ -249,18 +245,9 @@ public class RobotContainer {
                 m_drivebase));
 
     // Press A button -> BRAKE
-    // driverController
-    //     .a()
-    //     .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
-
-    // Press A button --> Stop with wheels in X-Lock position
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press B button --> increment the drive speed
-    driverController.rightBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
-
-    // Press X button --> decrement the drive speed
-    driverController.leftBumper().onTrue(Commands.runOnce( () -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    driverController
+        .a()
+        .whileTrue(Commands.runOnce(() -> m_drivebase.setMotorBrake(true), m_drivebase));
 
     // Press X button --> Stop with wheels in X-Lock position
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
