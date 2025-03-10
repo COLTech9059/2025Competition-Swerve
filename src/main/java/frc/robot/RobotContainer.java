@@ -34,7 +34,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -234,9 +233,6 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    // Build pathfinding commands
-    Command pathfindingCommand = AutoBuilder.pathfindThenFollowPath(path, constraints);
-
     // Send the proper joystick input based on driver preference -- Set this in `Constants.java`
     GetJoystickValue driveStickY;
     GetJoystickValue driveStickX;
@@ -259,6 +255,7 @@ public class RobotContainer {
             () -> driveStickX.value() * m_drivebase.getSpeed(),
             () -> turnStickX.value() * m_drivebase.getSpeed()));
 
+
     // Press A button -> BRAKE
     // driverController
     //     .a()
@@ -277,8 +274,12 @@ public class RobotContainer {
         .leftBumper()
         .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
+
     // Press B Button --> Pathfind to path
     // driverController.b().onTrue(pathfindingCommand);
+   
+    // Press X button --> Stop with wheels in X-Lock position
+    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press Y button --> Manually Re-Zero the Gyro
     driverController
