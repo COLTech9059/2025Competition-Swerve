@@ -309,18 +309,24 @@ public class RobotContainer {
             .withPosition(5, 4)
             .withSize(2, 1);
 
-    // Press Right Bumper --> Increment Elevator speed by 0.1
+    // Press Right Bumper & Back Button --> Increment Elevator speed by 0.1
     driverController
-        .rightBumper()
+        .rightBumper().and(driverController.back())
         .onTrue(Commands.runOnce(() -> elevator.incrementSpeed(0.1), elevator));
 
-    // Press Left Bumper --> Decrement Elevator Speed by 0.1
+    // Press Left Bumper & Back Button --> Decrement Elevator Speed by 0.1
     driverController
-        .leftBumper()
+        .leftBumper().and(driverController.back())
         .onTrue(Commands.runOnce(() -> elevator.decrementSpeed(0.1), elevator));
 
-    // PRESS X BUTTON --> Run the single motor speed test for the elevator
-    driverController.x().onTrue(ElevatorCommands.oneTest(elevator, led, elevator.getSpeed(), 1));
+    // Press Left Bumper --> Decrement Drive Speed by 0.1
+    driverController.leftBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+
+    // Press Right Bumper --> Increment Drive Speed by 0.1
+    driverController.rightBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+
+    // Press X Button --> X-stop
+    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press A Button --> Run the cage mechanism for a set amount of time
     driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
@@ -332,8 +338,8 @@ public class RobotContainer {
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
             () -> -driveStickY.value() * m_drivebase.getSpeed(),
-            () -> -driveStickX.value(),
-            () -> -turnStickX.value()));
+            () -> -driveStickX.value() * m_drivebase.getSpeed(),
+            () -> -turnStickX.value() * m_drivebase.getSpeed()));
 
 
     // PRESS B BUTTON --> Align with an april tag
@@ -348,7 +354,6 @@ public class RobotContainer {
   }
 
   public void randomizeLEDOnStartup() {
-    // Commands.runOnce(() -> LEDCommands.randomColor(led), led);
     CommandScheduler.getInstance().schedule(LEDCommands.randomColor(led));
   }
 
