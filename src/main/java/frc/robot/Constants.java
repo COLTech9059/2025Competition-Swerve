@@ -320,8 +320,8 @@ public final class Constants {
   /** Vision Camera Posses ************************************************* */
   public static class Cameras {
     // Camera names, must match names configured on coprocessor
-    public static String camera0Name = "camera_0";
-    public static String camera1Name = "camera_1";
+    public static String camera0Name = "Left Camera";
+    public static String camera1Name = "Right Camera";
     // ... And more, if needed
 
     // Robot to camera transforms
@@ -331,6 +331,9 @@ public final class Constants {
         new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
     public static Transform3d robotToCamera1 =
         new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+
+    // AprilTag Whitelist
+    public static int[] tagWhitelist = {1,2,3,4}; //Add certain AprilTags to list
 
     // Standard deviation multipliers for each camera
     // (Adjust to trust some cameras more than others)

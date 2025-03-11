@@ -46,6 +46,7 @@ public class VisionIOPhotonVision implements VisionIO {
   public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
 
+    inputs.camRobotOffset = robotToCamera;
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
@@ -59,6 +60,7 @@ public class VisionIOPhotonVision implements VisionIO {
                 Rotation2d.fromDegrees(result.getBestTarget().getPitch()));
       } else {
         inputs.latestTargetObservation = new TargetObservation(new Rotation2d(), new Rotation2d());
+        inputs.bestTarget = null;
       }
 
       // Add pose observation
