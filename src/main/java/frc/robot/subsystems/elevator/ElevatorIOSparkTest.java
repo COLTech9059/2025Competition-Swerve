@@ -28,7 +28,7 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   private final SparkMaxConfig eConfig = new SparkMaxConfig();
 
   // Define limit switch objects
-  private final DigitalInput l0Switch = new DigitalInput(0);
+  private final DigitalInput bottomSwitch = new DigitalInput(0);
   private final DigitalInput stopSwitch = new DigitalInput(1);
 
   @Override
@@ -68,12 +68,12 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   @Override
   public void runToSensor(double speed) {
     eMotor.set(speed);
-    if (l0Switch.get()) eMotor.stopMotor();
+    if (bottomSwitch.get()) eMotor.stopMotor();
   }
 
   @Override
   public boolean getSwitch() {
-    return l0Switch.get();
+    return bottomSwitch.get();
   }
 
   @Override
@@ -84,24 +84,24 @@ public class ElevatorIOSparkTest extends ElevatorIO {
 
   @Override
   public int getLevel() {
-    if (l0Switch.get()) levelTracker = 0;
-    if (stopSwitch.get()) levelTracker = 2;
+    if (bottomSwitch.get()) levelTracker = 0;
+    if (stopSwitch.get()) levelTracker = 1;
     return levelTracker;
   }
 
   @Override
   public int getExactLevel() {
-    if (l0Switch.get()) return 0;
-    if (stopSwitch.get()) return 2;
+    if (bottomSwitch.get()) return 0;
+    if (stopSwitch.get()) return 1;
     return -1;
   }
 
   @Override
   public void periodicUpdates() {
-    SmartDashboard.putBoolean("Bottom Switch", l0Switch.get());
+    SmartDashboard.putBoolean("Bottom Switch", bottomSwitch.get());
     SmartDashboard.putBoolean("Top Switch", stopSwitch.get());
 
-    if (l0Switch.get()) eEncoder.setPosition(Constants.level0);
+    if (bottomSwitch.get()) eEncoder.setPosition(Constants.level0);
     if (stopSwitch.get()) eEncoder.setPosition(Constants.level2);
   }
 }

@@ -108,10 +108,9 @@ public final class Constants {
 
   // Device ID Constants
   public static final int eMotorID = 15;
-
-  // public static final int eMotor2ID = 15;
-  public static final int intakeID = 16;
-  public static final int algaeID = 17;
+  public static final int pivotID = 16;
+  public static final int intakeID = 17;
+  // public static final int algaeID = 17;
   public static final int cageID = 18;
 
   public static final int level0ID = 1;

@@ -309,27 +309,27 @@ public class RobotContainer {
             .withPosition(5, 4)
             .withSize(2, 1);
 
-    // Press Right Bumper & Back Button --> Increment Elevator speed by 0.1
-    driverController
-        .rightBumper().and(driverController.back())
+    // Press Right Trigger --> Increment Elevator speed by 0.1
+    operatorController
+        .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevator.incrementSpeed(0.1), elevator));
 
-    // Press Left Bumper & Back Button --> Decrement Elevator Speed by 0.1
-    driverController
-        .leftBumper().and(driverController.back())
+    // Press Left Trigger --> Decrement Elevator Speed by 0.1
+    operatorController
+        .leftTrigger()
         .onTrue(Commands.runOnce(() -> elevator.decrementSpeed(0.1), elevator));
 
     // Press Left Bumper --> Decrement Drive Speed by 0.1
-    driverController.leftBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
     // Press Right Bumper --> Increment Drive Speed by 0.1
-    driverController.rightBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+    operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
 
     // Press X Button --> X-stop
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // Press A Button --> Run the cage mechanism for a set amount of time
-    driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
+    operatorController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
 
     SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 
@@ -351,6 +351,20 @@ public class RobotContainer {
                 m_vision.getBestTarget(0),
                 robotToCamera0,
                 new Transform2d(0, 0, new Rotation2d())));
+    
+    // Press Right Bumper --> Move elevator up one level
+    driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
+
+    // Press Left Bumper --> Move elevator down one level
+    driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
+
+    // Press Left Trigger --> Active intake of coral
+    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.35, 1));
+    driverController.leftTrigger().whileTrue(Commands.run(() -> elevator.activeIntake(0.5)));
+    driverController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.stopIntake()));
+
+    // Press Right Trigger --> Timed outtake of coral
+    driverController.rightTrigger().onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
   }
 
   public void randomizeLEDOnStartup() {

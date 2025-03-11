@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,19 +26,14 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   private RelativeEncoder eEncoder = eMotor.getEncoder();
-  // private SparkMax eMotor2 = new SparkMax(Constants.eMotor2ID, MotorType.kBrushless);
-  // private RelativeEncoder eEncoder2 = eMotor2.getEncoder();
+  private SparkMax pivot = new SparkMax(Constants.pivotID, MotorType.kBrushless);
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
-  // private SparkMax algae = new SparkMax(Constants.algaeID, MotorType.kBrushless);
   private SparkBaseConfig eMConfig;
   private SparkBaseConfig eM2Config;
 
   // Digital input (limit switch) objects
-  private DigitalInput l0Switch = new DigitalInput(Constants.level0ID);
-  private DigitalInput l1Switch = new DigitalInput(Constants.level1ID);
-  private DigitalInput l2Switch = new DigitalInput(Constants.level2ID);
-  private DigitalInput stage2Switch = new DigitalInput(Constants.stage2ID);
-  private DigitalInput l3Switch = new DigitalInput(Constants.level3ID);
+  private DigitalInput bottomSwitch = new DigitalInput(Constants.level0ID);
+  private DigitalInput topSwitch = new DigitalInput(Constants.level1ID);
 
   // Apply all necessary motor configs
   @Override
@@ -66,6 +62,16 @@ public class ElevatorIOSpark extends ElevatorIO {
     // eEncoder2.setPosition(pos);
   }
 
+  @Override
+  public void pivot(double speed) {
+    pivot.set(speed);
+  }
+
+  @Override
+  public void stopPivot() {
+    pivot.stopMotor();
+  }
+
   // Move the elevator to the given level at the given speed
   @Override
   public void setLevel(double speed, int level) {
@@ -76,35 +82,15 @@ public class ElevatorIOSpark extends ElevatorIO {
     } else {
 
       if (getLevel() > level) {
-
-        if (!stage2Switch.get()) {
-          eMotor.stopMotor();
-          // eMotor2.set(-speed);
-        } else if (stage2Switch.get() && !l0Switch.get()) {
-          eMotor.set(-speed);
-          // eMotor2.stopMotor();
-        } else {
-          eMotor.stopMotor();
-          // eMotor2.stopMotor();
-        }
+        eMotor.set(-speed);
       }
 
       if (getLevel() < level) {
-
-        if (l2Switch.get() && !l3Switch.get()) {
-          eMotor.stopMotor();
-          // eMotor2.set(speed);
-        } else if (!l2Switch.get()) {
-          eMotor.set(speed);
-          // eMotor2.stopMotor();
-        } else {
-          eMotor.stopMotor();
-          // eMotor2.stopMotor();
-        }
+        eMotor.set(speed);
       }
     }
 
-    if (level > 3) level = 3;
+    if (level > 1) level = 1;
     if (level < 0) level = 0;
   }
 
@@ -125,10 +111,10 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
-    if (l0Switch.get()) levelTracker = 0;
-    if (l1Switch.get()) levelTracker = 1;
-    if (l2Switch.get() && stage2Switch.get()) levelTracker = 2;
-    if (l3Switch.get()) levelTracker = 3;
+    if (bottomSwitch.get()) levelTracker = 0;
+    if (topSwitch.get()) levelTracker = 1;
+    // if (l2Switch.get() && stage2Switch.get()) levelTracker = 2;
+    // if (l3Switch.get()) levelTracker = 3;
     return levelTracker;
   }
 
@@ -138,10 +124,10 @@ public class ElevatorIOSpark extends ElevatorIO {
    */
   @Override
   public int getExactLevel() {
-    if (l0Switch.get()) return 0;
-    if (l1Switch.get()) return 1;
-    if (l2Switch.get() && stage2Switch.get()) return 2;
-    if (l3Switch.get()) return 3;
+    if (bottomSwitch.get()) return 0;
+    if (topSwitch.get()) return 1;
+    // if (l2Switch.get() && stage2Switch.get()) return 2;
+    // if (l3Switch.get()) return 3;
     return -1;
   }
 

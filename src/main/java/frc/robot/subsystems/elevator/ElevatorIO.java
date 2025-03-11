@@ -10,6 +10,8 @@ public class ElevatorIO {
   /** Configures the motor controller objects */
   public void configureMotors() {}
 
+  public void pivot(double speed) {}
+
   /**
    * Moves the elevator to a specific "level"
    *
@@ -17,6 +19,8 @@ public class ElevatorIO {
    * @param level The "level" to move the elevator to
    */
   public void setLevel(double speed, int level) {}
+
+  public void stopPivot() {}
 
   /**
    * Gets the last reached "level" of the elevator

@@ -33,6 +33,14 @@ public class Elevator extends RBSISubsystem {
     io.setLevel(speed, level);
   }
 
+  public void pivot(double speed) {
+    io.pivot(speed);
+  }
+
+  public void stopPivot() {
+    io.stopPivot();
+  }
+
   /**
    * Gets the last reached "level" of the elevator
    *

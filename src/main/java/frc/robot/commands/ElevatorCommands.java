@@ -24,6 +24,14 @@ public class ElevatorCommands {
     return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
+  public static Command pivot(Elevator elevator, double speed, double time) {
+    return Commands.sequence(
+      Commands.runOnce(() -> elevator.pivot(speed)),
+      Commands.waitSeconds(time),
+      Commands.runOnce(() -> elevator.stopPivot())
+    );
+  }
+
   /**
    * Moves the elevator down one "level"
    *
@@ -45,6 +53,15 @@ public class ElevatorCommands {
    */
   public static Command timedIntake(Elevator elevator, double speed, double time) {
     return Commands.run(() -> elevator.timedIntake(speed, time), elevator);
+  }
+
+  public static Command timedOuttake(Elevator elevator, double pivotSpeed, double outtakeSpeed, double pivotTime, double outtakeTime) {
+    pivotSpeed = Math.abs(pivotSpeed);
+    outtakeSpeed = Math.abs(outtakeSpeed);
+    return Commands.sequence(
+      pivot(elevator, -pivotSpeed, pivotTime),
+      timedIntake(elevator, -outtakeSpeed, outtakeTime)
+    );
   }
 
   /**
