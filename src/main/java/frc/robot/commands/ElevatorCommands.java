@@ -26,10 +26,9 @@ public class ElevatorCommands {
 
   public static Command pivot(Elevator elevator, double speed, double time) {
     return Commands.sequence(
-      Commands.runOnce(() -> elevator.pivot(speed)),
-      Commands.waitSeconds(time),
-      Commands.runOnce(() -> elevator.stopPivot())
-    );
+        Commands.runOnce(() -> elevator.pivot(speed)),
+        Commands.waitSeconds(time),
+        Commands.runOnce(() -> elevator.stopPivot()));
   }
 
   /**
@@ -55,13 +54,16 @@ public class ElevatorCommands {
     return Commands.run(() -> elevator.timedIntake(speed, time), elevator);
   }
 
-  public static Command timedOuttake(Elevator elevator, double pivotSpeed, double outtakeSpeed, double pivotTime, double outtakeTime) {
+  public static Command timedOuttake(
+      Elevator elevator,
+      double pivotSpeed,
+      double outtakeSpeed,
+      double pivotTime,
+      double outtakeTime) {
     pivotSpeed = Math.abs(pivotSpeed);
     outtakeSpeed = Math.abs(outtakeSpeed);
     return Commands.sequence(
-      pivot(elevator, -pivotSpeed, pivotTime),
-      timedIntake(elevator, -outtakeSpeed, outtakeTime)
-    );
+        pivot(elevator, -pivotSpeed, pivotTime), timedIntake(elevator, -outtakeSpeed, outtakeTime));
   }
 
   /**
