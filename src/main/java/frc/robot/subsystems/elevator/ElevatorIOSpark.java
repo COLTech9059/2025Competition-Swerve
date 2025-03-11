@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,26 +28,32 @@ public class ElevatorIOSpark extends ElevatorIO {
   private SparkMax pivot = new SparkMax(Constants.pivotID, MotorType.kBrushless);
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
   private SparkBaseConfig eMConfig;
-  private SparkBaseConfig eM2Config;
+  // private SparkBaseConfig eM2Config;
 
   // Digital input (limit switch) objects
   private DigitalInput bottomSwitch = new DigitalInput(Constants.level0ID);
   private DigitalInput topSwitch = new DigitalInput(Constants.level1ID);
+
+  // Pivot limit switches
+  // private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); //put id
+  // here
+  // private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch); //put id
+  // here
 
   // Apply all necessary motor configs
   @Override
   public void configureMotors() {
     // Set Inversions & Ramp Rates
     eMConfig.inverted(false);
-    eM2Config.inverted(false);
+    // eM2Config.inverted(false);
     eMConfig.openLoopRampRate(0.2);
     eMConfig.closedLoopRampRate(0.2);
-    eM2Config.openLoopRampRate(0.2);
-    eM2Config.closedLoopRampRate(0.2);
+    // eM2Config.openLoopRampRate(0.2);
+    // eM2Config.closedLoopRampRate(0.2);
 
     // Apply configuration
     // eMotor2.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    eMotor.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    eMotor.configure(eMConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   // Get the average between the two encoders
@@ -64,6 +69,9 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   @Override
   public void pivot(double speed) {
+    // if (!forwardPivot.get() && speed > 0) pivot.set(speed);
+    // else if (!reversePivot.get() && speed < 0) pivot.set(speed);
+    // else pivot.stopMotor();
     pivot.set(speed);
   }
 

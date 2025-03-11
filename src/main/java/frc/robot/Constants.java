@@ -17,15 +17,11 @@
 
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,6 +44,8 @@ import frc.robot.util.RBSIEnum.MotorIdleMode;
 import frc.robot.util.RBSIEnum.SwerveType;
 import frc.robot.util.RBSIEnum.VisionType;
 import frc.robot.util.RobotDeviceId;
+import java.io.IOException;
+import java.nio.file.Path;
 import lombok.Getter;
 import swervelib.math.Matter;
 
@@ -108,6 +106,7 @@ public final class Constants {
 
   // Device ID Constants
   public static final int eMotorID = 15;
+
   public static final int pivotID = 16;
   public static final int intakeID = 17;
   // public static final int algaeID = 17;
@@ -115,9 +114,8 @@ public final class Constants {
 
   public static final int level0ID = 1;
   public static final int level1ID = 2;
-  public static final int level2ID = 3;
-  public static final int stage2ID = 4;
-  public static final int level3ID = 5;
+  public static final int pivotForwardSwitch = 3;
+  public static final int pivotReverseSwitch = 4;
 
   // Elevator setpoints
   public static final double level0 = 0;

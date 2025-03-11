@@ -15,15 +15,6 @@
 
 package frc.robot.commands;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -45,6 +36,13 @@ import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.SwerveConstants;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class DriveCommands {
 
@@ -159,11 +157,11 @@ public class DriveCommands {
    * @param rOffset The offset of the robot from the april tag
    * @return The robotRelativeDrive Command
    */
-  public static Command targetAlignment(
-      Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
-    DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
-    return robotRelativeDrive(drive, list[0], list[1], list[2]);
-  }
+  // public static Command targetAlignment(
+  //     Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
+  //   DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
+  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  // }
 
   /**
    * Field relative drive command using joystick for linear control and PID for angular control.

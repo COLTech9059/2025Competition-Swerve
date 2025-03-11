@@ -65,6 +65,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
 
+  private double driveSpeed = .5;
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -209,6 +210,7 @@ public class Drive extends SubsystemBase {
     else if (value > 1) value = 0;
     driveSpeed = value;
   }
+
   /** Periodic function that is called each robot cycle by the command scheduler */
   @Override
   public void periodic() {

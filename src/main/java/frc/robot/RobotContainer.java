@@ -19,22 +19,21 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -49,10 +48,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
-import static frc.robot.Constants.Cameras.camera0Name;
-import static frc.robot.Constants.Cameras.camera1Name;
-import static frc.robot.Constants.Cameras.robotToCamera0;
-import static frc.robot.Constants.Cameras.robotToCamera1;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
@@ -82,6 +77,8 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -320,10 +317,14 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> elevator.decrementSpeed(0.1), elevator));
 
     // Press Left Bumper --> Decrement Drive Speed by 0.1
-    operatorController.leftBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    operatorController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
     // Press Right Bumper --> Increment Drive Speed by 0.1
-    operatorController.rightBumper().onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+    operatorController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
 
     // Press X Button --> X-stop
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
@@ -341,17 +342,16 @@ public class RobotContainer {
             () -> -driveStickX.value() * m_drivebase.getSpeed(),
             () -> -turnStickX.value() * m_drivebase.getSpeed()));
 
-
     // PRESS B BUTTON --> Align with an april tag
-    driverController
-        .b()
-        .onTrue(
-            DriveCommands.targetAlignment(
-                m_drivebase,
-                m_vision.getBestTarget(0),
-                robotToCamera0,
-                new Transform2d(0, 0, new Rotation2d())));
-    
+    // driverController
+    //     .b()
+    //     .onTrue(
+    //         DriveCommands.targetAlignment(
+    //             m_drivebase,
+    //             m_vision.getBestTarget(0),
+    //             robotToCamera0,
+    //             new Transform2d(0, 0, new Rotation2d())));
+
     // Press Right Bumper --> Move elevator up one level
     driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
 
@@ -359,12 +359,14 @@ public class RobotContainer {
     driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
 
     // Press Left Trigger --> Active intake of coral
-    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.35, 1));
+    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.1, 1));
     driverController.leftTrigger().whileTrue(Commands.run(() -> elevator.activeIntake(0.5)));
     driverController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.stopIntake()));
 
     // Press Right Trigger --> Timed outtake of coral
-    driverController.rightTrigger().onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
+    driverController
+        .rightTrigger()
+        .onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
   }
 
   public void randomizeLEDOnStartup() {
