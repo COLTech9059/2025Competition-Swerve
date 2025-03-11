@@ -55,12 +55,11 @@ public class ElevatorCommands {
       Elevator elevator,
       double pivotSpeed,
       double outtakeSpeed,
-      double pivotTime,
       double outtakeTime) {
     pivotSpeed = Math.abs(pivotSpeed);
     outtakeSpeed = Math.abs(outtakeSpeed);
     return Commands.sequence(
-        pivot(elevator, -pivotSpeed, pivotTime), timedIntake(elevator, -outtakeSpeed, outtakeTime));
+        pivot(elevator, pivotSpeed, false), timedIntake(elevator, -outtakeSpeed, outtakeTime));
   }
 
   /**

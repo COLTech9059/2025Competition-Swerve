@@ -19,19 +19,19 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.Cameras.camera0Name;
-import static frc.robot.Constants.Cameras.camera1Name;
-import static frc.robot.Constants.Cameras.robotToCamera0;
-import static frc.robot.Constants.Cameras.robotToCamera1;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -48,6 +48,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
@@ -77,8 +81,6 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
-import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -360,14 +362,14 @@ public class RobotContainer {
     driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
 
     // Press Left Trigger --> Active intake of coral
-    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.1, 1));
+    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.1, true));
     driverController.leftTrigger().whileTrue(Commands.run(() -> elevator.activeIntake(0.5)));
     driverController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.stopIntake()));
 
     // Press Right Trigger --> Timed outtake of coral
     driverController
         .rightTrigger()
-        .onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
+        .onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1));
   }
 
   public void randomizeLEDOnStartup() {
