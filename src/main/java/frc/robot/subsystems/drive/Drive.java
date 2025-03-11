@@ -65,7 +65,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
 
-  private double driveSpeed = 0.5;
+  // Modular Drive Speed (somehow got deleted in the merge)
+  private double driveSpeed = .5;
+
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();

@@ -351,7 +351,8 @@ public class RobotContainer {
     //             m_vision.getBestTarget(0),
     //             robotToCamera0,
     //             new Transform2d(0, 0, new Rotation2d())));
-
+    driverController.b().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
+    
     // Press Right Bumper --> Move elevator up one level
     driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
 

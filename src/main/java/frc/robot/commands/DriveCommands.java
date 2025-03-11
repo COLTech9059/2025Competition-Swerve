@@ -15,6 +15,16 @@
 
 package frc.robot.commands;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.PhotonUtils;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -31,18 +41,15 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.OperatorConstants;
+
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.SwerveConstants;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-import org.photonvision.targeting.PhotonTrackedTarget;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 
 public class DriveCommands {
 
@@ -120,16 +127,15 @@ public class DriveCommands {
    *
    * @param target The target april tag
    * @param cOffset The offset of the camera from the center of the robot
-   * @param rOffset The offset of the robot from the april tag
+   * @param direction the direction of the camera compared to the center of the robot; positive or negative 1 only.
+   * 
    * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
    */
-  public static DoubleSupplier[] alignmentCalculation(
-      PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
-
-    double yaw = target.getYaw();
-    Transform3d tOffset = target.bestCameraToTarget;
-    double totalOffset = tOffset.getY() + cOffset.getY() - rOffset.getY();
-    double xOffset = -Math.abs(rOffset.getX());
+  public static DoubleSupplier[] alignmentCalculation(PhotonTrackedTarget target, Transform3d cOffset, double direction) {
+    double yaw = target.getYaw(); // Angle to flat (+ right, - left)
+    Transform3d tOffset = target.bestCameraToTarget; // Returns the distance to target (x), horizontal offset (y), and vertical offset (z)
+    double totalOffset = tOffset.getZ() + cOffset.getY();
+    double xOffset = tOffset.getX();
     DoubleSupplier xSupply = () -> 0;
     DoubleSupplier ySupply = () -> 0;
     DoubleSupplier omegaSupply = () -> 0;
@@ -137,7 +143,7 @@ public class DriveCommands {
     if (Math.abs(yaw) >= 10) {
       xSupply = () -> 0;
       ySupply = () -> 0;
-      omegaSupply = () -> yaw * 0.1;
+      omegaSupply = () -> yaw * 0.4;
     } else if (Math.abs(totalOffset) >= 3 && Math.abs(xOffset) >= 3) {
       xSupply = () -> 0.1 * xOffset;
       ySupply = () -> 0.5 * totalOffset;
@@ -157,12 +163,45 @@ public class DriveCommands {
    * @param rOffset The offset of the robot from the april tag
    * @return The robotRelativeDrive Command
    */
-  // public static Command targetAlignment(
-  //     Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
+  // public static Command targetAlignment(Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
   //   DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
   //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
   // }
 
+  /**
+   * Constructs and returns a robotRelativeDrive command with the required values to line up with
+   * the target april tag
+   *
+   * @param drive The Drive subsystem
+   * @param vision The Vision subsystem
+   * 
+   * @author DevAspen, Revamped by SomnolentStone
+   * 
+   * @return a Blank Command (if no valid target)
+   * @return The robotRelativeDrive Command
+   */
+  public static Command targetAlignment(Drive drive, Vision vision) {
+    int cameraToUse = vision.determineBestCamera();
+    if (cameraToUse == -1) return Commands.none(); //Blank command, does nothing.
+
+    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+
+    // Check to see if target is on whitelist
+    boolean valid = false;
+    for (int tagId: Constants.Cameras.tagWhitelist) {
+      if (target.getFiducialId() == tagId) valid = true;
+    }
+    if (!valid) return Commands.none();
+
+    // Values to help center the target.
+    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); //Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset = camera.camRobotOffset;
+
+    DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
+    return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  }
+  
   /**
    * Field relative drive command using joystick for linear control and PID for angular control.
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
