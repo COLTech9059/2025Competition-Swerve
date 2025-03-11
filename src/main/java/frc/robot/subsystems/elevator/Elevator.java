@@ -33,8 +33,8 @@ public class Elevator extends RBSISubsystem {
     io.setLevel(speed, level);
   }
 
-  public void pivot(double speed) {
-    io.pivot(speed);
+  public void pivot(double speed, boolean up) {
+    io.pivot(speed, up);
   }
 
   public void stopPivot() {

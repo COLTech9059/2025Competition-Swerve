@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,10 +36,8 @@ public class ElevatorIOSpark extends ElevatorIO {
   private DigitalInput topSwitch = new DigitalInput(Constants.level1ID);
 
   // Pivot limit switches
-  // private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); //put id
-  // here
-  // private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch); //put id
-  // here
+  private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); 
+  private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch);
 
   // Apply all necessary motor configs
   @Override
@@ -58,7 +57,7 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Get the average between the two encoders
   private double getEncoderAverage() {
-    return (eEncoder.getPosition() /*+ eEncoder2.getPosition()/* */) / 2;
+    return (eEncoder.getPosition());
   }
 
   // Set the encoders to a specific position
@@ -68,11 +67,16 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   @Override
-  public void pivot(double speed) {
-    // if (!forwardPivot.get() && speed > 0) pivot.set(speed);
-    // else if (!reversePivot.get() && speed < 0) pivot.set(speed);
-    // else pivot.stopMotor();
-    pivot.set(speed);
+  public void pivot(double speed, boolean up) {
+    speed = Math.abs(speed);
+    
+    if (up) {
+      pivot.set(-speed);
+      if (reversePivot.get()) pivot.stopMotor();
+    } else {
+      pivot.set(speed);
+      if (forwardPivot.get()) pivot.stopMotor();
+    }
   }
 
   @Override
@@ -116,7 +120,7 @@ public class ElevatorIOSpark extends ElevatorIO {
     eMotor.set(speed);
   }
 
-  // Returns the current level of the elevator (0 means none)
+  // Returns the current level of the elevator 
   @Override
   public int getLevel() {
     if (bottomSwitch.get()) levelTracker = 0;

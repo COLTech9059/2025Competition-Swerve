@@ -10,7 +10,7 @@ public class ElevatorIO {
   /** Configures the motor controller objects */
   public void configureMotors() {}
 
-  public void pivot(double speed) {}
+  public void pivot(double speed, boolean up) {}
 
   /**
    * Moves the elevator to a specific "level"

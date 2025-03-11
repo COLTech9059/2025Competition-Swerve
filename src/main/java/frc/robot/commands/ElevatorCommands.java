@@ -24,11 +24,8 @@ public class ElevatorCommands {
     return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
-  public static Command pivot(Elevator elevator, double speed, double time) {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.pivot(speed)),
-        Commands.waitSeconds(time),
-        Commands.runOnce(() -> elevator.stopPivot()));
+  public static Command pivot(Elevator elevator, double speed, boolean up) {
+    return Commands.run(() -> elevator.pivot(speed, up));
   }
 
   /**
