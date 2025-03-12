@@ -59,7 +59,7 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Get the average between the two encoders
   private double getEncoderAverage() {
-    return (eEncoder.getPosition() /*+ eEncoder2.getPosition()/* */) / 2;
+    return (eEncoder.getPosition());
   }
 
   // Set the encoders to a specific position
@@ -69,11 +69,16 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   @Override
-  public void pivot(double speed) {
-    // if (!forwardPivot.get() && speed > 0) pivot.set(speed);
-    // else if (!reversePivot.get() && speed < 0) pivot.set(speed);
-    // else pivot.stopMotor();
-    pivot.set(speed);
+  public void pivot(double speed, boolean up) {
+    speed = Math.abs(speed);
+    
+    if (up) {
+      pivot.set(-speed);
+      if (reversePivot.get()) pivot.stopMotor();
+    } else {
+      pivot.set(speed);
+      if (forwardPivot.get()) pivot.stopMotor();
+    }
   }
 
   @Override
@@ -117,7 +122,7 @@ public class ElevatorIOSpark extends ElevatorIO {
     eMotor.set(speed);
   }
 
-  // Returns the current level of the elevator (0 means none)
+  // Returns the current level of the elevator 
   @Override
   public int getLevel() {
     if (!bottomSwitch.get()) levelTracker = 0;
