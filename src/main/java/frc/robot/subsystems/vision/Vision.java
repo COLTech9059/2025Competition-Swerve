@@ -71,34 +71,42 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
-  public VisionIOInputsAutoLogged getInputCamera(int camIndex){
+  public VisionIOInputsAutoLogged getInputCamera(int camIndex) {
     return inputs[camIndex];
   }
+
   /**
-   * Returns the camera ID of the most optimal camera to use. 
-   * Uses the best target it checks (if any)
+   * Returns the camera ID of the most optimal camera to use. Uses the best target it checks (if
+   * any)
    *
    * @author SomnolentStone
    * @return the index of the camera to use. -1 if no targets.
    */
-  public int determineBestCamera(){
+  public int determineBestCamera() {
     // Store the comparison target and the camera ID.
     PhotonTrackedTarget lastTargetChecked = null;
     int camID = -1;
 
-    // DEV NOTE: sorry for the setup; this is just in case we ever have a ton of cameras/one camera is out of commission.
+    // DEV NOTE: sorry for the setup; this is just in case we ever have a ton of cameras/one camera
+    // is out of commission.
     // Loop through all targets. Compare with best.
-    for (int i = 0; i < inputs.length; i++){
+    for (int i = 0; i < inputs.length; i++) {
       if (!inputs[i].connected) continue;
       PhotonTrackedTarget currentTarget = inputs[i].bestTarget;
-      if (currentTarget == null ) continue;
+      if (currentTarget == null) continue;
       if (lastTargetChecked != null) {
-        if (i == 0) {camID = i; continue;}
+        if (i == 0) {
+          camID = i;
+          continue;
+        }
         // Simply compare target size on detection.
         double currentTargetArea = currentTarget.getArea();
         double comparisonArea = lastTargetChecked.getArea();
-        
-        if (currentTargetArea >= comparisonArea) {lastTargetChecked = currentTarget; camID = i;}
+
+        if (currentTargetArea >= comparisonArea) {
+          lastTargetChecked = currentTarget;
+          camID = i;
+        }
       }
     }
 

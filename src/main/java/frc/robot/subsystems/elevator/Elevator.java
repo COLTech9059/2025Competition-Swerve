@@ -164,8 +164,8 @@ public class Elevator extends RBSISubsystem {
   }
 
   /** Returns the status of the limit switch */
-  public boolean getSwitch() {
-    return io.getSwitch();
+  public boolean getSwitch(boolean forward) {
+    return io.getSwitch(forward);
   }
 
   /**

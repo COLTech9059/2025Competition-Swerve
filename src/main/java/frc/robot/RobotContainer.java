@@ -58,7 +58,7 @@ import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.cage.CageIOSpark;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSparkTest;
+import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -140,7 +140,6 @@ public class RobotContainer {
    */
   @SuppressWarnings("UseSpecificCatch")
   public RobotContainer() {
-
     try {
       path = PathPlannerPath.fromPathFile("Multi-Path 1");
     } catch (Exception e) {
@@ -153,7 +152,7 @@ public class RobotContainer {
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSparkTest());
+        elevator = new Elevator(new ElevatorIOSpark());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -179,7 +178,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSparkTest());
+        elevator = new Elevator(new ElevatorIOSpark());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -193,7 +192,7 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSparkTest());
+        elevator = new Elevator(new ElevatorIOSpark());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -207,7 +206,7 @@ public class RobotContainer {
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
     // Define Auto Commands
-    defineAutoCommands();
+    // defineAutoCommands();
 
     // Push Subsystems to Dashboard
     SmartDashboard.putData(m_drivebase);
@@ -306,68 +305,74 @@ public class RobotContainer {
             .withPosition(5, 4)
             .withSize(2, 1);
 
-    // Press Right Trigger --> Increment Elevator speed by 0.1
-    operatorController
-        .rightTrigger()
-        .onTrue(Commands.runOnce(() -> elevator.incrementSpeed(0.1), elevator));
-
-    // Press Left Trigger --> Decrement Elevator Speed by 0.1
-    operatorController
-        .leftTrigger()
-        .onTrue(Commands.runOnce(() -> elevator.decrementSpeed(0.1), elevator));
-
-    // Press Left Bumper --> Decrement Drive Speed by 0.1
-    operatorController
-        .leftBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
-
-    // Press Right Bumper --> Increment Drive Speed by 0.1
-    operatorController
-        .rightBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
-
-    // Press X Button --> X-stop
-    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
-
-    // Press A Button --> Run the cage mechanism for a set amount of time
-    operatorController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
-
-    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
-
-    // SET STANDARD DRIVING AS DEFAULT COMMAND FOR THE DRIVEBASE
+    //// NEW CONTROLS ////
+    //// Driver
+    // Standard Driving
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
             () -> -driveStickY.value() * m_drivebase.getSpeed(),
             () -> -driveStickX.value() * m_drivebase.getSpeed(),
             () -> -turnStickX.value() * m_drivebase.getSpeed()));
+    // Right Bumper -> increase drive speed by .1; overflows to 0
+    driverController
+        .rightBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+    // Left Bumper -> decrease drive speed by .1; underflows to 1
+    driverController
+        .leftBumper()
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+    // X Button -> X-Stop
+    driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+    // HOLD Y Button -> Align AND approach AprilTag
+    driverController.y().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
+    driverController
+        .y()
+        .onFalse(DriveCommands.fieldRelativeDrive(m_drivebase, () -> 0, () -> 0, () -> 0));
+    // A Button -> Run Cage mechanism.
+    driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
 
-    // PRESS B BUTTON --> Align with an april tag
-    // driverController
-    //     .b()
-    //     .onTrue(
-    //         DriveCommands.targetAlignment(
-    //             m_drivebase,
-    //             m_vision.getBestTarget(0),
-    //             robotToCamera0,
-    //             new Transform2d(0, 0, new Rotation2d())));
-    driverController.b().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
-    
-    // Press Right Bumper --> Move elevator up one level
-    driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
+    //// Operator
+    // Right Bumper -> Extend Elevator
+    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
+    // Left Bumper -> Retract Elevator
+    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
+    operatorController
+        .leftBumper()
+        .onFalse(Commands.runOnce(() -> ElevatorCommands.interrupt(elevator)));
+    // Right Trigger -> Pivot intake up
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.125));
+    operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
+    operatorController
+        .rightBumper()
+        .onFalse(Commands.runOnce(() -> ElevatorCommands.interrupt(elevator)));
+    // Left Trigger -> Pivot intake down
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.125));
+    operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
+    // A Button -> Intake
+    operatorController.a().onTrue(ElevatorCommands.timedIntake(elevator, .25, 1));
+    // B Button -> Outtake
+    operatorController.b().onTrue(ElevatorCommands.timedOuttake(elevator, .25, .25, 1.0));
 
-    // Press Left Bumper --> Move elevator down one level
-    driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
+    SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
+
+    // // Press Right Bumper --> Move elevator up one level
+    // driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
+    // elevator.getSpeed()));
+
+    // // Press Left Bumper --> Move elevator down one level
+    // driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
+    // elevator.getSpeed()));
 
     // Press Left Trigger --> Active intake of coral
-    driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.1, 1));
-    driverController.leftTrigger().whileTrue(Commands.run(() -> elevator.activeIntake(0.5)));
-    driverController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.stopIntake()));
+    // driverController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, 0.1, 1));
+    // driverController.leftTrigger().whileTrue(Commands.run(() -> elevator.activeIntake(0.5)));
+    // driverController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.stopIntake()));
 
-    // Press Right Trigger --> Timed outtake of coral
-    driverController
-        .rightTrigger()
-        .onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
+    // // Press Right Trigger --> Timed outtake of coral
+    // driverController
+    //     .rightTrigger()
+    //     .onTrue(ElevatorCommands.timedOuttake(elevator, 0.35, 0.65, 1.5, 1));
   }
 
   public void randomizeLEDOnStartup() {

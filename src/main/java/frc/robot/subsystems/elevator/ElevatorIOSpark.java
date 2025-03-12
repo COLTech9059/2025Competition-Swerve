@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,17 +28,18 @@ public class ElevatorIOSpark extends ElevatorIO {
   private RelativeEncoder eEncoder = eMotor.getEncoder();
   private SparkMax pivot = new SparkMax(Constants.pivotID, MotorType.kBrushless);
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
-  private SparkBaseConfig eMConfig;
-  // private SparkBaseConfig eM2Config;
+  private SparkBaseConfig eMConfig = new SparkMaxConfig();
+  private SparkBaseConfig pivotConfig = new SparkMaxConfig();
 
   // Digital input (limit switch) objects
   private DigitalInput bottomSwitch = new DigitalInput(Constants.level0ID);
   private DigitalInput topSwitch = new DigitalInput(Constants.level1ID);
 
   // Pivot limit switches
-  // private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); //put id
+  private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); // put id
   // here
-  // private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch); //put id
+  private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch); // put id
+
   // here
 
   // Apply all necessary motor configs
@@ -50,7 +52,6 @@ public class ElevatorIOSpark extends ElevatorIO {
     eMConfig.closedLoopRampRate(0.2);
     // eM2Config.openLoopRampRate(0.2);
     // eM2Config.closedLoopRampRate(0.2);
-
     // Apply configuration
     // eMotor2.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     eMotor.configure(eMConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -90,11 +91,11 @@ public class ElevatorIOSpark extends ElevatorIO {
     } else {
 
       if (getLevel() > level) {
-        eMotor.set(-speed);
+        eMotor.set(speed);
       }
 
       if (getLevel() < level) {
-        eMotor.set(speed);
+        eMotor.set(-speed);
       }
     }
 
@@ -119,8 +120,8 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Returns the current level of the elevator (0 means none)
   @Override
   public int getLevel() {
-    if (bottomSwitch.get()) levelTracker = 0;
-    if (topSwitch.get()) levelTracker = 1;
+    if (!bottomSwitch.get()) levelTracker = 0;
+    if (!topSwitch.get()) levelTracker = 1;
     // if (l2Switch.get() && stage2Switch.get()) levelTracker = 2;
     // if (l3Switch.get()) levelTracker = 3;
     return levelTracker;
@@ -132,8 +133,8 @@ public class ElevatorIOSpark extends ElevatorIO {
    */
   @Override
   public int getExactLevel() {
-    if (bottomSwitch.get()) return 0;
-    if (topSwitch.get()) return 1;
+    if (!bottomSwitch.get()) return 0;
+    if (!topSwitch.get()) return 1;
     // if (l2Switch.get() && stage2Switch.get()) return 2;
     // if (l3Switch.get()) return 3;
     return -1;
@@ -192,13 +193,24 @@ public class ElevatorIOSpark extends ElevatorIO {
     if (elevatorSpeed < -1) elevatorSpeed = -1;
   }
 
+  @Override
+  public boolean getSwitch(boolean forward) {
+    if (forward) return forwardPivot.get();
+    else return reversePivot.get();
+  }
+
   // Updates encoder values according to elevator level
   @Override
   public void periodicUpdates() {
     SmartDashboard.putNumber("Elevator Speed", elevatorSpeed);
 
-    if (getLevel() == 1) setEncoders(Constants.level1);
-    if (getLevel() == 2) setEncoders(Constants.level2);
-    if (getLevel() == 3) setEncoders(Constants.level3);
+    SmartDashboard.putBoolean("Bottom switch", !bottomSwitch.get());
+    SmartDashboard.putBoolean("Top switch", !topSwitch.get());
+    SmartDashboard.putBoolean("Forward pivot", forwardPivot.get());
+    SmartDashboard.putBoolean("Reverse pivot", reversePivot.get());
+
+    // if (getLevel() == 1) setEncoders(Constants.level1);
+    // if (getLevel() == 2) setEncoders(Constants.level2);
+    // if (getLevel() == 3) setEncoders(Constants.level3);
   }
 }

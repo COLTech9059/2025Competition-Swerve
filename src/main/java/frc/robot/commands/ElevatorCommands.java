@@ -24,11 +24,8 @@ public class ElevatorCommands {
     return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
   }
 
-  public static Command pivot(Elevator elevator, double speed, double time) {
-    return Commands.sequence(
-        Commands.runOnce(() -> elevator.pivot(speed)),
-        Commands.waitSeconds(time),
-        Commands.runOnce(() -> elevator.stopPivot()));
+  public static Command pivot(Elevator elevator, double speed) {
+    return Commands.runOnce(() -> elevator.pivot(speed), elevator);
   }
 
   /**
@@ -55,15 +52,11 @@ public class ElevatorCommands {
   }
 
   public static Command timedOuttake(
-      Elevator elevator,
-      double pivotSpeed,
-      double outtakeSpeed,
-      double pivotTime,
-      double outtakeTime) {
+      Elevator elevator, double pivotSpeed, double outtakeSpeed, double outtakeTime) {
     pivotSpeed = Math.abs(pivotSpeed);
     outtakeSpeed = Math.abs(outtakeSpeed);
     return Commands.sequence(
-        pivot(elevator, -pivotSpeed, pivotTime), timedIntake(elevator, -outtakeSpeed, outtakeTime));
+        pivot(elevator, -pivotSpeed), timedIntake(elevator, -outtakeSpeed, outtakeTime));
   }
 
   /**
@@ -188,7 +181,7 @@ public class ElevatorCommands {
     return Commands.runEnd(
         () -> {
           elevator.runMotor(speed);
-          if (elevator.getSwitch()) interrupt(elevator);
+          if (elevator.getSwitch(false)) interrupt(elevator);
         },
         () -> LEDCommands.interrupt(led),
         elevator);

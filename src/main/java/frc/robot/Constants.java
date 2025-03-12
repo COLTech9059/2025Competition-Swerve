@@ -112,10 +112,10 @@ public final class Constants {
   // public static final int algaeID = 17;
   public static final int cageID = 18;
 
-  public static final int level0ID = 1;
-  public static final int level1ID = 2;
-  public static final int pivotForwardSwitch = 3;
-  public static final int pivotReverseSwitch = 4;
+  public static final int level0ID = 7;
+  public static final int level1ID = 6;
+  public static final int pivotForwardSwitch = 8;
+  public static final int pivotReverseSwitch = 9;
 
   // Elevator setpoints
   public static final double level0 = 0;
@@ -331,7 +331,7 @@ public final class Constants {
         new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
 
     // AprilTag Whitelist
-    public static int[] tagWhitelist = {1,2,3,4}; //Add certain AprilTags to list
+    public static int[] tagWhitelist = {1, 2, 3, 4}; // Add certain AprilTags to list
 
     // Standard deviation multipliers for each camera
     // (Adjust to trust some cameras more than others)

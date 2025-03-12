@@ -123,7 +123,7 @@ public class ElevatorIO {
   public void decrementSpeed(double value) {}
 
   /** Returns the status of the limit switch */
-  public boolean getSwitch() {
+  public boolean getSwitch(boolean forward) {
     return false;
   }
 

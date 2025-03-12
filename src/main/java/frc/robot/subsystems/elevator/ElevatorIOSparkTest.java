@@ -71,7 +71,7 @@ public class ElevatorIOSparkTest extends ElevatorIO {
   }
 
   @Override
-  public boolean getSwitch() {
+  public boolean getSwitch(boolean forward) {
     return bottomSwitch.get();
   }
 
