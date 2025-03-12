@@ -69,16 +69,8 @@ public class ElevatorIOSpark extends ElevatorIO {
   }
 
   @Override
-  public void pivot(double speed, boolean up) {
-    speed = Math.abs(speed);
-    
-    if (up) {
-      pivot.set(-speed);
-      if (reversePivot.get()) pivot.stopMotor();
-    } else {
-      pivot.set(speed);
-      if (forwardPivot.get()) pivot.stopMotor();
-    }
+  public void pivot(double speed) {
+    pivot.set(speed);
   }
 
   @Override
