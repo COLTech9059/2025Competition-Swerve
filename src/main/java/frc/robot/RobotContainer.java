@@ -19,19 +19,19 @@
 
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
+import static frc.robot.Constants.Cameras.camera0Name;
+import static frc.robot.Constants.Cameras.camera1Name;
+import static frc.robot.Constants.Cameras.robotToCamera0;
+import static frc.robot.Constants.Cameras.robotToCamera1;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -48,10 +48,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
-import static frc.robot.Constants.Cameras.camera0Name;
-import static frc.robot.Constants.Cameras.camera1Name;
-import static frc.robot.Constants.Cameras.robotToCamera0;
-import static frc.robot.Constants.Cameras.robotToCamera1;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
@@ -81,6 +77,8 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
@@ -313,9 +311,9 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> -driveStickY.value() * m_drivebase.getSpeed(),
-            () -> -driveStickX.value() * m_drivebase.getSpeed(),
-            () -> -turnStickX.value() * m_drivebase.getSpeed()));
+            () -> driveStickY.value() * m_drivebase.getSpeed(),
+            () -> driveStickX.value() * m_drivebase.getSpeed(),
+            () -> turnStickX.value() * m_drivebase.getSpeed()));
     // Right Bumper -> increase drive speed by .1; overflows to 0
     driverController
         .rightBumper()
@@ -328,9 +326,13 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
     // HOLD Y Button -> Align AND approach AprilTag
     driverController.y().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
-    driverController
-        .y()
-        .onFalse(DriveCommands.fieldRelativeDrive(m_drivebase, () -> 0, () -> 0, () -> 0));
+    // driverController
+    //     .y()
+    //     .onFalse(DriveCommands.fieldRelativeDrive(
+    //       m_drivebase,
+    //       () -> -driveStickY.value() * m_drivebase.getSpeed(),
+    //       () -> -driveStickX.value() * m_drivebase.getSpeed(),
+    //       () -> -turnStickX.value() * m_drivebase.getSpeed()));
     // A Button -> Run Cage mechanism.
     driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
 

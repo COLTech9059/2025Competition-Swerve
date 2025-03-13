@@ -114,7 +114,7 @@ public class ElevatorIOSpark extends ElevatorIO {
     eMotor.set(speed);
   }
 
-  // Returns the current level of the elevator 
+  // Returns the current level of the elevator
   @Override
   public int getLevel() {
     if (!bottomSwitch.get()) levelTracker = 0;
