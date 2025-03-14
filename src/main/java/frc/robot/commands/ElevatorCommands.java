@@ -21,7 +21,10 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command upLevel(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() + 1), elevator);
+    // return Commands.startRun(() -> elevator.setLevel(speed, elevator.getLevel() + 1), null,
+    // elevator);
+    return Commands.run(() -> elevator.setLevel(speed, 1), elevator)
+        .until(() -> (elevator.getExactLevel() == 1));
   }
 
   public static Command pivot(Elevator elevator, double speed) {
@@ -36,7 +39,8 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, elevator.getLevel() - 1), elevator);
+    return Commands.run(() -> elevator.setLevel(speed, 0), elevator)
+        .until(() -> (elevator.getExactLevel() == 0));
   }
 
   /**
@@ -57,6 +61,10 @@ public class ElevatorCommands {
     outtakeSpeed = Math.abs(outtakeSpeed);
     return Commands.sequence(
         pivot(elevator, -pivotSpeed), timedIntake(elevator, -outtakeSpeed, outtakeTime));
+  }
+
+  public static Command runIntake(Elevator elevator, double speed) {
+    return Commands.runOnce(() -> elevator.activeIntake(speed), elevator);
   }
 
   /**

@@ -150,7 +150,7 @@ public class Robot extends LoggedRobot {
     // TODO: Make sure Gyro inits here with whatever is in the path planning thingie
     switch (Constants.getAutoType()) {
       case PATHPLANNER:
-        // m_autoCommandPathPlanner = m_robotContainer.getAutonomousCommandPathPlanner();
+        m_autoCommandPathPlanner = m_robotContainer.getAutonomousCommandPathPlanner();
         // schedule the autonomous command
         if (m_autoCommandPathPlanner != null) {
           m_autoCommandPathPlanner.schedule();

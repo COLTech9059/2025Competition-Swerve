@@ -18,7 +18,9 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import java.util.List;
 import org.littletonrobotics.junction.AutoLog;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 public interface VisionIO {
@@ -52,4 +54,8 @@ public interface VisionIO {
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
+
+  public default List<PhotonPipelineResult> getAllPipelineResults() {
+    return null;
+  }
 }

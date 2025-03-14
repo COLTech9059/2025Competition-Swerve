@@ -49,7 +49,6 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.CageCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
@@ -206,7 +205,7 @@ public class RobotContainer {
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
     // Define Auto Commands
-    // defineAutoCommands();
+    defineAutoCommands();
 
     // Push Subsystems to Dashboard
     SmartDashboard.putData(m_drivebase);
@@ -255,7 +254,7 @@ public class RobotContainer {
     SmartDashboard.putData(led);
 
     // Define Auto commands
-    defineAutoCommands();
+    // defineAutoCommands();
 
     // Define SysId Routines
     definesysIdRoutines();
@@ -313,50 +312,52 @@ public class RobotContainer {
             m_drivebase,
             () -> driveStickY.value() * m_drivebase.getSpeed(),
             () -> driveStickX.value() * m_drivebase.getSpeed(),
-            () -> turnStickX.value() * m_drivebase.getSpeed()));
+            () -> turnStickX.value() * m_drivebase.getSpeed() * 0.8));
+
     // Right Bumper -> increase drive speed by .1; overflows to 0
     driverController
         .rightBumper()
         .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+
     // Left Bumper -> decrease drive speed by .1; underflows to 1
     driverController
         .leftBumper()
         .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+
     // X Button -> X-Stop
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+
     // HOLD Y Button -> Align AND approach AprilTag
-    driverController.y().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
+    // driverController.y().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
     // driverController
     //     .y()
-    //     .onFalse(DriveCommands.fieldRelativeDrive(
-    //       m_drivebase,
-    //       () -> -driveStickY.value() * m_drivebase.getSpeed(),
-    //       () -> -driveStickX.value() * m_drivebase.getSpeed(),
-    //       () -> -turnStickX.value() * m_drivebase.getSpeed()));
+    //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
+
     // A Button -> Run Cage mechanism.
-    driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.35, 2));
+    // driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.50, 2));
 
     //// Operator
     // Right Bumper -> Extend Elevator
     operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
-    // Left Bumper -> Retract Elevator
+
+    // // Left Bumper -> Retract Elevator
     operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
-    operatorController
-        .leftBumper()
-        .onFalse(Commands.runOnce(() -> ElevatorCommands.interrupt(elevator)));
+
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.125));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.4));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
-    operatorController
-        .rightBumper()
-        .onFalse(Commands.runOnce(() -> ElevatorCommands.interrupt(elevator)));
+
     // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.125));
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.25));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
+
     // A Button -> Intake
-    operatorController.a().onTrue(ElevatorCommands.timedIntake(elevator, .25, 1));
+    operatorController.a().whileTrue(ElevatorCommands.runIntake(elevator, -.25));
+    operatorController.a().onFalse(ElevatorCommands.runIntake(elevator, 0));
+
     // B Button -> Outtake
-    operatorController.b().onTrue(ElevatorCommands.timedOuttake(elevator, .25, .25, 1.0));
+    operatorController.b().whileTrue(ElevatorCommands.runIntake(elevator, .25));
+    operatorController.b().onFalse(ElevatorCommands.runIntake(elevator, 0));
 
     SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 

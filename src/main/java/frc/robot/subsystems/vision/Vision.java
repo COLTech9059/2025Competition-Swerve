@@ -51,6 +51,7 @@ public class Vision extends SubsystemBase {
     this.inputs = new VisionIOInputsAutoLogged[io.length];
     for (int i = 0; i < inputs.length; i++) {
       inputs[i] = new VisionIOInputsAutoLogged();
+      // SmartDashboard.putData("Camera " + i, (Sendable) io[i].getAllPipelineResults());
     }
 
     // Initialize disconnected alerts

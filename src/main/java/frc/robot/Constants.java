@@ -164,9 +164,8 @@ public final class Constants {
 
     // Maximum chassis accelerations desired for robot motion  -- metric / radians
     // TODO: Compute the maximum linear acceleration given the PHYSICS of the ROBOT!
-    public static final double kMaxLinearAccel = 4.0; // m/s/s
+    public static final double kMaxLinearAccel = 2.5; // m/s/s
     public static final double kMaxAngularAccel = Units.degreesToRadians(720);
-
     // Hold time on motor brakes when disabled
     public static final double kWheelLockTime = 10; // seconds
 

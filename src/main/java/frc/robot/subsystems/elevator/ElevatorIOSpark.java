@@ -31,16 +31,13 @@ public class ElevatorIOSpark extends ElevatorIO {
   private SparkBaseConfig eMConfig = new SparkMaxConfig();
   private SparkBaseConfig pivotConfig = new SparkMaxConfig();
 
-  // Digital input (limit switch) objects
+  // Elevator limit switches
   private DigitalInput bottomSwitch = new DigitalInput(Constants.level0ID);
   private DigitalInput topSwitch = new DigitalInput(Constants.level1ID);
 
   // Pivot limit switches
-  private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch); // put id
-  // here
-  private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch); // put id
-
-  // here
+  private DigitalInput forwardPivot = new DigitalInput(Constants.pivotForwardSwitch);
+  private DigitalInput reversePivot = new DigitalInput(Constants.pivotReverseSwitch);
 
   // Apply all necessary motor configs
   @Override
@@ -132,8 +129,6 @@ public class ElevatorIOSpark extends ElevatorIO {
   public int getExactLevel() {
     if (!bottomSwitch.get()) return 0;
     if (!topSwitch.get()) return 1;
-    // if (l2Switch.get() && stage2Switch.get()) return 2;
-    // if (l3Switch.get()) return 3;
     return -1;
   }
 
@@ -199,7 +194,7 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Updates encoder values according to elevator level
   @Override
   public void periodicUpdates() {
-    SmartDashboard.putNumber("Elevator Speed", elevatorSpeed);
+    SmartDashboard.putNumber("Elevator Level", getExactLevel());
 
     SmartDashboard.putBoolean("Bottom switch", !bottomSwitch.get());
     SmartDashboard.putBoolean("Top switch", !topSwitch.get());
