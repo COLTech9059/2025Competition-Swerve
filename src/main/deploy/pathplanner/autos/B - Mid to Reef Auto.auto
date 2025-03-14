@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red_Leave"
+            "pathName": "B - Mid to Reef"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.25
           }
         }
       ]

@@ -7,19 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Multi-Path 1"
+            "pathName": "Right to Reef"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Multi-Path 2"
+            "waitTime": 0.25
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral Score"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Old_Testing",
+  "folder": "Scoring",
   "choreoAuto": false
 }

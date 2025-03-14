@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": "Old_Testing",
   "choreoAuto": false
 }
