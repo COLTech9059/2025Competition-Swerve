@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.58,
+        "x": 9.97,
         "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.58,
+        "x": 10.97,
         "y": 4.0
       },
       "isLocked": true,
@@ -16,15 +16,15 @@
     },
     {
       "anchor": {
-        "x": 5.9,
-        "y": 4.175
+        "x": 11.678970855214795,
+        "y": 3.851614924721476
       },
       "prevControl": {
-        "x": 6.9,
-        "y": 4.175
+        "x": 10.678970855214795,
+        "y": 3.851614924721476
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": null
     }
   ],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "Reef Lineup",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

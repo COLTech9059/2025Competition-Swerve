@@ -9,17 +9,11 @@
           "data": {
             "pathName": "B - Mid to Reef"
           }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.25
-          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Leave",
+  "folder": "Center",
   "choreoAuto": false
 }

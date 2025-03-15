@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Multi-Path 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Multi-Path 2"
+            "pathName": "R - Left Leave"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Old_Testing",
+  "folder": "Left",
   "choreoAuto": false
 }

@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Consistancy Test"
+            "pathName": "R - Right Leave"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Old_Testing",
+  "folder": "Right",
   "choreoAuto": false
 }

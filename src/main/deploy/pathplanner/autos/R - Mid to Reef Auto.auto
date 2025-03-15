@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B - Right to Reef"
+            "pathName": "R - Mid to Reef"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right",
+  "folder": "Center",
   "choreoAuto": false
 }
