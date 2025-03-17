@@ -27,6 +27,10 @@ public class ElevatorCommands {
         .until(() -> (elevator.getExactLevel() == 1));
   }
 
+  // public static Command moveElevator(Elevator elevator, double speed, int level){
+  //   return Commands.run(() -> elevator.run)
+  // }
+
   public static Command pivot(Elevator elevator, double speed) {
     return Commands.runOnce(() -> elevator.pivot(speed), elevator);
   }
