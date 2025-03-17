@@ -113,60 +113,6 @@ public class DriveCommands {
   }
 
   /**
-   * Calculates the DoubleSupplier values to be plugged into robotRelativeDrive so the robot can
-   * line up with a target april tag
-   *
-   * @param target The target april tag
-   * @param cOffset The offset of the camera from the center of the robot
-   * @param rOffset The offset of the robot from the april tag
-   * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
-   */
-  // public static DoubleSupplier[] alignmentCalculation(
-  //     PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
-
-  //   double yaw = target.getYaw();
-  //   Transform3d tOffset = target.bestCameraToTarget;
-
-  //   if (tOffset == null) {
-  //     tOffset = new Transform3d();
-  //   }
-
-  //   double totalOffset = tOffset.getY() + cOffset.getY() - rOffset.getY();
-  //   double xOffset = -Math.abs(rOffset.getX());
-  //   DoubleSupplier xSupply = () -> 0;
-  //   DoubleSupplier ySupply = () -> 0;
-  //   DoubleSupplier omegaSupply = () -> 0;
-
-  //   if (Math.abs(yaw) >= 10) {
-  //     xSupply = () -> 0;
-  //     ySupply = () -> 0;
-  //     omegaSupply = () -> yaw * 0.1;
-  //   } else if (Math.abs(totalOffset) >= 3 && Math.abs(xOffset) >= 3) {
-  //     xSupply = () -> 0.1 * xOffset;
-  //     ySupply = () -> 0.5 * totalOffset;
-  //     omegaSupply = () -> 0;
-  //   }
-
-  //   return new DoubleSupplier[] {xSupply, ySupply, omegaSupply};
-  // }
-
-  /**
-   * Constructs and returns a robotRelativeDrive command with the required values to line up with
-   * the target april tag
-   *
-   * @param drive The Drive subsystem
-   * @param target The target april tag
-   * @param cOffset The offset of the camera from the center of the robot
-   * @param rOffset The offset of the robot from the april tag
-   * @return The robotRelativeDrive Command
-   */
-  // public static Command targetAlignment(
-  //     Drive drive, PhotonTrackedTarget target, Transform3d cOffset, Transform2d rOffset) {
-  //   DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
-  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
-  // }
-
-  /**
    * Field relative drive command using joystick for linear control and PID for angular control.
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
