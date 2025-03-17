@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Red_Leave"
+            "pathName": "R - Left to Reef"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Left",
   "choreoAuto": false
 }

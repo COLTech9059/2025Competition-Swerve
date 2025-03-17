@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Corner Test"
+            "pathName": "R - Right to Reef"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": "Right",
   "choreoAuto": false
 }

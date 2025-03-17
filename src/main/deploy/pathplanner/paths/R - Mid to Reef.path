@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.25,
-        "y": 7.0
+        "x": 9.97,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.0,
-        "y": 7.0
+        "x": 10.97,
+        "y": 4.0
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.25,
-        "y": 7.0
+        "x": 11.678970855214795,
+        "y": 3.851614924721476
       },
       "prevControl": {
-        "x": 8.0,
-        "y": 7.0
+        "x": 10.678970855214795,
+        "y": 3.851614924721476
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Old_Testing",
+  "folder": "Reef Lineup",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

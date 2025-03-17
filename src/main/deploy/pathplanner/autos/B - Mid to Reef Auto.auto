@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Multi-Path 1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Multi-Path 2"
+            "pathName": "B - Mid to Reef"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Testing",
+  "folder": "Center",
   "choreoAuto": false
 }

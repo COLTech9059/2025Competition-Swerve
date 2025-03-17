@@ -3,11 +3,14 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Testing",
-    "Testing Auto"
+    "Leave",
+    "Reef Lineup",
+    "Old_Testing"
   ],
   "autoFolders": [
-    "Testing"
+    "Center",
+    "Left",
+    "Right"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
@@ -33,5 +36,7 @@
   "brModuleY": -0.273,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
-  "robotFeatures": []
+  "robotFeatures": [
+    "{\"name\":\"Manip\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.35,\"y\":0.0},\"size\":{\"width\":0.4,\"length\":0.1},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":true}}"
+  ]
 }

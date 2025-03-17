@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -52,11 +53,15 @@ public class ElevatorIOSpark extends ElevatorIO {
     // eM2Config.inverted(false);
     eMConfig.openLoopRampRate(0.2);
     eMConfig.closedLoopRampRate(0.2);
+
+    pivotConfig.idleMode(IdleMode.kBrake);
     // eM2Config.openLoopRampRate(0.2);
     // eM2Config.closedLoopRampRate(0.2);
+
     // Apply configuration
     // eMotor2.configure(eM2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     eMotor.configure(eMConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    pivot.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   // Get the average between the two encoders

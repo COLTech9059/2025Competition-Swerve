@@ -30,11 +30,9 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -57,7 +55,7 @@ import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.cage.CageIOSpark;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOSpark;
+import frc.robot.subsystems.elevator.ElevatorIOElevatorPivot;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -82,13 +80,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
-  // Define PathPlanner paths for use in teleop
-  private PathPlannerPath path;
+  private double yInversion = 1;
+  private double xInversion = 1;
 
-  // Create the constraints to use while pathfinding. The constraints defined in the path will only
-  // be used for the path.
-  private PathConstraints constraints =
-      new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+  private DoubleSupplier xInvert = () -> (1);
+  private DoubleSupplier yInvert = () -> (1);
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
@@ -137,12 +133,7 @@ public class RobotContainer {
    * Constructor for the Robot Container. This container holds subsystems, opertator interface
    * devices, and commands.
    */
-  @SuppressWarnings("UseSpecificCatch")
   public RobotContainer() {
-    try {
-      path = PathPlannerPath.fromPathFile("Multi-Path 1");
-    } catch (Exception e) {
-    }
 
     // Instantiate Robot Subsystems based on RobotType
     switch (Constants.getMode()) {
@@ -151,7 +142,7 @@ public class RobotContainer {
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSpark());
+        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -177,7 +168,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSpark());
+        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -191,7 +182,7 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOSpark());
+        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -204,14 +195,14 @@ public class RobotContainer {
     // ``m_drivebase``, as that is automatically monitored.
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
-    // Define Auto Commands
-    defineAutoCommands();
-
     // Push Subsystems to Dashboard
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData((Sendable) m_drivebase.getGyro());
     SmartDashboard.putData(elevator);
     SmartDashboard.putData(led);
+
+    // Define Auto commands
+    defineAutoCommands();
 
     // Set up the SmartDashboard Auto Chooser based on auto type
     switch (Constants.getAutoType()) {
@@ -253,13 +244,11 @@ public class RobotContainer {
     // Display LED subsystem on dashboard
     SmartDashboard.putData(led);
 
-    // Define Auto commands
-    // defineAutoCommands();
-
     // Define SysId Routines
     definesysIdRoutines();
     // Configure the button and trigger bindings
     configureBindings();
+    updateDriveInversions();
   }
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
@@ -272,6 +261,8 @@ public class RobotContainer {
                 m_drivebase.resetPose(
                     new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
             m_drivebase));
+
+    NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.7, 2));
   }
 
   /**
@@ -283,18 +274,18 @@ public class RobotContainer {
   private void configureBindings() {
 
     // Send the proper joystick input based on driver preference -- Set this in `Constants.java`
-    GetJoystickValue driveStickY;
-    GetJoystickValue driveStickX;
-    GetJoystickValue turnStickX;
-    if (OperatorConstants.kDriveLeftTurnRight) {
-      driveStickY = driverController::getLeftY;
-      driveStickX = driverController::getLeftX;
-      turnStickX = driverController::getRightX;
-    } else {
-      driveStickY = driverController::getRightY;
-      driveStickX = driverController::getRightX;
-      turnStickX = driverController::getLeftX;
-    }
+    // GetJoystickValue driveStickY;
+    // GetJoystickValue driveStickX;
+    // GetJoystickValue turnStickX;
+    // if (OperatorConstants.kDriveLeftTurnRight) {
+    //   driveStickY = driverController::getLeftY;
+    //   driveStickX = driverController::getLeftX;
+    //   turnStickX = driverController::getRightX;
+    // } else {
+    //   driveStickY = driverController::getRightY;
+    //   driveStickX = driverController::getRightX;
+    //   turnStickX = driverController::getLeftX;
+    // }
 
     DoubleSupplier doubleSupply = () -> 3.3;
 
@@ -304,25 +295,15 @@ public class RobotContainer {
             .withPosition(5, 4)
             .withSize(2, 1);
 
-    //// NEW CONTROLS ////
-    //// Driver
-    // Standard Driving
-    m_drivebase.setDefaultCommand(
-        DriveCommands.fieldRelativeDrive(
-            m_drivebase,
-            () -> driveStickY.value() * m_drivebase.getSpeed(),
-            () -> driveStickX.value() * m_drivebase.getSpeed(),
-            () -> turnStickX.value() * m_drivebase.getSpeed() * 0.8));
-
     // Right Bumper -> increase drive speed by .1; overflows to 0
     driverController
         .rightBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.3)));
 
     // Left Bumper -> decrease drive speed by .1; underflows to 1
     driverController
         .leftBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.3)));
 
     // X Button -> X-Stop
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
@@ -334,25 +315,39 @@ public class RobotContainer {
     //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
     // A Button -> Run Cage mechanism.
-    // driverController.a().onTrue(CageCommands.timedRun(cage, led, 0.50, 2));
+    driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.7), cage));
+    driverController.a().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
+
+    driverController
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    m_drivebase.resetPose(
+                        new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+                m_drivebase));
+
+    // B Button -> Run Cage mechanism backwards
+    driverController.b().whileTrue(Commands.runOnce(() -> cage.runMotor(-.5), cage));
+    driverController.b().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
 
     //// Operator
     // Right Bumper -> Extend Elevator
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
+    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
 
     // // Left Bumper -> Retract Elevator
-    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
+    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.4));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.55));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
-    // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.25));
+    // // Left Trigger -> Pivot intake down
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.55));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake
-    operatorController.a().whileTrue(ElevatorCommands.runIntake(elevator, -.25));
+    operatorController.a().whileTrue(ElevatorCommands.runIntake(elevator, -.15));
     operatorController.a().onFalse(ElevatorCommands.runIntake(elevator, 0));
 
     // B Button -> Outtake
@@ -382,6 +377,43 @@ public class RobotContainer {
 
   public void randomizeLEDOnStartup() {
     CommandScheduler.getInstance().schedule(LEDCommands.randomColor(led));
+  }
+
+  public void updateDriveInversions() {
+    GetJoystickValue driveStickY;
+    GetJoystickValue driveStickX;
+    GetJoystickValue turnStickX;
+    if (OperatorConstants.kDriveLeftTurnRight) {
+      driveStickY = driverController::getLeftY;
+      driveStickX = driverController::getLeftX;
+      turnStickX = driverController::getRightX;
+    } else {
+      driveStickY = driverController::getRightY;
+      driveStickX = driverController::getRightX;
+      turnStickX = driverController::getLeftX;
+    }
+
+    // driverController.leftTrigger().onTrue(Commands.runOnce(() -> xInversion = (xInversion == 1) ?
+    // -1 : 1));
+    driverController
+        .leftTrigger()
+        .onTrue(
+            Commands.runOnce(
+                () -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+    // driverController.rightTrigger().onTrue(Commands.runOnce(() -> yInversion = (yInversion == 1)
+    // ? -1 : 1));
+    driverController
+        .rightTrigger()
+        .onTrue(
+            Commands.runOnce(
+                () -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+
+    m_drivebase.setDefaultCommand(
+        DriveCommands.fieldRelativeDrive(
+            m_drivebase,
+            () -> driveStickY.value() * m_drivebase.getSpeed() * yInvert.getAsDouble(),
+            () -> driveStickX.value() * m_drivebase.getSpeed() * xInvert.getAsDouble(),
+            () -> turnStickX.value() * m_drivebase.getSpeed() * 0.8));
   }
 
   /**
