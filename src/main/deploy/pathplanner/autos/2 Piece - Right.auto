@@ -1,0 +1,74 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B - Right to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Left Alignment"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral Shot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right to Coral"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Coral Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Coral to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Left Alignment"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral Shot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Advanced",
+  "choreoAuto": false
+}

@@ -127,12 +127,9 @@ public class DriveCommands {
    *     negative 1 only.
    * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
    */
-  public static DoubleSupplier[] alignmentCalculation(
-      PhotonTrackedTarget target, Transform3d cOffset, double direction) {
+  public static DoubleSupplier[] alignmentCalculation(PhotonTrackedTarget target, Transform3d cOffset, double direction) {
     double yaw = target.getYaw(); // Angle to flat (+ right, - left)
-    Transform3d tOffset =
-        target.bestCameraToTarget; // Returns the distance to target (x), horizontal offset (y), and
-    // vertical offset (z)
+    Transform3d tOffset = target.bestCameraToTarget; // Returns the distance to target (x), horizontal offset (y), and vertical offset (z)
     double totalOffset = tOffset.getY() + cOffset.getX();
     double xOffset = tOffset.getX();
     DoubleSupplier xSupply = () -> 0;
@@ -193,14 +190,104 @@ public class DriveCommands {
     if (!valid) return Commands.none();
 
     // Values to help center the target.
-    double direction =
-        camera.camRobotOffset.getX()
-            / Math.abs(
-                camera.camRobotOffset
-                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset = camera.camRobotOffset;
+    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
 
     DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
+    return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  }
+  /**
+   * Constructs and returns a robotRelativeDrive command with the required values to line up with
+   * the target april tag
+   *
+   * @param drive The Drive subsystem
+   * @param target The target april tag
+   * @param cOffset The offset of the camera from the center of the robot
+   * @param rOffset The offset of the robot from the april tag
+   * @return The robotRelativeDrive Command
+   */
+  // public static Command targetAlignment(Drive drive, PhotonTrackedTarget target, Transform3d
+  // cOffset, Transform2d rOffset) {
+  //   DoubleSupplier[] list = alignmentCalculation(target, cOffset, rOffset);
+  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  // }
+
+  /**
+   * Constructs and returns a robotRelativeDrive command with the required values to line up with
+   * the target april tag
+   *
+   * @param drive The Drive subsystem
+   * @param vision The Vision subsystem
+   * @param centerType The center type the method wants to use (right, left, center)
+   * @author DevAspen, Revamped by SomnolentStone
+   * @return a Blank Command (if no valid target)
+   * @return The robotRelativeDrive Command
+   */
+  public static Command targetAlignment(Drive drive, Vision vision, Constants.Cameras.centerType centerType) {
+    int cameraToUse = vision.determineBestCamera();
+    if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
+
+    // offset the center
+    Transform3d robotOffset = new Transform3d();
+    switch(centerType){
+      case RIGHT: 
+        robotOffset = new Transform3d();
+        break;
+      case LEFT:
+        robotOffset = new Transform3d();
+        break;
+      case CENTER:
+      default:  
+    }
+    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+
+    // Check to see if target is on whitelist
+    boolean valid = false;
+    for (int tagId : Constants.Cameras.tagWhitelist) {
+      if (target.getFiducialId() == tagId) valid = true;
+    }
+    if (!valid) return Commands.none();
+
+    // Values to help center the target.
+    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
+
+    DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
+    return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  }
+  /**
+   * Constructs and returns a robotRelativeDrive command with the required values to line up with
+   * the target april tag
+   *
+   * @param drive The Drive subsystem
+   * @param vision The Vision subsystem
+   * @param rOffset A Transform2d representing the desired offset from the center of the robot to the tag
+   * @author DevAspen, Revamped by SomnolentStone
+   * @return a Blank Command (if no valid target)
+   * @return The robotRelativeDrive Command
+   */
+  public static Command targetAlignment(Drive drive, Vision vision, Transform2d rOffset) {
+    Transform3d rOffset3d = new Transform3d(rOffset);
+    
+    int cameraToUse = vision.determineBestCamera();
+    if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
+
+    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+
+    // Check to see if target is on whitelist
+    boolean valid = false;
+    for (int tagId : Constants.Cameras.tagWhitelist) {
+      if (target.getFiducialId() == tagId) valid = true;
+    }
+    if (!valid) return Commands.none();
+
+    // Values to help center the target.
+    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
+
+    DoubleSupplier[] list = alignmentCalculation(target, camOffset.plus(rOffset3d), direction);
     return robotRelativeDrive(drive, list[0], list[1], list[2]);
   }
 

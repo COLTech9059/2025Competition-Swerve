@@ -32,6 +32,8 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -262,6 +264,12 @@ public class RobotContainer {
             m_drivebase));
 
     NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.25, 4));
+
+    NamedCommands.registerCommand("Coral Intake", Commands.sequence(ElevatorCommands.pivot(elevator, 0.5), ElevatorCommands.timedIntake(elevator, -0.35, 3)));
+
+    NamedCommands.registerCommand("Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
+    NamedCommands.registerCommand("Left Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision, new Transform2d(6.0, 0.0, new Rotation2d())));
+    NamedCommands.registerCommand("Right Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision, new Transform2d(-6.0, 0.0, new Rotation2d())));
   }
 
   /**
@@ -308,10 +316,8 @@ public class RobotContainer {
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
     // HOLD Y Button -> Align AND approach AprilTag
-    // driverController.y().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
-    // driverController
-    //     .y()
-    //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
+    driverController.back().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
+    driverController.back().onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
     // A Button -> Run Cage mechanism.
     driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));

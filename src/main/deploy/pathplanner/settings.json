@@ -3,15 +3,17 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "Leave",
     "Advanced",
+    "Leave",
+    "Coral Lineup",
     "Old_Testing",
     "Reef Lineup"
   ],
   "autoFolders": [
+    "Advanced",
     "Center",
     "Left",
-    "Advanced",
+    "Alignment",
     "Right"
   ],
   "defaultMaxVel": 3.0,

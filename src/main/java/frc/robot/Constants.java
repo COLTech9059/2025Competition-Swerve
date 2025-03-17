@@ -319,6 +319,13 @@ public final class Constants {
     // Camera names, must match names configured on coprocessor
     public static String camera0Name = "Left Camera";
     public static String camera1Name = "Right Camera";
+    
+    // Enums for targeting biases (right, center, left)
+    public static enum centerType {
+      RIGHT, // center the target onto the right camera
+      LEFT,  // center the target onto the left camera
+      CENTER // center the target onto the robot
+    };
     // ... And more, if needed
 
     // Robot to camera transforms
@@ -330,7 +337,7 @@ public final class Constants {
         new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
 
     // AprilTag Whitelist
-    public static int[] tagWhitelist = {1, 2, 3, 4}; // Add certain AprilTags to list
+    public static int[] tagWhitelist = {6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22}; // Add certain AprilTags to list
 
     // Standard deviation multipliers for each camera
     // (Adjust to trust some cameras more than others)

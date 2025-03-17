@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.25,
-        "y": 1.1
+        "x": 1.2,
+        "y": 1.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.098391853329981,
-        "y": 2.4579124526242575
+        "x": 2.0782894736855204,
+        "y": 1.7638980263164523
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.55,
-        "y": 2.7
+        "x": 3.7,
+        "y": 2.95
       },
       "prevControl": {
-        "x": 1.5448608766557705,
-        "y": 2.4391105905823394
+        "x": 2.80953947368552,
+        "y": 2.2834703947375043
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,14 +31,7 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Coral Score",
-      "waypointRelativePos": 1.0,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -52,7 +45,7 @@
     "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "Old_Testing",
+  "folder": "Reef Lineup",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -125.00000000000001

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B - Right to Reef"
+            "pathName": "B - Left to Reef"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Right",
+  "folder": "Alignment",
   "choreoAuto": false
 }
