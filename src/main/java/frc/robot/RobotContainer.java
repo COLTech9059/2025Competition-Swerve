@@ -30,7 +30,6 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.sendable.Sendable;
@@ -262,7 +261,7 @@ public class RobotContainer {
                     new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
             m_drivebase));
 
-    NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.7, 2));
+    NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.25, 4));
   }
 
   /**
@@ -298,12 +297,12 @@ public class RobotContainer {
     // Right Bumper -> increase drive speed by .1; overflows to 0
     driverController
         .rightBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.3)));
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() + 0.1)));
 
     // Left Bumper -> decrease drive speed by .1; underflows to 1
     driverController
         .leftBumper()
-        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.3)));
+        .onTrue(Commands.runOnce(() -> m_drivebase.setSpeed(m_drivebase.getSpeed() - 0.1)));
 
     // X Button -> X-Stop
     driverController.x().onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
@@ -315,7 +314,7 @@ public class RobotContainer {
     //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
     // A Button -> Run Cage mechanism.
-    driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.7), cage));
+    driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));
     driverController.a().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
 
     driverController
@@ -411,8 +410,8 @@ public class RobotContainer {
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
-            () -> driveStickY.value() * m_drivebase.getSpeed() * yInvert.getAsDouble(),
-            () -> driveStickX.value() * m_drivebase.getSpeed() * xInvert.getAsDouble(),
+            () -> -driveStickY.value() * m_drivebase.getSpeed() * yInvert.getAsDouble(),
+            () -> -driveStickX.value() * m_drivebase.getSpeed() * xInvert.getAsDouble(),
             () -> turnStickX.value() * m_drivebase.getSpeed() * 0.8));
   }
 

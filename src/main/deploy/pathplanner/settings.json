@@ -4,12 +4,14 @@
   "holonomicMode": true,
   "pathFolders": [
     "Leave",
-    "Reef Lineup",
-    "Old_Testing"
+    "Advanced",
+    "Old_Testing",
+    "Reef Lineup"
   ],
   "autoFolders": [
     "Center",
     "Left",
+    "Advanced",
     "Right"
   ],
   "defaultMaxVel": 3.0,

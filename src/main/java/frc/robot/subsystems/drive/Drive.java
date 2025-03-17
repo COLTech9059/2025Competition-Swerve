@@ -71,7 +71,7 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase {
 
   // Modular Drive Speed (somehow got deleted in the merge)
-  private double driveSpeed = 0.7;
+  private double driveSpeed = 0.9;
 
   static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -212,8 +212,8 @@ public class Drive extends SubsystemBase {
    * @param value Double value to set the drive speed to
    */
   public void setSpeed(double value) {
-    if (value < 0.4) value = 0.7;
-    else if (value > 0.7) value = 0.4;
+    if (value < 0.6) value = 0.9;
+    else if (value > 0.9) value = 0.6;
     driveSpeed = value;
   }
 
