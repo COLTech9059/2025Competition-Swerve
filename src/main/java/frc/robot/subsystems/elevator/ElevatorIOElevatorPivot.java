@@ -22,7 +22,7 @@ public class ElevatorIOElevatorPivot extends ElevatorIO {
   // Motor, encoder, and config objects
   // private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
   // private RelativeEncoder eEncoder = eMotor.getEncoder();
-  private SparkMax pivot = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
+  private SparkMax pivot = new SparkMax(Constants.pivotID, MotorType.kBrushless);
   private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
   // private SparkBaseConfig eMConfig = new SparkMaxConfig();
   private SparkBaseConfig pivotConfig = new SparkMaxConfig();

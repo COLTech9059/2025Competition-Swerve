@@ -34,6 +34,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -56,7 +57,7 @@ import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.cage.CageIOSpark;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIOElevatorPivot;
+import frc.robot.subsystems.elevator.ElevatorIOSpark;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -81,11 +82,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
-  private double yInversion = 1;
-  private double xInversion = 1;
-
-  private DoubleSupplier xInvert = () -> (1);
-  private DoubleSupplier yInvert = () -> (1);
+  private DoubleSupplier xInvert = () -> 1;
+  private DoubleSupplier yInvert = () -> 1;
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
@@ -98,7 +96,7 @@ public class RobotContainer {
   // These are the "Active Subsystems" that the robot controls
   private final Drive m_drivebase;
 
-  private final Elevator elevator;
+  private final Elevator elevator = new Elevator(new ElevatorIOSpark());
   private final Cage cage = new Cage(new CageIOSpark());
 
   private final Flywheel m_flywheel;
@@ -143,7 +141,6 @@ public class RobotContainer {
         // YAGSL drivebase, get config from deploy directory
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIOSim()); // new Flywheel(new FlywheelIOTalonFX());
         m_vision =
             switch (Constants.getVisionType()) {
@@ -169,7 +166,6 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIOSim() {});
         m_vision =
             new Vision(
@@ -183,7 +179,6 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         m_drivebase = new Drive();
         led = new LEDs(new LEDsIOBlinkin());
-        elevator = new Elevator(new ElevatorIOElevatorPivot());
         m_flywheel = new Flywheel(new FlywheelIO() {});
         m_vision =
             new Vision(m_drivebase::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
@@ -265,11 +260,24 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.25, 4));
 
-    NamedCommands.registerCommand("Coral Intake", Commands.sequence(ElevatorCommands.pivot(elevator, 0.5), ElevatorCommands.timedIntake(elevator, -0.35, 3)));
+    NamedCommands.registerCommand(
+        "Coral Intake",
+        Commands.sequence(
+            ElevatorCommands.pivot(elevator, 0.5),
+            ElevatorCommands.timedIntake(elevator, -0.35, 3)));
 
-    NamedCommands.registerCommand("Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
-    NamedCommands.registerCommand("Left Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision, new Transform2d(6.0, 0.0, new Rotation2d())));
-    NamedCommands.registerCommand("Right Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision, new Transform2d(-6.0, 0.0, new Rotation2d())));
+    NamedCommands.registerCommand(
+        "Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
+    NamedCommands.registerCommand(
+        "Left Alignment",
+        DriveCommands.targetAlignment(
+            m_drivebase,
+            m_vision,
+            new Transform2d(Units.inchesToMeters(6.0), 0.0, new Rotation2d())));
+    NamedCommands.registerCommand(
+        "Right Alignment",
+        DriveCommands.targetAlignment(
+            m_drivebase, m_vision, new Transform2d(-6.0, 0.0, new Rotation2d())));
   }
 
   /**
@@ -317,7 +325,9 @@ public class RobotContainer {
 
     // HOLD Y Button -> Align AND approach AprilTag
     driverController.back().whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
-    driverController.back().onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
+    driverController
+        .back()
+        .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
     // A Button -> Run Cage mechanism.
     driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));
@@ -344,11 +354,11 @@ public class RobotContainer {
     // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.55));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.15));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.55));
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.15));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake

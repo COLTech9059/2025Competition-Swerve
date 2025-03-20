@@ -20,6 +20,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -127,9 +128,37 @@ public class DriveCommands {
    *     negative 1 only.
    * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
    */
-  public static DoubleSupplier[] alignmentCalculation(PhotonTrackedTarget target, Transform3d cOffset, double direction) {
+  // public static DoubleSupplier[] alignmentCalculation(PhotonTrackedTarget target, Transform3d
+  // cOffset, double direction) {
+
+  //   double yaw = target.getYaw(); // Angle to flat (+ right, - left)
+  //   Transform3d tOffset = target.bestCameraToTarget; // Returns the distance to target (x),
+  // horizontal offset (y), and vertical offset (z)
+  //   double totalOffset = tOffset.getY() + cOffset.getX();
+  //   double xOffset = tOffset.getX();
+  //   DoubleSupplier xSupply = () -> 0;
+  //   DoubleSupplier ySupply = () -> 0;
+  //   DoubleSupplier omegaSupply = () -> 0;
+
+  //   if (Math.abs(yaw) >= 10) {
+  //     xSupply = () -> 0;
+  //     ySupply = () -> 0;
+  //     omegaSupply = () -> yaw * 0.4;
+  //   } else if (Math.abs(totalOffset) >= 3 && Math.abs(xOffset) >= 3) {
+  //     xSupply = () -> 0.1 * xOffset;
+  //     ySupply = () -> 0.5 * totalOffset;
+  //     omegaSupply = () -> 0;
+  //   }
+
+  //   return new DoubleSupplier[] {xSupply, ySupply, omegaSupply};
+  // }
+
+  public static DoubleSupplier[] alignmentCalculation(
+      PhotonTrackedTarget target, Transform3d cOffset, double direction) {
     double yaw = target.getYaw(); // Angle to flat (+ right, - left)
-    Transform3d tOffset = target.bestCameraToTarget; // Returns the distance to target (x), horizontal offset (y), and vertical offset (z)
+    Transform3d tOffset =
+        target.bestCameraToTarget; // Returns the distance to target (x), horizontal offset (y), and
+    // vertical offset (z)
     double totalOffset = tOffset.getY() + cOffset.getX();
     double xOffset = tOffset.getX();
     DoubleSupplier xSupply = () -> 0;
@@ -145,6 +174,84 @@ public class DriveCommands {
       ySupply = () -> 0.5 * totalOffset;
       omegaSupply = () -> 0;
     }
+
+    return new DoubleSupplier[] {xSupply, ySupply, omegaSupply};
+  }
+
+  /**
+   * Calculates the DoubleSupplier values to be plugged into robotRelativeDrive so the robot can
+   * line up with a target april tag
+   *
+   * @param target The target april tag
+   * @param center The center axis to align the april tag to.
+   * @param direction the direction of the camera compared to the center of the robot; positive or
+   *     negative 1 only.
+   * @return An array of DoubleSuppliers. [0] is for x, [1] is for y, and [2] is for omega
+   */
+  public static DoubleSupplier[] alignmentCalculation(
+      PhotonTrackedTarget target,
+      Transform3d center,
+      Transform3d camPoseToRobotCenter,
+      Constants.Cameras.centerType centerType) {
+    /* ok planning comments start now
+      ok so considering offsets, the yaw isn't going to be perfectly accurate
+      it's based on the center of the camera used, and changing the center offset will alter that angle
+      however, we have the distance to the target and the offset of the target horizontally
+      we can use trigonometric functions to get new angles, and that will help us become parallel to the target.
+
+      Assuming getBestCameraToTarget returns an x value (distance) field-relative (states that it maps camera pose to target pose)...
+      ...we can multiply the horizontal offset between the center by the sin of the angle to perpendicular (probably yaw)
+      and then add it to the x value.
+
+      now for the horizontal (y-axis)
+      a bit tricky because if the center is oriented about the left camera but it detects a tag from the right camera, you would have to get the absolute value
+      (as in, you can't simply just subtract one from the other.)
+      so, we need the camera pose relative to the robot and the center to properly do this
+      even with this, it'll take conditionals to determine what to do with the transformations
+    */
+    // Important Values
+    double yaw = target.getYaw(); // Angle to flat (+ right, - left)
+    Transform3d tOffset =
+        target
+            .getBestCameraToTarget(); // Returns the distance to target (x), horizontal offset, left
+    // positive (y), and vertical offset (z)
+
+    // calc offsets (PLEASE @DevAspen DO THIS i can't focus on this rn)
+
+    // Distance calculation (using absolute value because idk if getx will give a negative)
+    double dist =
+        Math.abs(tOffset.getX())
+            + Math.abs(
+                1
+                    * Math.sin(
+                        Math.toRadians(
+                            yaw))); // TODO: needs horizontal offset compared to the camera that
+    // captured AprilTag (where the 1 is)
+
+    // Horizontal offset
+    double horizontal =
+        tOffset.getY()
+            + (1
+                * Math.cos(
+                    Math.toRadians(
+                        yaw))); // TODO: needs horizontal offset compared to the camera that
+    // captured AprilTag (where the 1 is)
+
+    // double totalOffset = tOffset.getY() + center.getX();
+    // double xOffset = tOffset.getX();
+    DoubleSupplier xSupply = () -> (.2 * dist);
+    DoubleSupplier ySupply = () -> (.5 * horizontal);
+    DoubleSupplier omegaSupply = () -> (yaw * .4);
+
+    // if (Math.abs(yaw) >= 10) {
+    //   xSupply = () -> 0;
+    //   ySupply = () -> 0;
+    //   omegaSupply = () -> yaw * 0.4;
+    // } else if (Math.abs(totalOffset) >= 3 && Math.abs(xOffset) >= 3) {
+    //   xSupply = () -> 0.1 * xOffset;
+    //   ySupply = () -> 0.5 * totalOffset;
+    //   omegaSupply = () -> 0;
+    // }
 
     return new DoubleSupplier[] {xSupply, ySupply, omegaSupply};
   }
@@ -172,8 +279,7 @@ public class DriveCommands {
    * @param drive The Drive subsystem
    * @param vision The Vision subsystem
    * @author DevAspen, Revamped by SomnolentStone
-   * @return a Blank Command (if no valid target)
-   * @return The robotRelativeDrive Command
+   * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
    */
   public static Command targetAlignment(Drive drive, Vision vision) {
     int cameraToUse = vision.determineBestCamera();
@@ -190,12 +296,22 @@ public class DriveCommands {
     if (!valid) return Commands.none();
 
     // Values to help center the target.
-    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
+    double direction =
+        camera.camRobotOffset.getX()
+            / Math.abs(
+                camera.camRobotOffset
+                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset =
+        new Transform3d(
+            camera.camRobotOffset.getX(),
+            camera.camRobotOffset.getY() + 18.0,
+            camera.camRobotOffset.getZ(),
+            camera.camRobotOffset.getRotation());
 
     DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
     return robotRelativeDrive(drive, list[0], list[1], list[2]);
   }
+
   /**
    * Constructs and returns a robotRelativeDrive command with the required values to line up with
    * the target april tag
@@ -220,27 +336,36 @@ public class DriveCommands {
    * @param vision The Vision subsystem
    * @param centerType The center type the method wants to use (right, left, center)
    * @author DevAspen, Revamped by SomnolentStone
-   * @return a Blank Command (if no valid target)
-   * @return The robotRelativeDrive Command
+   * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
    */
-  public static Command targetAlignment(Drive drive, Vision vision, Constants.Cameras.centerType centerType) {
+  public static Command targetAlignment(
+      Drive drive, Vision vision, Constants.Cameras.centerType centerType) {
     int cameraToUse = vision.determineBestCamera();
     if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
 
-    // offset the center
-    Transform3d robotOffset = new Transform3d();
-    switch(centerType){
-      case RIGHT: 
-        robotOffset = new Transform3d();
-        break;
-      case LEFT:
-        robotOffset = new Transform3d();
-        break;
-      case CENTER:
-      default:  
-    }
     VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
     PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+
+    // offset the center
+    Transform3d center =
+        new Transform3d(
+            camera.camRobotOffset.getX(),
+            0.0,
+            camera.camRobotOffset.getZ(),
+            new Rotation3d()); // Center of robot but at the same height and plane as the cameras
+    switch (centerType) {
+      case RIGHT:
+        center = Constants.Cameras.robotToCamera1;
+        break;
+      case LEFT:
+        center =
+            Constants.Cameras
+                .robotToCamera0; // taking constants because we don't know what camera the program
+        // will use
+        break;
+      case CENTER:
+      default:
+    }
 
     // Check to see if target is on whitelist
     boolean valid = false;
@@ -250,26 +375,33 @@ public class DriveCommands {
     if (!valid) return Commands.none();
 
     // Values to help center the target.
-    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
+    double direction =
+        camera.camRobotOffset.getX()
+            / Math.abs(
+                camera.camRobotOffset
+                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
+    // Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(),
+    // camera.camRobotOffset.getY() + Units.inchesToMeters(18.0), camera.camRobotOffset.getZ(),
+    // camera.camRobotOffset.getRotation());
 
-    DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
+    DoubleSupplier[] list = alignmentCalculation(target, center, direction);
     return robotRelativeDrive(drive, list[0], list[1], list[2]);
   }
+
   /**
    * Constructs and returns a robotRelativeDrive command with the required values to line up with
    * the target april tag
    *
    * @param drive The Drive subsystem
    * @param vision The Vision subsystem
-   * @param rOffset A Transform2d representing the desired offset from the center of the robot to the tag
+   * @param rOffset A Transform2d representing the desired offset from the center of the robot to
+   *     the tag
    * @author DevAspen, Revamped by SomnolentStone
-   * @return a Blank Command (if no valid target)
-   * @return The robotRelativeDrive Command
+   * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
    */
   public static Command targetAlignment(Drive drive, Vision vision, Transform2d rOffset) {
     Transform3d rOffset3d = new Transform3d(rOffset);
-    
+
     int cameraToUse = vision.determineBestCamera();
     if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
 
@@ -284,8 +416,17 @@ public class DriveCommands {
     if (!valid) return Commands.none();
 
     // Values to help center the target.
-    double direction = camera.camRobotOffset.getX() / Math.abs(camera.camRobotOffset.getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(), camera.camRobotOffset.getY() + 18.0, camera.camRobotOffset.getZ(), camera.camRobotOffset.getRotation());
+    double direction =
+        camera.camRobotOffset.getX()
+            / Math.abs(
+                camera.camRobotOffset
+                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
+    Transform3d camOffset =
+        new Transform3d(
+            camera.camRobotOffset.getX(),
+            camera.camRobotOffset.getY() + Units.inchesToMeters(18.0),
+            camera.camRobotOffset.getZ(),
+            camera.camRobotOffset.getRotation());
 
     DoubleSupplier[] list = alignmentCalculation(target, camOffset.plus(rOffset3d), direction);
     return robotRelativeDrive(drive, list[0], list[1], list[2]);

@@ -22,7 +22,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +43,8 @@ public class VisionIOPhotonVision implements VisionIO {
   public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
     camera = new PhotonCamera(name);
     this.robotToCamera = robotToCamera;
-    
-    SmartDashboard.putData(name, (Sendable) camera); //TODO: remove if no worky
+
+    SmartDashboard.putData(name, (Sendable) camera); // TODO: remove if no worky
   }
 
   @Override

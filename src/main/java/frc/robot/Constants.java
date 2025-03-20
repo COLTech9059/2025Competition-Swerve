@@ -319,25 +319,36 @@ public final class Constants {
     // Camera names, must match names configured on coprocessor
     public static String camera0Name = "Left Camera";
     public static String camera1Name = "Right Camera";
-    
+
     // Enums for targeting biases (right, center, left)
     public static enum centerType {
       RIGHT, // center the target onto the right camera
-      LEFT,  // center the target onto the left camera
+      LEFT, // center the target onto the left camera
       CENTER // center the target onto the robot
     };
+
     // ... And more, if needed
 
     // Robot to camera transforms
     // (ONLY USED FOR PHOTONVISION -- Limelight: configure in web UI instead)
     // TODO: Configure the camera offsets
     public static Transform3d robotToCamera0 =
-        new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
+        new Transform3d(
+            Units.inchesToMeters(6.5),
+            Units.inchesToMeters(9.5),
+            Units.inchesToMeters(15.0),
+            new Rotation3d(Math.toRadians(16.0), 0.0, 0.0));
     public static Transform3d robotToCamera1 =
-        new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+        new Transform3d(
+            Units.inchesToMeters(6.5),
+            Units.inchesToMeters(-9.5),
+            Units.inchesToMeters(15.0),
+            new Rotation3d(Math.toRadians(-16.0), 0.0, 0.0));
 
     // AprilTag Whitelist
-    public static int[] tagWhitelist = {6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22}; // Add certain AprilTags to list
+    public static int[] tagWhitelist = {
+      6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22
+    }; // Add certain AprilTags to list
 
     // Standard deviation multipliers for each camera
     // (Adjust to trust some cameras more than others)

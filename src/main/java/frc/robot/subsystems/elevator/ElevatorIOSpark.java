@@ -27,7 +27,9 @@ public class ElevatorIOSpark extends ElevatorIO {
   // Elevator speed controllers
   private Timer speedTimer = new Timer();
   private double speedDeadband = .1;
-  private double period = 2; // Because it being a sin function, Math.PI is the base period that would actually be used. A period value of 2 would make half of the period 2 seconds.
+  private double period =
+      2; // Because it being a sin function, Math.PI is the base period that would actually be used.
+  // A period value of 2 would make half of the period 2 seconds.
 
   // Motor, encoder, and config objects
   private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
@@ -77,7 +79,9 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   @Override
   public void pivot(double speed) {
-    pivot.set(speed);
+    if (!forwardPivot.get() && (speed > 0)) pivot.set(speed);
+    else if (!reversePivot.get() && (speed < 0)) pivot.set(speed);
+    else pivot.set(0);
   }
 
   @Override
@@ -85,11 +89,10 @@ public class ElevatorIOSpark extends ElevatorIO {
     pivot.stopMotor();
   }
 
-
   // Runs the elevator with dynamic speed.
   // Ramps up the speed to max, then reduces it back to zero.
   // Deadbands are available to guarantee the elevator always runs.
-  public void runElevatorWithPeriod(double speed, int level){
+  public void runElevatorWithPeriod(double speed, int level) {
     if (getExactLevel() == level) {
       speedTimer.stop();
       speedTimer.reset();
@@ -97,17 +100,19 @@ public class ElevatorIOSpark extends ElevatorIO {
       eMotor.stopMotor();
       return;
     }
-    
+
     // start the timer
     if (speedTimer.get() == 0) {
       speedTimer.start();
     }
-    // Speed multiplied by the result of a sin function (but really it's half of a sin function.) Value from 0-1.
+    // Speed multiplied by the result of a sin function (but really it's half of a sin function.)
+    // Value from 0-1.
 
-    double newSpeed = speed * Math.sin((speedTimer.get()/period) * Math.PI);
+    double newSpeed = speed * Math.sin((speedTimer.get() / period) * Math.PI);
     if (newSpeed < speedDeadband) newSpeed = speedDeadband;
     eMotor.set(newSpeed);
   }
+
   // Move the elevator to the given level at the given speed
   @Override
   public void setLevel(double speed, int level) {
