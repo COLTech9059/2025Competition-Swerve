@@ -66,7 +66,7 @@ public final class Constants {
    * etc.) and the operating modes of the code (REAL, SIM, or REPLAY)
    */
   private static RobotType robotType = RobotType.COMPBOT;
-  public static String stickType = "Xbox Controller"; //Either "Xbox Controller" or "Flght Stick"
+  public static String stickType = "Flight Stick"; //Either "Xbox Controller" or "Flght Stick"
 
   // Define swerve, auto, and vision types being used
   // NOTE: Only PHOENIX6 swerve base has been tested at this point!!!
