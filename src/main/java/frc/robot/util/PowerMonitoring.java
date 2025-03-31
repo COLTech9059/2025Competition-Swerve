@@ -14,7 +14,6 @@
 package frc.robot.util;
 
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CANandPowerPorts;
 import frc.robot.Constants.PowerConstants;
 import frc.robot.util.Alert.AlertType;
@@ -113,12 +112,12 @@ public class PowerMonitoring extends VirtualSubsystem {
     Logger.recordOutput("PowerMonitor/TotalCurrent", totalCurrent);
     Logger.recordOutput("PowerMonitor/DriveCurrent", driveCurrent);
     Logger.recordOutput("PowerMonitor/SteerCurrent", steerCurrent);
-    SmartDashboard.putNumber("BatteryVoltage", batteryVoltage);
-    SmartDashboard.putNumber("EstimatedBatteryPercent", batteryPercent);
-    SmartDashboard.putNumber("AmpHoursUsed", totalAmpHours);
-    SmartDashboard.putNumber("TotalCurrent", totalCurrent);
-    SmartDashboard.putNumber("DriveCurrent", driveCurrent);
-    SmartDashboard.putNumber("SteerCurrent", steerCurrent);
+    // SmartDashboard.putNumber("BatteryVoltage", batteryVoltage);
+    // SmartDashboard.putNumber("EstimatedBatteryPercent", batteryPercent);
+    // SmartDashboard.putNumber("AmpHoursUsed", totalAmpHours);
+    // SmartDashboard.putNumber("TotalCurrent", totalCurrent);
+    // SmartDashboard.putNumber("DriveCurrent", driveCurrent);
+    // SmartDashboard.putNumber("SteerCurrent", steerCurrent);
 
     // Compute and log any passed-in subsystems
     for (RBSISubsystem subsystem : subsystems) {
@@ -127,7 +126,7 @@ public class PowerMonitoring extends VirtualSubsystem {
         subsystemCurrent += channelCurrents[port];
       }
       Logger.recordOutput("PowerMonitor/" + subsystem.getName() + "Current", subsystemCurrent);
-      SmartDashboard.putNumber(subsystem.getName() + "Current", subsystemCurrent);
+      // SmartDashboard.putNumber(subsystem.getName() + "Current", subsystemCurrent);
     }
 
     // TODO: Do something about setting priorities if drawing too much current

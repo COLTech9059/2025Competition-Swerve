@@ -37,19 +37,17 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
@@ -77,19 +75,26 @@ import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.OverrideSwitches;
 import frc.robot.util.PowerMonitoring;
 import frc.robot.util.RBSIEnum;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /** This is the location for defining robot hardware, commands, and controller button bindings. */
 public class RobotContainer {
 
+  GetJoystickValue driveStickY;
+  GetJoystickValue driveStickX;
+  GetJoystickValue turnStickX;
+
   private DoubleSupplier xInvert = () -> 1;
   private DoubleSupplier yInvert = () -> 1;
+  private BooleanSupplier twistAxis = () -> true;
 
   /** Define the Driver and, optionally, the Operator/Co-Driver Controllers */
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   // final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
   final CommandGenericHID driverStick = new CommandGenericHID(0); // Also Main Driver (flight stick)
+
   final CommandXboxController operatorController = new CommandXboxController(1); // Second Operator
   final OverrideSwitches overrides = new OverrideSwitches(2); // Console toggle switches
 
@@ -193,10 +198,9 @@ public class RobotContainer {
     m_power = new PowerMonitoring(batteryCapacity, m_flywheel);
 
     // Push Subsystems to Dashboard
-    SmartDashboard.putData(m_drivebase);
+    ComplexWidget driveWidget =
+        Shuffleboard.getTab("Testing").add("Drive", m_drivebase).withPosition(0, 0).withSize(4, 2);
     SmartDashboard.putData((Sendable) m_drivebase.getGyro());
-    SmartDashboard.putData(elevator);
-    SmartDashboard.putData(led);
 
     // Define Auto commands
     defineAutoCommands();
@@ -239,7 +243,8 @@ public class RobotContainer {
             led, new int[] {1, 9, 14, 19, 27, 34, 40, 47, 54, 55, 59, 67, 71, 78, 86, 91});
 
     // Display LED subsystem on dashboard
-    SmartDashboard.putData(led);
+    ComplexWidget ledWidget =
+        Shuffleboard.getTab("Testing").add("LED", led).withPosition(0, 0).withSize(4, 2);
 
     // Define SysId Routines
     definesysIdRoutines();
@@ -248,16 +253,31 @@ public class RobotContainer {
     updateDriveInversions();
   }
 
-  public double getAxis1() {
+  private double getAxis0() {
+    return driverStick.getRawAxis(0);
+  }
+
+  private double getAxis1() {
     return driverStick.getRawAxis(1);
   }
 
-  public double getAxis2() {
+  private double getAxis2() {
     return driverStick.getRawAxis(2);
   }
 
-  public double getAxis3() {
-    return driverStick.getRawAxis(3);
+  private double getPOV() {
+    double value = 0;
+    if (driverStick
+        .povRight()
+        .or(driverStick.povDownRight())
+        .or(driverStick.povUpRight())
+        .getAsBoolean()) value = 1;
+    if (driverStick
+        .povLeft()
+        .or(driverStick.povDownLeft())
+        .or(driverStick.povUpLeft())
+        .getAsBoolean()) value = -1;
+    return value;
   }
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
@@ -317,12 +337,6 @@ public class RobotContainer {
 
     DoubleSupplier doubleSupply = () -> 3.3;
 
-    SuppliedValueWidget<Double> widget =
-        Shuffleboard.getTab("SmartDashboard")
-            .addDouble("Testing", doubleSupply)
-            .withPosition(5, 4)
-            .withSize(2, 1);
-
     switch (Constants.stickType) {
       case "Xbox Controller":
         // Right Bumper -> increase drive speed by .1; overflows to 0
@@ -344,7 +358,7 @@ public class RobotContainer {
         //     .back()
         //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
-        // A Button -> Run Cage mechanism.  
+        // A Button -> Run Cage mechanism.
         // driverController.a().whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));
         // driverController.a().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
 
@@ -354,64 +368,79 @@ public class RobotContainer {
         //         Commands.runOnce(
         //             () ->
         //                 m_drivebase.resetPose(
-        //                     new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+        //                     new Pose2d(m_drivebase.getPose().getTranslation(), new
+        // Rotation2d())),
         //             m_drivebase));
 
         // B Button -> Run Cage mechanism backwards
         // driverController.b().whileTrue(Commands.runOnce(() -> cage.runMotor(-.5), cage));
-        // driverController.b().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage)); 
+        // driverController.b().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
         break;
       case "Flight Stick":
-        // Speed modulation using the throttle wheel. Raw values range from -1 to 1, so basic math is done to account for that.
-        driverStick.axisGreaterThan(4, -1).whileTrue(Commands.runOnce(() -> m_drivebase.setSpeed(0.6 + (0.4 * ((driverStick.getRawAxis(4) + 1)/2)) )));
+        // BooleanSupplier param = () -> true;
+        // Speed modulation using the throttle wheel. Raw values range from -1 to 1, so basic math
+        // is done to account for that.
+        // new Trigger(param)
+        //     .whileTrue(
+        //         Commands.runOnce(
+        //             () ->
+        //                 m_drivebase.setSpeed(
+        //                     0.3 + (0.6 * ((-driverStick.getRawAxis(3) + 1) / 2)))));
 
         // Front trigger pressed -> X-lock
         driverStick.button(1).onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
-        // Button 7 -> Run cage mechanism 
+        // Button 7 -> Run cage mechanism
         driverStick.button(7).whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));
         driverStick.button(7).onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
 
         // Button 12 -> Reset pose
-        driverStick.button(12).onTrue(Commands.runOnce( () -> m_drivebase.resetPose(new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),m_drivebase));
+        driverStick
+            .button(12)
+            .onTrue(
+                Commands.runOnce(
+                    () ->
+                        m_drivebase.resetPose(
+                            new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
+                    m_drivebase));
 
         // Button 8 -> Run Cage mechanism backwards
         driverStick.button(8).whileTrue(Commands.runOnce(() -> cage.runMotor(-.5), cage));
-        driverStick.button(8).onFalse(Commands.runOnce(() -> cage.runMotor(0), cage)); 
-      }
-      //// Operator
-      // Right Bumper -> Extend Elevator
-      // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
+        driverStick.button(8).onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
+    }
+    //// Operator
+    // Right Bumper -> Extend Elevator
+    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
 
-      // // Left Bumper -> Retract Elevator
-      // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
+    // // Left Bumper -> Retract Elevator
+    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
 
-      // Right Trigger -> Pivot intake up
-      operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.15));
-      operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
+    // Right Trigger -> Pivot intake up
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.15));
+    operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
-      // // Left Trigger -> Pivot intake down
-      operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.15));
-      operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
+    // // Left Trigger -> Pivot intake down
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.15));
+    operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
-      // A Button -> Intake
-      operatorController.a().whileTrue(ElevatorCommands.runIntake(elevator, -.15));
-      operatorController.a().onFalse(ElevatorCommands.runIntake(elevator, 0));
+    // A Button -> Intake
+    operatorController.a().whileTrue(ElevatorCommands.runIntake(elevator, -.15));
+    operatorController.a().onFalse(ElevatorCommands.runIntake(elevator, 0));
 
-      // B Button -> Outtake
-      operatorController.b().whileTrue(ElevatorCommands.runIntake(elevator, .25));
-      operatorController.b().onFalse(ElevatorCommands.runIntake(elevator, 0));
+    // B Button -> Outtake
+    operatorController.b().whileTrue(ElevatorCommands.runIntake(elevator, .25));
+    operatorController.b().onFalse(ElevatorCommands.runIntake(elevator, 0));
 
-      // SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
+    // SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 
-      // // Press Right Bumper --> Move elevator up one level
-      // driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
-      // elevator.getSpeed()));
+    // // Press Right Bumper --> Move elevator up one level
+    // driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
+    // elevator.getSpeed()));
 
-      // // Press Left Bumper --> Move elevator down one level
-      // driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
-      // elevator.getSpeed()));
-    
+    // // Press Left Bumper --> Move elevator down one level
+    // driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
+    // elevator.getSpeed()));
+
   }
 
   public void randomizeLEDOnStartup() {
@@ -419,60 +448,81 @@ public class RobotContainer {
   }
 
   public void updateDriveInversions() {
- 
-    GetJoystickValue driveStickY;
-    GetJoystickValue driveStickX;
-    GetJoystickValue turnStickX;
 
-    driveStickY = this::getAxis2;
-    driveStickX = this::getAxis1;
-    turnStickX = this::getAxis3;
-
-    SmartDashboard.putNumber("Axis 2", driveStickY.value());
-    SmartDashboard.putNumber("Axis 1", driveStickX.value());
-    SmartDashboard.putNumber("Axis 3", turnStickX.value());
+    driveStickY = this::getAxis1;
+    driveStickX = this::getAxis0;
 
     switch (Constants.stickType) {
       case "Xbox Controller":
-      // if (OperatorConstants.kDriveLeftTurnRight) {
-      //   driveStickY = driverController::getLeftY;
-      //   driveStickX = driverController::getLeftX;
-      //   turnStickX = driverController::getRightX;
-      // } else {
-      //   driveStickY = driverController::getRightY;
-      //   driveStickX = driverController::getRightX;
-      //   turnStickX = driverController::getLeftX;
-      // }
-        // driverController.leftTrigger().onTrue(Commands.runOnce(() -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
-        // driverController.rightTrigger().onTrue(Commands.runOnce(() -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        // if (OperatorConstants.kDriveLeftTurnRight) {
+        //   driveStickY = driverController::getLeftY;
+        //   driveStickX = driverController::getLeftX;
+        //   turnStickX = driverController::getRightX;
+        // } else {
+        //   driveStickY = driverController::getRightY;
+        //   driveStickX = driverController::getRightX;
+        //   turnStickX = driverController::getLeftX;
+        // }
+        // driverController.leftTrigger().onTrue(Commands.runOnce(() -> xInvert =
+        // (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        // driverController.rightTrigger().onTrue(Commands.runOnce(() -> yInvert =
+        // (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
         break;
       case "Flight Stick":
         // driveStickY = this::getAxis2;
         // driveStickX = this::getAxis1;
         // turnStickX = this::getAxis3;
 
-        driverStick.button(3).onTrue(Commands.runOnce(() -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
-        driverStick.button(4).onTrue(Commands.runOnce(() -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        driverStick
+            .button(3)
+            .onTrue(
+                Commands.runOnce(
+                    () -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        driverStick
+            .button(4)
+            .onTrue(
+                Commands.runOnce(
+                    () -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+
+        driverStick
+            .button(2)
+            .onTrue(
+                Commands.runOnce(
+                    () -> twistAxis = (twistAxis.getAsBoolean()) ? () -> false : () -> true));
         break;
       default:
         // driveStickY = this::getAxis2;
         // driveStickX = this::getAxis1;
         // turnStickX = this::getAxis3;
 
-        driverStick.button(3).onTrue(Commands.runOnce(() -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
-        driverStick.button(4).onTrue(Commands.runOnce(() -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        driverStick
+            .button(3)
+            .onTrue(
+                Commands.runOnce(
+                    () -> xInvert = (xInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+        driverStick
+            .button(4)
+            .onTrue(
+                Commands.runOnce(
+                    () -> yInvert = (yInvert.getAsDouble() == 1.0) ? () -> (-1.0) : () -> (1.0)));
+
+        driverStick
+            .button(2)
+            .onTrue(
+                Commands.runOnce(
+                    () -> twistAxis = (twistAxis.getAsBoolean()) ? () -> false : () -> true));
         break;
     }
 
     // driverController.leftTrigger().onTrue(Commands.runOnce(() -> xInversion = (xInversion == 1) ?
     // -1 : 1));
-    
+
     m_drivebase.setDefaultCommand(
         DriveCommands.fieldRelativeDrive(
             m_drivebase,
             () -> -driveStickY.value() * m_drivebase.getSpeed() * yInvert.getAsDouble(),
             () -> -driveStickX.value() * m_drivebase.getSpeed() * xInvert.getAsDouble(),
-            () -> turnStickX.value() * m_drivebase.getSpeed() * 0.8));
+            () -> -turnStickX.value() * m_drivebase.getSpeed() * 0.8));
   }
 
   /**
@@ -588,5 +638,15 @@ public class RobotContainer {
     //   scoreTraj.done().onTrue(scoringSubsystem.score());
 
     return routine;
+  }
+
+  public void shuffleboardUpdates() {
+    SmartDashboard.putNumber("Throttle", driverStick.getRawAxis(3));
+    SmartDashboard.putNumber("Speed", m_drivebase.getSpeed());
+    SmartDashboard.putBoolean("Use Twist Axis", twistAxis.getAsBoolean());
+    SmartDashboard.putNumber("POV Axis", getPOV());
+    m_drivebase.setSpeed(0.3 + (0.6 * ((-driverStick.getRawAxis(3) + 1) / 2)));
+    if (twistAxis.getAsBoolean()) turnStickX = this::getAxis2;
+    else turnStickX = this::getPOV;
   }
 }

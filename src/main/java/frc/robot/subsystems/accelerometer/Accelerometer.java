@@ -20,7 +20,6 @@ import com.studica.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.util.VirtualSubsystem;
 import frc.robot.util.YagslConstants;
@@ -123,10 +122,10 @@ public class Accelerometer extends VirtualSubsystem {
     Logger.recordOutput("Acceleration/Rio/Jerk_msss", rioJerkVector);
     Logger.recordOutput("Acceleration/IMU/Accel_mss", imuAccVector);
     Logger.recordOutput("Acceleration/IMU/Jerk_msss", imuJerkVector);
-    SmartDashboard.putNumber("RioXAccel", rioAccVector.getX());
-    SmartDashboard.putNumber("RioYAccel", rioAccVector.getY());
-    SmartDashboard.putNumber("IMUXAccel", imuAccVector.getX());
-    SmartDashboard.putNumber("IMUYAccel", imuAccVector.getY());
+    // SmartDashboard.putNumber("RioXAccel", rioAccVector.getX());
+    // SmartDashboard.putNumber("RioYAccel", rioAccVector.getY());
+    // SmartDashboard.putNumber("IMUXAccel", imuAccVector.getX());
+    // SmartDashboard.putNumber("IMUYAccel", imuAccVector.getY());
 
     // Set the "previous" accelerations to the current for the next loop
     prevRioAccel = rioAccVector;

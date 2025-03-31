@@ -116,6 +116,8 @@ public class Robot extends LoggedRobot {
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
+
+    m_robotContainer.shuffleboardUpdates();
   }
 
   /** This function is called once when the robot is disabled. */
