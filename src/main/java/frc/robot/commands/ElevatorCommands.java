@@ -56,7 +56,10 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command timedIntake(Elevator elevator, double speed, double time) {
-    return Commands.run(() -> elevator.timedIntake(speed, time), elevator);
+    return Commands.sequence(
+        Commands.runOnce(() -> elevator.activeIntake(speed), elevator),
+        Commands.waitSeconds(time),
+        Commands.runOnce(() -> elevator.stopIntake()));
   }
 
   public static Command timedOuttake(

@@ -66,6 +66,7 @@ public final class Constants {
    * etc.) and the operating modes of the code (REAL, SIM, or REPLAY)
    */
   private static RobotType robotType = RobotType.COMPBOT;
+  public static String stickType = "Xbox Controller"; //Either "Xbox Controller" or "Flght Stick"
 
   // Define swerve, auto, and vision types being used
   // NOTE: Only PHOENIX6 swerve base has been tested at this point!!!
@@ -75,7 +76,7 @@ public final class Constants {
   private static SwerveType swerveType = SwerveType.PHOENIX6; // PHOENIX6, YAGSL
   private static CTREPro phoenixPro = CTREPro.UNLICENSED; // LICENSED, UNLICENSED
   private static AutoType autoType = AutoType.PATHPLANNER; // PATHPLANNER, CHOREO
-  private static VisionType visionType = VisionType.NONE; // PHOTON, LIMELIGHT, NONE
+  private static VisionType visionType = VisionType.PHOTON; // PHOTON, LIMELIGHT, NONE
 
   /** Enumerate the robot types (name your robots here) */
   public static enum RobotType {
