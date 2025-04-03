@@ -1,35 +1,28 @@
 package frc.robot.commands;
 
 // Constants
-import frc.robot.Constants;
-import frc.robot.Constants.Cameras.centerType;
-
-// Subsystems that we will be using
-import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
-import frc.robot.subsystems.elevator.Elevator;
-
-// Other command repos
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-// Other imports
 import edu.wpi.first.wpilibj2.command.*;
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import frc.robot.Constants.AprilTagConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.Cameras.centerType;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 import java.util.function.DoubleSupplier;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class VisionCommands {
 
   // Helpers
-  private static DoubleSupplier[] speedsToAlign(PhotonTrackedTarget target, Transform3d center, Transform3d camPoseToRobotCenter){
+  private static DoubleSupplier[] speedsToAlign(
+      PhotonTrackedTarget target, Transform3d center, Transform3d camPoseToRobotCenter) {
     // Important Values
     double yaw = target.getYaw(); // Angle to flat (+ right, - left)
 
-    // bit of a misnomer but the function below returns the best estimation of camera pose to target.
+    // bit of a misnomer but the function below returns the best estimation of camera pose to
+    // target.
     // X -> forward distance, Y -> (Left-Positive) horizontal distance Z->, height
     Transform3d tOffset = target.getBestCameraToTarget();
 
@@ -42,7 +35,12 @@ public class VisionCommands {
     // captured AprilTag (where the 1 is)
 
     // Horizontal offset
-    double horizontal = tOffset.getY() + (centerOffset * Math.cos(Math.toRadians(yaw))); // TODO: needs horizontal offset compared to the camera that
+    double horizontal =
+        tOffset.getY()
+            + (centerOffset
+                * Math.cos(
+                    Math.toRadians(
+                        yaw))); // TODO: needs horizontal offset compared to the camera that
     // captured AprilTag (where the 1 is)
 
     DoubleSupplier xSupply = () -> (.2 * dist);
@@ -60,10 +58,10 @@ public class VisionCommands {
 
   // Main commands (ones that actually return Commands)
 
-  public static Command alignToAprilTag(Drive driveSub, Vision visionSub, centerType centerBias){
+  public static Command alignToAprilTag(Drive driveSub, Vision visionSub, centerType centerBias) {
     // get the id of the camera we are using
     int camToUse = visionSub.determineBestCamera();
-    
+
     SmartDashboard.putNumber("bestCamera", camToUse);
     // return nothing if we don't have a camera
     if (camToUse == -1) return Commands.none();
@@ -73,19 +71,28 @@ public class VisionCommands {
     PhotonTrackedTarget target = visionSub.getBestTarget(camToUse);
 
     // find the center we want to align about.
-    Transform3d center = new Transform3d(cam.camRobotOffset.getX(), 0.0, cam.camRobotOffset.getZ(), new Rotation3d()); // Center of robot but at the same height and plane as the cameras
+    Transform3d center =
+        new Transform3d(
+            cam.camRobotOffset.getX(),
+            0.0,
+            cam.camRobotOffset.getZ(),
+            new Rotation3d()); // Center of robot but at the same height and plane as the cameras
     switch (centerBias) {
       case RIGHT:
         center = Constants.Cameras.robotToCamera1;
         break;
       case LEFT:
-        center = Constants.Cameras.robotToCamera0; // taking constants because we don't know what camera the program will use
+        center =
+            Constants.Cameras
+                .robotToCamera0; // taking constants because we don't know what camera the program
+        // will use
         break;
       case CENTER:
       default:
     }
 
-    // Post the fiducial ID of the tag (if any) to smartDashboard for debugging (if there is no presence then something is wrong.)
+    // Post the fiducial ID of the tag (if any) to smartDashboard for debugging (if there is no
+    // presence then something is wrong.)
     SmartDashboard.putNumber("fiducialID", target.getFiducialId());
 
     // Checks to see if the tag is on a whitelist. Does nothing if it is not on the whitelist.
@@ -102,6 +109,7 @@ public class VisionCommands {
     DoubleSupplier[] speedValues = speedsToAlign(target, center, cam.camRobotOffset);
 
     // steal the robot relative drive command
-    return DriveCommands.robotRelativeDrive(driveSub, speedValues[0], speedValues[1], speedValues[2]);
+    return DriveCommands.robotRelativeDrive(
+        driveSub, speedValues[0], speedValues[1], speedValues[2]);
   }
 }
