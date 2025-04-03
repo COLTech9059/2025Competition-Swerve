@@ -33,6 +33,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -377,18 +378,15 @@ public class RobotContainer {
         // driverController.b().onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
         break;
       case "Flight Stick":
-        // BooleanSupplier param = () -> true;
-        // Speed modulation using the throttle wheel. Raw values range from -1 to 1, so basic math
-        // is done to account for that.
-        // new Trigger(param)
-        //     .whileTrue(
-        //         Commands.runOnce(
-        //             () ->
-        //                 m_drivebase.setSpeed(
-        //                     0.3 + (0.6 * ((-driverStick.getRawAxis(3) + 1) / 2)))));
 
         // Front trigger pressed -> X-lock
         driverStick.button(1).onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
+
+        // Button 9 -> Target Alignment
+        driverStick.button(9).whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
+        driverStick
+            .button(9)
+            .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
         // Button 7 -> Run cage mechanism
         driverStick.button(7).whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));
