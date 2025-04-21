@@ -32,9 +32,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -52,6 +49,7 @@ import frc.robot.Constants.AprilTagConstants.AprilTagLayoutType;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.commands.LEDCommands;
+import frc.robot.commands.VisionCommands;
 import frc.robot.subsystems.accelerometer.Accelerometer;
 import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.cage.CageIOSpark;
@@ -300,18 +298,18 @@ public class RobotContainer {
             ElevatorCommands.pivot(elevator, 0.5),
             ElevatorCommands.timedIntake(elevator, -0.35, 3)));
 
-    NamedCommands.registerCommand(
-        "Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
-    NamedCommands.registerCommand(
-        "Left Alignment",
-        DriveCommands.targetAlignment(
-            m_drivebase,
-            m_vision,
-            new Transform2d(Units.inchesToMeters(6.0), 0.0, new Rotation2d())));
-    NamedCommands.registerCommand(
-        "Right Alignment",
-        DriveCommands.targetAlignment(
-            m_drivebase, m_vision, new Transform2d(-6.0, 0.0, new Rotation2d())));
+    // NamedCommands.registerCommand(
+    //     "Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
+    // NamedCommands.registerCommand(
+    //     "Left Alignment",
+    //     DriveCommands.targetAlignment(
+    //         m_drivebase,
+    //         m_vision,
+    //         new Transform2d(Units.inchesToMeters(6.0), 0.0, new Rotation2d())));
+    // NamedCommands.registerCommand(
+    //     "Right Alignment",
+    //     DriveCommands.targetAlignment(
+    //         m_drivebase, m_vision, new Transform2d(-6.0, 0.0, new Rotation2d())));
   }
 
   /**
@@ -383,10 +381,12 @@ public class RobotContainer {
         driverStick.button(1).onTrue(Commands.runOnce(m_drivebase::stopWithX, m_drivebase));
 
         // Button 9 -> Target Alignment
-        driverStick.button(9).whileTrue(DriveCommands.targetAlignment(m_drivebase, m_vision));
-        driverStick
-            .button(9)
-            .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
+        // driverStick.button(9).whileTrue(VisionCommands.alignToAprilTag(m_drivebase, m_vision,
+        // Constants.Cameras.centerType.CENTER));
+        driverStick.button(9).onTrue(VisionCommands.OrientToAprilTagPlane(m_drivebase, m_vision));
+        // driverStick
+        //     .button(9)
+        //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
         // Button 7 -> Run cage mechanism
         driverStick.button(7).whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));

@@ -20,7 +20,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,8 +37,6 @@ import frc.robot.Constants.DrivebaseConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.SwerveConstants;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -281,36 +278,36 @@ public class DriveCommands {
    * @author DevAspen, Revamped by SomnolentStone
    * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
    */
-  public static Command targetAlignment(Drive drive, Vision vision) {
-    int cameraToUse = vision.determineBestCamera();
-    if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
+  // public static Command targetAlignment(Drive drive, Vision vision) {
+  //   int cameraToUse = vision.determineBestCamera();
+  //   if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
 
-    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
-    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+  //   VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+  //   PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
 
-    // Check to see if target is on whitelist
-    boolean valid = false;
-    for (int tagId : Constants.Cameras.tagWhitelist) {
-      if (target.getFiducialId() == tagId) valid = true;
-    }
-    if (!valid) return Commands.none();
+  //   // Check to see if target is on whitelist
+  //   boolean valid = false;
+  //   for (int tagId : Constants.Cameras.tagWhitelist) {
+  //     if (target.getFiducialId() == tagId) valid = true;
+  //   }
+  //   if (!valid) return Commands.none();
 
-    // Values to help center the target.
-    double direction =
-        camera.camRobotOffset.getX()
-            / Math.abs(
-                camera.camRobotOffset
-                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset =
-        new Transform3d(
-            camera.camRobotOffset.getX(),
-            camera.camRobotOffset.getY() + 18.0,
-            camera.camRobotOffset.getZ(),
-            camera.camRobotOffset.getRotation());
+  //   // Values to help center the target.
+  //   double direction =
+  //       camera.camRobotOffset.getX()
+  //           / Math.abs(
+  //               camera.camRobotOffset
+  //                   .getX()); // Divide by the positive self to gain a value of 1 or -1.
+  //   Transform3d camOffset =
+  //       new Transform3d(
+  //           camera.camRobotOffset.getX(),
+  //           camera.camRobotOffset.getY() + 18.0,
+  //           camera.camRobotOffset.getZ(),
+  //           camera.camRobotOffset.getRotation());
 
-    DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
-    return robotRelativeDrive(drive, list[0], list[1], list[2]);
-  }
+  //   DoubleSupplier[] list = alignmentCalculation(target, camOffset, direction);
+  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  // }
 
   /**
    * Constructs and returns a robotRelativeDrive command with the required values to line up with
@@ -338,99 +335,100 @@ public class DriveCommands {
    * @author DevAspen, Revamped by SomnolentStone
    * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
    */
-  public static Command targetAlignment(
-      Drive drive, Vision vision, Constants.Cameras.centerType centerType) {
-    int cameraToUse = vision.determineBestCamera();
-    if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
+  // public static Command targetAlignment(
+  //     Drive drive, Vision vision, Constants.Cameras.centerType centerType) {
+  //   int cameraToUse = vision.determineBestCamera();
+  //   if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
 
-    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
-    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+  //   VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+  //   PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
 
-    // offset the center
-    Transform3d center =
-        new Transform3d(
-            camera.camRobotOffset.getX(),
-            0.0,
-            camera.camRobotOffset.getZ(),
-            new Rotation3d()); // Center of robot but at the same height and plane as the cameras
-    switch (centerType) {
-      case RIGHT:
-        center = Constants.Cameras.robotToCamera1;
-        break;
-      case LEFT:
-        center =
-            Constants.Cameras
-                .robotToCamera0; // taking constants because we don't know what camera the program
-        // will use
-        break;
-      case CENTER:
-      default:
-    }
+  //   // offset the center
+  //   Transform3d center =
+  //       new Transform3d(
+  //           camera.camRobotOffset.getX(),
+  //           0.0,
+  //           camera.camRobotOffset.getZ(),
+  //           new Rotation3d()); // Center of robot but at the same height and plane as the cameras
+  //   switch (centerType) {
+  //     case RIGHT:
+  //       center = Constants.Cameras.robotToCamera1;
+  //       break;
+  //     case LEFT:
+  //       center =
+  //           Constants.Cameras
+  //               .robotToCamera0; // taking constants because we don't know what camera the
+  // program
+  //       // will use
+  //       break;
+  //     case CENTER:
+  //     default:
+  //   }
 
-    // Check to see if target is on whitelist
-    boolean valid = false;
-    for (int tagId : Constants.Cameras.tagWhitelist) {
-      if (target.getFiducialId() == tagId) valid = true;
-    }
-    if (!valid) return Commands.none();
+  //   // Check to see if target is on whitelist
+  //   boolean valid = false;
+  //   for (int tagId : Constants.Cameras.tagWhitelist) {
+  //     if (target.getFiducialId() == tagId) valid = true;
+  //   }
+  //   if (!valid) return Commands.none();
 
-    // Values to help center the target.
-    double direction =
-        camera.camRobotOffset.getX()
-            / Math.abs(
-                camera.camRobotOffset
-                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
-    // Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(),
-    // camera.camRobotOffset.getY() + Units.inchesToMeters(18.0), camera.camRobotOffset.getZ(),
-    // camera.camRobotOffset.getRotation());
+  //   // Values to help center the target.
+  //   double direction =
+  //       camera.camRobotOffset.getX()
+  //           / Math.abs(
+  //               camera.camRobotOffset
+  //                   .getX()); // Divide by the positive self to gain a value of 1 or -1.
+  //   // Transform3d camOffset = new Transform3d(camera.camRobotOffset.getX(),
+  //   // camera.camRobotOffset.getY() + Units.inchesToMeters(18.0), camera.camRobotOffset.getZ(),
+  //   // camera.camRobotOffset.getRotation());
 
-    DoubleSupplier[] list = alignmentCalculation(target, center, direction);
-    return robotRelativeDrive(drive, list[0], list[1], list[2]);
-  }
+  //   DoubleSupplier[] list = alignmentCalculation(target, center, direction);
+  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  // }
 
-  /**
-   * Constructs and returns a robotRelativeDrive command with the required values to line up with
-   * the target april tag
-   *
-   * @param drive The Drive subsystem
-   * @param vision The Vision subsystem
-   * @param rOffset A Transform2d representing the desired offset from the center of the robot to
-   *     the tag
-   * @author DevAspen, Revamped by SomnolentStone
-   * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
-   */
-  public static Command targetAlignment(Drive drive, Vision vision, Transform2d rOffset) {
-    Transform3d rOffset3d = new Transform3d(rOffset);
+  // /**
+  //  * Constructs and returns a robotRelativeDrive command with the required values to line up with
+  //  * the target april tag
+  //  *
+  //  * @param drive The Drive subsystem
+  //  * @param vision The Vision subsystem
+  //  * @param rOffset A Transform2d representing the desired offset from the center of the robot to
+  //  *     the tag
+  //  * @author DevAspen, Revamped by SomnolentStone
+  //  * @return A Blank Command (if no valid target) or the robotRelativeDrive Command
+  //  */
+  // public static Command targetAlignment(Drive drive, Vision vision, Transform2d rOffset) {
+  //   Transform3d rOffset3d = new Transform3d(rOffset);
 
-    int cameraToUse = vision.determineBestCamera();
-    if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
+  //   int cameraToUse = vision.determineBestCamera();
+  //   if (cameraToUse == -1) return Commands.none(); // Blank command, does nothing.
 
-    VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
-    PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
+  //   VisionIOInputsAutoLogged camera = vision.getInputCamera(cameraToUse);
+  //   PhotonTrackedTarget target = vision.getBestTarget(cameraToUse);
 
-    // Check to see if target is on whitelist
-    boolean valid = false;
-    for (int tagId : Constants.Cameras.tagWhitelist) {
-      if (target.getFiducialId() == tagId) valid = true;
-    }
-    if (!valid) return Commands.none();
+  //   // Check to see if target is on whitelist
+  //   boolean valid = false;
+  //   for (int tagId : Constants.Cameras.tagWhitelist) {
+  //     if (target.getFiducialId() == tagId) valid = true;
+  //   }
+  //   if (!valid) return Commands.none();
 
-    // Values to help center the target.
-    double direction =
-        camera.camRobotOffset.getX()
-            / Math.abs(
-                camera.camRobotOffset
-                    .getX()); // Divide by the positive self to gain a value of 1 or -1.
-    Transform3d camOffset =
-        new Transform3d(
-            camera.camRobotOffset.getX(),
-            camera.camRobotOffset.getY() + Units.inchesToMeters(18.0),
-            camera.camRobotOffset.getZ(),
-            camera.camRobotOffset.getRotation());
+  //   // Values to help center the target.
+  //   double direction =
+  //       camera.camRobotOffset.getX()
+  //           / Math.abs(
+  //               camera.camRobotOffset
+  //                   .getX()); // Divide by the positive self to gain a value of 1 or -1.
+  //   Transform3d camOffset =
+  //       new Transform3d(
+  //           camera.camRobotOffset.getX(),
+  //           camera.camRobotOffset.getY() + Units.inchesToMeters(18.0),
+  //           camera.camRobotOffset.getZ(),
+  //           camera.camRobotOffset.getRotation());
 
-    DoubleSupplier[] list = alignmentCalculation(target, camOffset.plus(rOffset3d), direction);
-    return robotRelativeDrive(drive, list[0], list[1], list[2]);
-  }
+  //   DoubleSupplier[] list = alignmentCalculation(target, camOffset.plus(rOffset3d), direction);
+  //   return robotRelativeDrive(drive, list[0], list[1], list[2]);
+  // }
 
   /**
    * Field relative drive command using joystick for linear control and PID for angular control.

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
@@ -56,7 +57,18 @@ public class VisionIOPhotonVision implements VisionIO {
     for (var result : camera.getAllUnreadResults()) {
       // Update latest target observation
       if (result.hasTargets()) {
-        inputs.bestTarget = result.getBestTarget();
+        // determining best target based on size
+        List<PhotonTrackedTarget> targets = result.getTargets();
+        PhotonTrackedTarget prevTarget = null;
+        for (int i = 0; i < targets.size(); i++) {
+          PhotonTrackedTarget currentTarget = targets.get(i);
+          if (prevTarget == null) {
+            inputs.bestTarget = currentTarget;
+            continue;
+          }
+          if (currentTarget.getArea() > prevTarget.getArea()) inputs.bestTarget = currentTarget;
+        }
+        // inputs.bestTarget = result.getBestTarget();
         inputs.latestTargetObservation =
             new TargetObservation(
                 Rotation2d.fromDegrees(result.getBestTarget().getYaw()),

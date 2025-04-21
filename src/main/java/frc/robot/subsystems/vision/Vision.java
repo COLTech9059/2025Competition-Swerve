@@ -29,9 +29,11 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AprilTagConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+import frc.robot.subsystems.vision.VisionIO.TargetObservation;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -82,7 +84,7 @@ public class Vision extends SubsystemBase {
    * @author SomnolentStone
    * @return the index of the camera to use. -1 if no targets.
    */
-  public int determineBestCamera() {
+  public int oldBestCamera() {
     // Store the comparison target and the camera ID.
     PhotonTrackedTarget lastTargetChecked = null;
     int camID = -1;
@@ -90,15 +92,16 @@ public class Vision extends SubsystemBase {
     // DEV NOTE: sorry for the setup; this is just in case we ever have a ton of cameras/one camera
     // is out of commission.
     // Loop through all targets. Compare with best.
-    for (int i = 0; i < inputs.length; i++) {
+    for (int i = 0; i < io.length; i++) {
       if (!inputs[i].connected) continue;
       PhotonTrackedTarget currentTarget = inputs[i].bestTarget;
       if (currentTarget == null) continue;
+      if (i == 0) {
+        lastTargetChecked = currentTarget;
+        camID = i;
+        continue;
+      }
       if (lastTargetChecked != null) {
-        if (i == 0) {
-          camID = i;
-          continue;
-        }
         // Simply compare target size on detection.
         double currentTargetArea = currentTarget.getArea();
         double comparisonArea = lastTargetChecked.getArea();
@@ -107,6 +110,42 @@ public class Vision extends SubsystemBase {
           lastTargetChecked = currentTarget;
           camID = i;
         }
+      }
+    }
+
+    return camID;
+  }
+
+  public int determineBestCamera() {
+    // Store the comparison target and the camera ID.
+    TargetObservation prevObservation = null;
+    int camID = -1;
+    DriverStation.reportWarning("determining Camera!", false);
+    // DEV NOTE: sorry for the setup; this is just in case we ever have a ton of cameras/one camera
+    // is out of commission.
+    // Loop through all targets. Compare with best.
+    for (int i = 0; i < inputs.length; i++) {
+      DriverStation.reportWarning("Checking Camera " + i + "!", false);
+      if (!inputs[i].connected) {
+        continue;
+      }
+      DriverStation.reportWarning("Camera " + i + "is enabled!", false);
+      TargetObservation currentObservation = inputs[i].latestTargetObservation;
+      if (currentObservation.equals(new TargetObservation(new Rotation2d(), new Rotation2d()))) {
+        continue;
+      }
+      if (prevObservation.equals(null)) {
+        prevObservation = currentObservation;
+        camID = i;
+        continue;
+      }
+      // Right-most is best.
+      double currentYaw = currentObservation.tx().getRadians();
+      double comparisonYaw = prevObservation.tx().getRadians();
+
+      if (currentYaw >= comparisonYaw) {
+        prevObservation = currentObservation;
+        camID = i;
       }
     }
 
