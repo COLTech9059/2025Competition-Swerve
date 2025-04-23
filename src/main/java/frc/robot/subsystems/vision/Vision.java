@@ -29,7 +29,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AprilTagConstants;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
@@ -120,21 +119,21 @@ public class Vision extends SubsystemBase {
     // Store the comparison target and the camera ID.
     TargetObservation prevObservation = null;
     int camID = -1;
-    DriverStation.reportWarning("determining Camera!", false);
+    // DriverStation.reportWarning("determining Camera!", false);
     // DEV NOTE: sorry for the setup; this is just in case we ever have a ton of cameras/one camera
     // is out of commission.
     // Loop through all targets. Compare with best.
     for (int i = 0; i < inputs.length; i++) {
-      DriverStation.reportWarning("Checking Camera " + i + "!", false);
+      // DriverStation.reportWarning("Checking Camera " + i + "!", false);
       if (!inputs[i].connected) {
         continue;
       }
-      DriverStation.reportWarning("Camera " + i + "is enabled!", false);
+      // DriverStation.reportWarning("Camera " + i + " is enabled!", false);
       TargetObservation currentObservation = inputs[i].latestTargetObservation;
       if (currentObservation.equals(new TargetObservation(new Rotation2d(), new Rotation2d()))) {
         continue;
       }
-      if (prevObservation.equals(null)) {
+      if (prevObservation == null) {
         prevObservation = currentObservation;
         camID = i;
         continue;

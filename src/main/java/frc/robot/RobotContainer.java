@@ -32,6 +32,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -383,10 +384,12 @@ public class RobotContainer {
         // Button 9 -> Target Alignment
         // driverStick.button(9).whileTrue(VisionCommands.alignToAprilTag(m_drivebase, m_vision,
         // Constants.Cameras.centerType.CENTER));
-        driverStick.button(9).onTrue(VisionCommands.OrientToAprilTagPlane(m_drivebase, m_vision));
-        // driverStick
-        //     .button(9)
-        //     .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
+        driverStick
+            .button(9)
+            .whileTrue(VisionCommands.OrientToAprilTagPlane(m_drivebase, m_vision));
+        driverStick
+            .button(9)
+            .onFalse(Commands.runOnce(() -> m_drivebase.runVelocity(new ChassisSpeeds())));
 
         // Button 7 -> Run cage mechanism
         driverStick.button(7).whileTrue(Commands.runOnce(() -> cage.runMotor(.8), cage));

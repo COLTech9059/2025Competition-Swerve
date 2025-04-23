@@ -1,12 +1,14 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants;
 import frc.robot.Constants.Cameras.centerType;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO.TargetObservation;
@@ -116,28 +118,43 @@ public class VisionCommands {
 
   // Simple function to just
   public static Command OrientToAprilTagPlane(Drive drive, Vision vision) {
-    // get the id of the camera we are using
-    DriverStation.reportWarning("Determining best camera!", false);
-    int camToUse = vision.determineBestCamera();
-    DriverStation.reportWarning("Determined best camera!", false);
-    SmartDashboard.putNumber("bestCamera", camToUse);
-    // return nothing if we don't have a camera
-    if (camToUse == -1) return Commands.none();
 
-    // get camera + target data
-    VisionIOInputsAutoLogged cam = vision.getInputCamera(camToUse);
+    return Commands.runOnce(
+        () -> {
+          int camToUse = vision.determineBestCamera();
+          if (camToUse == -1) return;
 
-    TargetObservation latestObservation = cam.latestTargetObservation;
+          VisionIOInputsAutoLogged cam = vision.getInputCamera(camToUse);
 
-    // Yaw
-    double yaw =
-        Math.abs(latestObservation.tx().getRadians()) > Math.PI / 24
-            ? latestObservation.tx().getRadians()
-            : 0;
+          TargetObservation latestObservation = cam.latestTargetObservation;
 
-    // I'm lazy so here's the definition of a zero for a double supplier.
-    DoubleSupplier Zero = () -> (0);
+          // Yaw
+          DoubleSupplier yaw =
+              () ->
+                  Math.abs(latestObservation.tx().getRadians()) > Math.PI / 36
+                      ? latestObservation.tx().getRadians()
+                      : 0;
+          SmartDashboard.putNumber("yaw", yaw.getAsDouble());
+          // I'm lazy so here's the definition of a zero for a double supplier.
+          DoubleSupplier Zero = () -> (0);
 
-    return DriveCommands.robotRelativeDrive(drive, Zero, Zero, () -> (yaw));
+          // Drive
+          // Get the Linear Velocity & Omega from inputs
+          double omega = getOmega(-yaw.getAsDouble() * 10);
+
+          // Run with straight-up velocities w.r.t. the robot!
+          drive.runVelocity(
+              new ChassisSpeeds(
+                  Zero.getAsDouble(),
+                  Zero.getAsDouble(),
+                  omega * drive.getMaxAngularSpeedRadPerSec()));
+        },
+        vision,
+        drive);
+  }
+
+  private static double getOmega(double omega) {
+    omega = MathUtil.applyDeadband(omega, OperatorConstants.kDeadband);
+    return Math.copySign(omega * omega, omega);
   }
 }
