@@ -88,7 +88,8 @@ public class RobotContainer {
   // Replace with ``CommandPS4Controller`` or ``CommandJoystick`` if needed
   final CommandXboxController driverController = new CommandXboxController(0); // Main Driver
 
-  // final CommandGenericHID driverStick = new CommandGenericHID(0); // Also Main Driver (flight stick)
+  // final CommandGenericHID driverStick = new CommandGenericHID(0); // Also Main Driver (flight
+  // stick)
   final CommandXboxController operatorController = new CommandXboxController(1); // Second Operator
   final OverrideSwitches overrides = new OverrideSwitches(2); // Console toggle switches
 
@@ -383,12 +384,8 @@ public class RobotContainer {
         // driverStick.button(8).whileTrue(Commands.runOnce(() -> cage.runMotor(-.5), cage));
         // driverStick.button(8).onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
     }
-    //// Operator
-    // Right Bumper -> Extend Elevator
-    // operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator, 0.2));
-
-    // // Left Bumper -> Retract Elevator
-    // operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator, 0.2));
+    
+    // Operator Controls
 
     // Right Trigger -> Pivot intake up
     operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.15));
@@ -408,13 +405,13 @@ public class RobotContainer {
 
     // SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 
-    // // Press Right Bumper --> Move elevator up one level
-    // driverController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
-    // elevator.getSpeed()));
+    // Press Right Bumper --> Move elevator up one level
+    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
+    elevator.getSpeed()));
 
-    // // Press Left Bumper --> Move elevator down one level
-    // driverController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
-    // elevator.getSpeed()));
+    // Press Left Bumper --> Move elevator down one level
+    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
+    elevator.getSpeed()));
 
   }
 

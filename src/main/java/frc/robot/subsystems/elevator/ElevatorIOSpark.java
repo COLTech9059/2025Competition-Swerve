@@ -226,7 +226,7 @@ public class ElevatorIOSpark extends ElevatorIO {
   @Override
   public boolean getSwitch(boolean forward) {
     if (forward) return forwardPivot.get();
-    else return reversePivot.get();
+    return reversePivot.get();
   }
 
   // Updates encoder values according to elevator level
@@ -238,9 +238,5 @@ public class ElevatorIOSpark extends ElevatorIO {
     SmartDashboard.putBoolean("Top switch", !topSwitch.get());
     SmartDashboard.putBoolean("Forward pivot", forwardPivot.get());
     SmartDashboard.putBoolean("Reverse pivot", reversePivot.get());
-
-    // if (getLevel() == 1) setEncoders(Constants.level1);
-    // if (getLevel() == 2) setEncoders(Constants.level2);
-    // if (getLevel() == 3) setEncoders(Constants.level3);
   }
 }

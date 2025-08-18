@@ -113,8 +113,7 @@ public class VisionCommands {
         driveSub, speedValues[0], speedValues[1], speedValues[2]);
   }
 
-
-public static Command Align(Drive Drive, Vision Vision ) {
-  return Commands.none();
-}
+  public static Command Align(Drive Drive, Vision Vision) {
+    return Commands.none();
+  }
 }
