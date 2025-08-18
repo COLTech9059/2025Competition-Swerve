@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.025,
-        "y": 5.26
+        "x": 4.85,
+        "y": 5.225
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.064220084236446,
-        "y": 5.708287614141286
+        "x": 4.889220084236445,
+        "y": 5.673287614141286
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Left to Reef end"
     },
     {
       "anchor": {

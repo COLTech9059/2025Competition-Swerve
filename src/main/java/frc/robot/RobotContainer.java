@@ -280,15 +280,21 @@ public class RobotContainer {
         Commands.sequence(
             ElevatorCommands.pivot(elevator, 0.5),
             ElevatorCommands.timedIntake(elevator, -0.35, 3)));
+    
+    NamedCommands.registerCommand("Raise Elevator", ElevatorCommands.upLevel(elevator, 0.35));
+
+    NamedCommands.registerCommand("Lower Elevator", ElevatorCommands.downLevel(elevator, 0.35));
 
     NamedCommands.registerCommand(
         "Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
+
     NamedCommands.registerCommand(
         "Left Alignment",
         DriveCommands.targetAlignment(
             m_drivebase,
             m_vision,
             new Transform2d(Units.inchesToMeters(6.0), 0.0, new Rotation2d())));
+
     NamedCommands.registerCommand(
         "Right Alignment",
         DriveCommands.targetAlignment(
