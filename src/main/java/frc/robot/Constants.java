@@ -114,17 +114,16 @@ public final class Constants {
   // public static final int algaeID = 17;
   public static final int cageID = 18;
 
-  public static final int level0ID = 7;
-  public static final int level1ID = 6;
-  public static final int pivotForwardSwitch = 8;
-  public static final int pivotReverseSwitch = 9;
+  public static final int level0ID = 1;
+  public static final int level1ID = 2;
+  public static final int pivotForwardSwitch = 0;
+  public static final int pivotReverseSwitch = 4;
 
   // Elevator setpoints
-  public static final double level0 = 0;
-  public static final double level1 = 0;
-  public static final double level2 = 0;
-  public static final double stage2 = 0;
-  public static final double level3 = 0;
+  public static final double level1 = 0; // Lower elevator encoder bound, always equal to 0
+  public static final double level2 =
+      100; // "Level 2"/intake position elevator encoder value, calculated to 3 decimal places ()
+  public static final double level3 = 400; // Upper elevator encoder bound, to 3 decimal places
 
   public static final double loopPeriodSecs = 0.02;
 

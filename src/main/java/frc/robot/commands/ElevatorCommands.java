@@ -23,8 +23,20 @@ public class ElevatorCommands {
   public static Command upLevel(Elevator elevator, double speed) {
     // return Commands.startRun(() -> elevator.setLevel(speed, elevator.getLevel() + 1), null,
     // elevator);
-    return Commands.run(() -> elevator.setLevel(speed, 1), elevator)
-        .until(() -> (elevator.getExactLevel() == 1));
+    return Commands.run(() -> elevator.setLevel(speed, 3), elevator);
+        // .until(() -> (elevator.getExactLevel() == 3));
+  }
+
+  /**
+   * Moves the elevator to intake position
+   *
+   * @param elevator the elevator subsystem
+   * @param speed the speed (as a decimal percentage) that the elevator will raise itself
+   * @return the relevant code statements as a Command object
+   */
+  public static Command intakePosition(Elevator elevator, double speed) {
+    return Commands.run(() -> elevator.setLevel(speed, 2), elevator)
+        .until(() -> (elevator.getExactLevel() == 2));
   }
 
   // public static Command moveElevator(Elevator elevator, double speed, int level){
@@ -43,8 +55,8 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, 0), elevator)
-        .until(() -> (elevator.getExactLevel() == 0));
+    return Commands.run(() -> elevator.setLevel(speed, 1), elevator);
+        // .until(() -> (elevator.getExactLevel() == 1));
   }
 
   /**

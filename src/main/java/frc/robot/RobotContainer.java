@@ -56,7 +56,7 @@ import frc.robot.subsystems.cage.Cage;
 import frc.robot.subsystems.cage.CageIOSpark;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.Elevator;
-import frc.robot.subsystems.elevator.ElevatorIO;
+import frc.robot.subsystems.elevator.ElevatorIOCascade;
 import frc.robot.subsystems.flywheel_example.Flywheel;
 import frc.robot.subsystems.flywheel_example.FlywheelIO;
 import frc.robot.subsystems.flywheel_example.FlywheelIOSim;
@@ -99,7 +99,8 @@ public class RobotContainer {
 
   private final Elevator elevator =
       new Elevator(
-          new ElevatorIO()); // Should be ElevatorIOSpark, but the elevator is currently disabled.
+          new ElevatorIOCascade()); // Should be ElevatorIOSpark, but the elevator is currently
+  // disabled.
   private final Cage cage = new Cage(new CageIOSpark());
 
   private final Flywheel m_flywheel;
@@ -280,7 +281,7 @@ public class RobotContainer {
         Commands.sequence(
             ElevatorCommands.pivot(elevator, 0.5),
             ElevatorCommands.timedIntake(elevator, -0.35, 3)));
-    
+
     NamedCommands.registerCommand("Raise Elevator", ElevatorCommands.upLevel(elevator, 0.35));
 
     NamedCommands.registerCommand("Lower Elevator", ElevatorCommands.downLevel(elevator, 0.35));
@@ -390,15 +391,15 @@ public class RobotContainer {
         // driverStick.button(8).whileTrue(Commands.runOnce(() -> cage.runMotor(-.5), cage));
         // driverStick.button(8).onFalse(Commands.runOnce(() -> cage.runMotor(0), cage));
     }
-    
+
     // Operator Controls
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.15));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.20));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.15));
+    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.20));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake
@@ -412,13 +413,17 @@ public class RobotContainer {
     // SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 
     // Press Right Bumper --> Move elevator up one level
-    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator,
-    elevator.getSpeed()));
+    operatorController
+        .rightBumper()
+        .onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
 
     // Press Left Bumper --> Move elevator down one level
-    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator,
-    elevator.getSpeed()));
+    operatorController
+        .leftBumper()
+        .onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
 
+    // X Button --> Intake Position
+    operatorController.x().onTrue(ElevatorCommands.intakePosition(elevator, elevator.getSpeed()));
   }
 
   public void randomizeLEDOnStartup() {
