@@ -24,7 +24,7 @@ public class ElevatorCommands {
     // return Commands.startRun(() -> elevator.setLevel(speed, elevator.getLevel() + 1), null,
     // elevator);
     return Commands.run(() -> elevator.setLevel(speed, 3), elevator)
-    .until(() -> (elevator.getExactLevel() == 3));
+        .until(() -> (elevator.getExactLevel() == 3));
   }
 
   /**
@@ -67,7 +67,7 @@ public class ElevatorCommands {
    */
   public static Command downLevel(Elevator elevator, double speed) {
     return Commands.run(() -> elevator.setLevel(speed, 1), elevator)
-    .until(() -> (elevator.getExactLevel() == 1));
+        .until(() -> (elevator.getExactLevel() == 1));
   }
 
   /**

@@ -114,8 +114,12 @@ public class ElevatorIOCascade extends ElevatorIO {
     if (target > 3) target = 3;
     if (target < 1) target = 1;
 
-    if ( (getLevel() == 1 && target == 2 && getExactLevel() != 2) || ( ( getLevel() == 1 || getLevel() == 2 ) && target == 3 && getExactLevel() != 3) ) eMotor.set(speed);
-    else if ( (getLevel() == 3 && target == 2 && getExactLevel() != 2) || ( ( getLevel() == 3 || getLevel() == 2 ) && target == 1 && getExactLevel() != 1) ) eMotor.set(-speed);
+    if ((getLevel() == 1 && target == 2 && getExactLevel() != 2)
+        || ((getLevel() == 1 || getLevel() == 2) && target == 3 && getExactLevel() != 3))
+      eMotor.set(speed);
+    else if ((getLevel() == 3 && target == 2 && getExactLevel() != 2)
+        || ((getLevel() == 3 || getLevel() == 2) && target == 1 && getExactLevel() != 1))
+      eMotor.set(-speed);
     else eMotor.set(0);
   }
 
