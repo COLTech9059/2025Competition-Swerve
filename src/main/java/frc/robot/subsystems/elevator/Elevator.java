@@ -37,6 +37,10 @@ public class Elevator extends RBSISubsystem {
     io.pivot(speed);
   }
 
+  public void pivotPos(double speed, int target) {
+    io.pivotPos(speed, target);
+  }
+
   public void stopPivot() {
     io.stopPivot();
   }
@@ -58,6 +62,14 @@ public class Elevator extends RBSISubsystem {
    */
   public int getExactLevel() {
     return io.getExactLevel();
+  }
+
+  public int getPivotPos() {
+    return io.getPivotPos();
+  }
+
+  public int getExactPivotPos() {
+    return io.getExactPivotPos();
   }
 
   /** Stops the motion of the elevator */

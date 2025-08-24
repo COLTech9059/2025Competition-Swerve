@@ -12,6 +12,8 @@ public class ElevatorIO {
 
   public void pivot(double speed) {}
 
+  public void pivotPos(double speed, int target) {}
+
   /**
    * Moves the elevator to a specific "level"
    *
@@ -38,6 +40,14 @@ public class ElevatorIO {
    *     level
    */
   public int getExactLevel() {
+    return -1;
+  }
+
+  public int getPivotPos() {
+    return 1;
+  }
+
+  public int getExactPivotPos() {
     return -1;
   }
 

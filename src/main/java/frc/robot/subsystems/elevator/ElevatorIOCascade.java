@@ -16,6 +16,7 @@ public class ElevatorIOCascade extends ElevatorIO {
 
   // Helper variables
   private int levelTracker = 1;
+  private int pivotTracker = 1;
   private double elevatorSpeed = 0.45;
 
   // Motor, encoder, and config objects
@@ -39,6 +40,7 @@ public class ElevatorIOCascade extends ElevatorIO {
   public void configureMotors() {
     // Set Inversions & Ramp Rates
     eMConfig.inverted(true);
+    pivotConfig.inverted(true);
     eMConfig.openLoopRampRate(0.2);
     eMConfig.closedLoopRampRate(0.2);
 
@@ -73,10 +75,30 @@ public class ElevatorIOCascade extends ElevatorIO {
     return levelTracker;
   }
 
+  @Override
+  public int getPivotPos() {
+    if (this.getSwitch(false)) pivotTracker = 1;
+    else if (this.getSwitch(true)) pivotTracker = 2;
+    return pivotTracker;
+  }
+
+  @Override
+  public int getExactPivotPos() {
+    if (this.getSwitch(false)) return 1;
+    if (this.getSwitch(true)) return 2;
+    return -1;
+  }
+
   /** Returns the speed value of the elevator */
   @Override
   public double getSpeed() {
     return elevatorSpeed;
+  }
+
+  @Override
+  public boolean getSwitch(boolean forward) {
+    if (forward) return !forwardPivot.get();
+    else return !reversePivot.get();
   }
 
   /**
@@ -86,24 +108,15 @@ public class ElevatorIOCascade extends ElevatorIO {
    * @param level The desired "level," 1 or 2
    */
   @Override
-  public void setLevel(double speed, int level) {
+  public void setLevel(double speed, int target) {
     speed = Math.abs(speed);
 
-    if (getExactLevel() == level) {
-      eMotor.stopMotor();
-    } else {
+    if (target > 3) target = 3;
+    if (target < 1) target = 1;
 
-      if (getLevel() > level) {
-        eMotor.set(-speed);
-      }
-
-      if (getLevel() < level) {
-        eMotor.set(speed);
-      }
-    }
-
-    if (level > 3) level = 3;
-    if (level < 1) level = 1;
+    if ( (getLevel() == 1 && target == 2 && getExactLevel() != 2) || ( ( getLevel() == 1 || getLevel() == 2 ) && target == 3 && getExactLevel() != 3) ) eMotor.set(speed);
+    else if ( (getLevel() == 3 && target == 2 && getExactLevel() != 2) || ( ( getLevel() == 3 || getLevel() == 2 ) && target == 1 && getExactLevel() != 1) ) eMotor.set(-speed);
+    else eMotor.set(0);
   }
 
   /**
@@ -113,8 +126,21 @@ public class ElevatorIOCascade extends ElevatorIO {
    */
   @Override
   public void pivot(double speed) {
-    if (!forwardPivot.get() && (speed > 0)) pivot.set(speed);
-    else if (!reversePivot.get() && (speed < 0)) pivot.set(speed);
+    // if not reverse pivot and speed is positive pivot backward
+    if (this.getSwitch(false) && (speed > 0)) pivot.set(speed);
+    else if (this.getSwitch(true) && (speed < 0)) pivot.set(speed);
+    else pivot.set(0);
+  }
+
+  @Override
+  public void pivotPos(double speed, int target) {
+    speed = Math.abs(speed);
+
+    if (target > 2) target = 2;
+    if (target < 1) target = 1;
+
+    if (pivotTracker == 1 && !this.getSwitch(true) && target == 2) pivot.set(-speed);
+    else if (pivotTracker == 2 && !this.getSwitch(false) && target == 1) pivot.set(speed);
     else pivot.set(0);
   }
 
@@ -156,10 +182,13 @@ public class ElevatorIOCascade extends ElevatorIO {
 
     SmartDashboard.putBoolean("Bottom switch", bottomSwitch.get());
     SmartDashboard.putBoolean("Top switch", topSwitch.get());
-    SmartDashboard.putBoolean("Forward pivot", forwardPivot.get());
-    SmartDashboard.putBoolean("Reverse pivot", reversePivot.get());
+    SmartDashboard.putBoolean("Forward pivot", !forwardPivot.get());
+    SmartDashboard.putBoolean("Reverse pivot", !reversePivot.get());
 
     // if (bottomSwitch.get()) eEncoder.setPosition(Constants.level1);
     // if (topSwitch.get()) eEncoder.setPosition(Constants.level2);
+
+    getLevel();
+    getPivotPos();
   }
 }

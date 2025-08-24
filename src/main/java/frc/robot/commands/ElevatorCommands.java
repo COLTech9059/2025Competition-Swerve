@@ -23,8 +23,8 @@ public class ElevatorCommands {
   public static Command upLevel(Elevator elevator, double speed) {
     // return Commands.startRun(() -> elevator.setLevel(speed, elevator.getLevel() + 1), null,
     // elevator);
-    return Commands.run(() -> elevator.setLevel(speed, 3), elevator);
-        // .until(() -> (elevator.getExactLevel() == 3));
+    return Commands.run(() -> elevator.setLevel(speed, 3), elevator)
+    .until(() -> (elevator.getExactLevel() == 3));
   }
 
   /**
@@ -44,7 +44,18 @@ public class ElevatorCommands {
   // }
 
   public static Command pivot(Elevator elevator, double speed) {
-    return Commands.runOnce(() -> elevator.pivot(speed), elevator);
+    return Commands.runOnce(() -> elevator.pivot(speed));
+    // return Commands.runEnd(() -> elevator.pivot(speed), () -> elevator.stopPivot(), elevator)
+    //     .until(() -> (elevator.getSwitch(true)));
+  }
+
+  // public static Command pivotDown(Elevator elevator, double speed) {
+  //   return Commands.runEnd(() -> elevator.pivot(speed), () -> elevator.stopPivot(), elevator)
+  //       .until(() -> (elevator.getSwitch(false)));
+  // }
+
+  public static Command pivotPos(Elevator elevator, double speed, int target) {
+    return Commands.run(() -> elevator.pivotPos(speed, target));
   }
 
   /**
@@ -55,8 +66,8 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, 1), elevator);
-        // .until(() -> (elevator.getExactLevel() == 1));
+    return Commands.run(() -> elevator.setLevel(speed, 1), elevator)
+    .until(() -> (elevator.getExactLevel() == 1));
   }
 
   /**
@@ -74,13 +85,13 @@ public class ElevatorCommands {
         Commands.runOnce(() -> elevator.stopIntake()));
   }
 
-  public static Command timedOuttake(
-      Elevator elevator, double pivotSpeed, double outtakeSpeed, double outtakeTime) {
-    pivotSpeed = Math.abs(pivotSpeed);
-    outtakeSpeed = Math.abs(outtakeSpeed);
-    return Commands.sequence(
-        pivot(elevator, -pivotSpeed), timedIntake(elevator, -outtakeSpeed, outtakeTime));
-  }
+  // public static Command timedOuttake(
+  //     Elevator elevator, double pivotSpeed, double outtakeSpeed, double outtakeTime) {
+  //   pivotSpeed = Math.abs(pivotSpeed);
+  //   outtakeSpeed = Math.abs(outtakeSpeed);
+  //   return Commands.sequence(
+  //       pivot(elevator, -pivotSpeed), timedIntake(elevator, -outtakeSpeed, outtakeTime));
+  // }
 
   public static Command runIntake(Elevator elevator, double speed) {
     return Commands.runOnce(() -> elevator.activeIntake(speed), elevator);

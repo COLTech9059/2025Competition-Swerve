@@ -395,11 +395,11 @@ public class RobotContainer {
     // Operator Controls
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.20));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivotPos(elevator, 0.3, 2));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().onTrue(ElevatorCommands.pivot(elevator, -0.20));
+    operatorController.leftTrigger().whileTrue(ElevatorCommands.pivotPos(elevator, 0.3, 1));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake
