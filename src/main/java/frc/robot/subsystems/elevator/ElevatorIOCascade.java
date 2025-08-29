@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.EncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -15,17 +16,21 @@ import frc.robot.Constants;
 public class ElevatorIOCascade extends ElevatorIO {
 
   // Helper variables
-  private int levelTracker = 1;
-  private int pivotTracker = 1;
-  private double elevatorSpeed = 0.45;
+  private int lastReportedElevatorLevel = 1;
+  private int lastReportedPivotPosition = 1;
+  private double elevatorSpeed = 0.50;
+
+  // Encoder value target.
+  private double lastReportedEncoderValue = 0.000;
 
   // Motor, encoder, and config objects
-  private SparkMax eMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
-  private RelativeEncoder eEncoder = eMotor.getEncoder();
-  private SparkMax pivot = new SparkMax(Constants.pivotID, MotorType.kBrushless);
-  private SparkMax intake = new SparkMax(Constants.intakeID, MotorType.kBrushless);
-  private SparkBaseConfig eMConfig = new SparkMaxConfig();
-  private SparkBaseConfig pivotConfig = new SparkMaxConfig();
+  private SparkMax elevatorMotor = new SparkMax(Constants.eMotorID, MotorType.kBrushless);
+  private RelativeEncoder elevatorEncoder = elevatorMotor.getEncoder();
+  private EncoderConfig elevatorEncoderConfig = new EncoderConfig();
+  private SparkMax pivotMotor = new SparkMax(Constants.pivotID, MotorType.kBrushless);
+  private SparkMax intakeMotor = new SparkMax(Constants.intakeID, MotorType.kBrushless);
+  private SparkBaseConfig elevatorMotorConfig = new SparkMaxConfig();
+  private SparkBaseConfig pivotMotorConfig = new SparkMaxConfig();
 
   // Elevator limit switches
   private DigitalInput bottomSwitch = new DigitalInput(Constants.level0ID);
@@ -39,17 +44,22 @@ public class ElevatorIOCascade extends ElevatorIO {
   @Override
   public void configureMotors() {
     // Set Inversions & Ramp Rates
-    eMConfig.inverted(true);
-    pivotConfig.inverted(true);
-    eMConfig.openLoopRampRate(0.2);
-    eMConfig.closedLoopRampRate(0.2);
+    elevatorMotorConfig.inverted(true);
+    pivotMotorConfig.inverted(true);
+    elevatorMotorConfig.openLoopRampRate(0.2);
+    elevatorMotorConfig.closedLoopRampRate(0.2);
 
-    pivotConfig.idleMode(IdleMode.kBrake);
-    eMConfig.idleMode(IdleMode.kBrake);
+    pivotMotorConfig.idleMode(IdleMode.kBrake);
+    elevatorMotorConfig.idleMode(IdleMode.kBrake);
+
+    // Apply encoder conversion rate
+    elevatorEncoderConfig.positionConversionFactor(Constants.elevatorPositionConversionFactor);
 
     // Apply configuration
-    eMotor.configure(eMConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    pivot.configure(pivotConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    elevatorMotor.configure(
+        elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    pivotMotor.configure(
+        pivotMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   /**
@@ -59,27 +69,10 @@ public class ElevatorIOCascade extends ElevatorIO {
   @Override
   public int getExactLevel() {
     if (bottomSwitch.get()) return 1;
-    // if (eEncoder.getPosition() <= Constants.level2 + 1
-    //     && eEncoder.getPosition() >= Constants.level2 - 1) return 2;
+    if (elevatorEncoder.getPosition() <= Constants.level2 + Constants.encoderMarginOfError
+        && elevatorEncoder.getPosition() >= Constants.level2 - Constants.encoderMarginOfError) return 2;
     if (topSwitch.get()) return 3;
     return -1;
-  }
-
-  /** Returns the last detected "level" of the elevator */
-  @Override
-  public int getLevel() {
-    if (bottomSwitch.get()) levelTracker = 1;
-    if (topSwitch.get()) levelTracker = 3;
-    // if (eEncoder.getPosition() <= Constants.level2 + 1
-    //     && eEncoder.getPosition() >= Constants.level2 - 1) levelTracker = 2;
-    return levelTracker;
-  }
-
-  @Override
-  public int getPivotPos() {
-    if (this.getSwitch(false)) pivotTracker = 1;
-    else if (this.getSwitch(true)) pivotTracker = 2;
-    return pivotTracker;
   }
 
   @Override
@@ -107,8 +100,8 @@ public class ElevatorIOCascade extends ElevatorIO {
    * @param speed The speed to run the motor at
    * @param level The desired "level," 1 or 2
    */
-  @Override
-  public void setLevel(double speed, int target) {
+  // @Override
+  public void oldSetLevel(double speed, int target) {
     speed = Math.abs(speed);
 
     if (target > 3) target = 3;
@@ -116,11 +109,60 @@ public class ElevatorIOCascade extends ElevatorIO {
 
     if ((getLevel() == 1 && target == 2 && getExactLevel() != 2)
         || ((getLevel() == 1 || getLevel() == 2) && target == 3 && getExactLevel() != 3))
-      eMotor.set(speed);
+      elevatorMotor.set(speed);
     else if ((getLevel() == 3 && target == 2 && getExactLevel() != 2)
         || ((getLevel() == 3 || getLevel() == 2) && target == 1 && getExactLevel() != 1))
-      eMotor.set(-speed);
-    else eMotor.set(0);
+      elevatorMotor.set(-speed);
+    else elevatorMotor.set(0);
+  }
+
+  // hiya there!! cleaned up some logic + made it look spiffy -L
+
+  // Set a new encoder target (only set once in a command.)
+  @Override
+  public void reportEncoderValue() {
+    lastReportedEncoderValue = elevatorEncoder.getPosition();
+  }
+
+  /**
+   * Moves the elevator to the specified "level"
+   *
+   * @param targetPosition desired level to set the elevator to (range from 1 to 3)
+   */
+  @Override
+  public void setLevel(int targetPosition) {
+    // Stop the motor and do nothing if the movement is invalid.
+    if (targetPosition < 1 || targetPosition > 3) {
+      elevatorMotor.stopMotor();
+      return;
+    }
+
+    // Check to see if the movement requested is valid. If not, stop the motor and return.
+    boolean validMovement =
+        ((targetPosition == 2)
+                && (getExactLevel() != 2)
+                && (lastReportedElevatorLevel != 2)) // to level 2
+            || ((targetPosition == 3)
+                && (getExactLevel() != 3)
+                && (lastReportedElevatorLevel != 3)) // to level 3
+            || ((targetPosition == 1)
+                && (getExactLevel() != 1)
+                && (lastReportedElevatorLevel != 1)); // to level 1
+
+    if (!validMovement) {
+      elevatorMotor.stopMotor();
+      return;
+    }
+
+    // Determine speed direction.
+    double input = Math.min(Math.max(0,(Math.PI/2) - ((elevatorEncoder.getPosition() - lastReportedEncoderValue)/ (Constants.encoderSetpoints[targetPosition - 1] - lastReportedEncoderValue) * (Math.PI / 2)) ),(Math.PI/2));
+    double currentAlpha = Math.max(.1, Math.sin(input));
+    double speed = currentAlpha * .8;
+    if ((targetPosition < getExactLevel()) || (targetPosition < lastReportedElevatorLevel))
+      speed = -speed;
+
+    // Set the speed.
+    elevatorMotor.set(speed);
   }
 
   /**
@@ -130,10 +172,22 @@ public class ElevatorIOCascade extends ElevatorIO {
    */
   @Override
   public void pivot(double speed) {
-    // if not reverse pivot and speed is positive pivot backward
-    if (this.getSwitch(false) && (speed > 0)) pivot.set(speed);
-    else if (this.getSwitch(true) && (speed < 0)) pivot.set(speed);
-    else pivot.set(0);
+    // Prevent pivot movement entirely if we are at the bottom stage. Also stop moving.
+    if (getExactLevel() == 1) {
+      pivotMotor.stopMotor();
+      return;
+    }
+
+    // If it does not actively detect the desired sensor, and the last reported pivot sensor is not
+    // the desired sensor, enable movement to that position.
+    // Logs the last reported position as the pivot may get jostled around mid-match, possibly
+    // resulting the pivot moving into an irregular position.
+    boolean canMoveForward = (!this.getSwitch(true) && (lastReportedPivotPosition != 2));
+    boolean canMoveBackward = (!this.getSwitch(false) && (lastReportedPivotPosition != 1));
+
+    if (canMoveForward && (speed < 0)) pivotMotor.set(speed);
+    else if (canMoveBackward && (speed > 0)) pivotMotor.set(speed);
+    else pivotMotor.stopMotor();
   }
 
   @Override
@@ -143,9 +197,11 @@ public class ElevatorIOCascade extends ElevatorIO {
     if (target > 2) target = 2;
     if (target < 1) target = 1;
 
-    if (pivotTracker == 1 && !this.getSwitch(true) && target == 2) pivot.set(-speed);
-    else if (pivotTracker == 2 && !this.getSwitch(false) && target == 1) pivot.set(speed);
-    else pivot.set(0);
+    if (lastReportedPivotPosition == 1 && !this.getSwitch(true) && target == 2)
+      pivotMotor.set(-speed);
+    else if (lastReportedPivotPosition == 2 && !this.getSwitch(false) && target == 1)
+      pivotMotor.set(speed);
+    else pivotMotor.stopMotor();
   }
 
   /**
@@ -155,42 +211,71 @@ public class ElevatorIOCascade extends ElevatorIO {
    */
   @Override
   public void activeIntake(double speed) {
-    intake.set(speed);
+    intakeMotor.set(speed);
   }
 
   /** Stop the elevator */
   @Override
   public void stop() {
-    eMotor.stopMotor();
+    elevatorMotor.stopMotor();
   }
 
   /** Stop the pivot motor */
   @Override
   public void stopPivot() {
-    pivot.stopMotor();
+    pivotMotor.stopMotor();
   }
 
   /** Stop the intake motor */
   @Override
   public void stopIntake() {
-    intake.stopMotor();
+    intakeMotor.stopMotor();
+  }
+
+  // Periodic update functions.
+  // Ran in the "periodicUpdates" function, updated every 20ms.
+
+  /** Returns the last detected "level" of the elevator */
+  @Override
+  public int getLevel() {
+    if (bottomSwitch.get()) {
+      lastReportedElevatorLevel = 1;
+      elevatorEncoder.setPosition(Constants.encoderSetpoints[0]); // p.s. it's at 0 because java tables start indexing at 0 :p
+    }
+    if (topSwitch.get()) {
+      lastReportedElevatorLevel = 3;
+      elevatorEncoder.setPosition(Constants.encoderSetpoints[2]); // same deal, 3 is 2.
+    }
+    if (elevatorEncoder.getPosition() <= Constants.level2 + Constants.encoderMarginOfError
+        && elevatorEncoder.getPosition() >= Constants.level2 - Constants.encoderMarginOfError) {
+          lastReportedElevatorLevel = 2;
+        }
+    return lastReportedElevatorLevel;
+  }
+
+  @Override
+  public int getPivotPos() {
+    // Update PivotPosition while we're at it.
+    if (this.getSwitch(false)) lastReportedPivotPosition = 1;
+    else if (this.getSwitch(true)) lastReportedPivotPosition = 2;
+    return lastReportedPivotPosition;
   }
 
   /** Updates the dashboard information */
   @Override
   public void periodicUpdates() {
     SmartDashboard.putNumber("Elevator Level", getExactLevel());
-    SmartDashboard.putNumber("Elevator Encoder", eEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
 
-    SmartDashboard.putNumber("E Encoder", eEncoder.getPosition());
+    SmartDashboard.putNumber("E Encoder", elevatorEncoder.getPosition());
 
     SmartDashboard.putBoolean("Bottom switch", bottomSwitch.get());
     SmartDashboard.putBoolean("Top switch", topSwitch.get());
     SmartDashboard.putBoolean("Forward pivot", !forwardPivot.get());
     SmartDashboard.putBoolean("Reverse pivot", !reversePivot.get());
 
-    // if (bottomSwitch.get()) eEncoder.setPosition(Constants.level1);
-    // if (topSwitch.get()) eEncoder.setPosition(Constants.level2);
+    // if (bottomSwitch.get()) elevatorEncoder.setPosition(Constants.level1);
+    // if (topSwitch.get()) elevatorEncoder.setPosition(Constants.level2);
 
     getLevel();
     getPivotPos();

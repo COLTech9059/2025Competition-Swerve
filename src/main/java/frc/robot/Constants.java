@@ -120,10 +120,14 @@ public final class Constants {
   public static final int pivotReverseSwitch = 4;
 
   // Elevator setpoints
-  public static final double level1 = 0; // Lower elevator encoder bound, always equal to 0
-  public static final double level2 =
-      100; // "Level 2"/intake position elevator encoder value, calculated to 3 decimal places ()
-  public static final double level3 = 400; // Upper elevator encoder bound, to 3 decimal places
+  public static final double[] encoderSetpoints = {0.000, 125.000, 315.000};
+  public static final double level1 = 0.000; // Lower elevator encoder bound, always equal to 0
+  public static final double level2 = 125.000; // "Level 2"/intake position elevator encoder value
+  public static final double level3 = 315.000; // Upper elevator encoder bound, to 3 decimal places
+  public static final double encoderMarginOfError = 3.000;
+
+  public static final double elevatorPositionConversionFactor =
+      1; // Elevator encoder position conversion factor, measured in inches/rotation (1/x)
 
   public static final double loopPeriodSecs = 0.02;
 

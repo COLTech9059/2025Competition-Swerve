@@ -20,11 +20,9 @@ public class ElevatorCommands {
    * @param speed the speed (as a decimal percentage) that the elevator will raise itself
    * @return the relevant code statements as a Command object
    */
-  public static Command upLevel(Elevator elevator, double speed) {
-    // return Commands.startRun(() -> elevator.setLevel(speed, elevator.getLevel() + 1), null,
-    // elevator);
-    return Commands.run(() -> elevator.setLevel(speed, 3), elevator)
-        .until(() -> (elevator.getExactLevel() == 3));
+  public static Command upLevel(Elevator elevator) {
+    elevator.reportEncoderValue();
+    return Commands.run(() -> elevator.setLevel(3), elevator).until(() -> (elevator.getExactLevel() == 3)).finallyDo(() -> elevator.stop());
   }
 
   /**
@@ -34,9 +32,9 @@ public class ElevatorCommands {
    * @param speed the speed (as a decimal percentage) that the elevator will raise itself
    * @return the relevant code statements as a Command object
    */
-  public static Command intakePosition(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, 2), elevator)
-        .until(() -> (elevator.getExactLevel() == 2));
+  public static Command intakePosition(Elevator elevator) {
+    elevator.reportEncoderValue();
+    return Commands.run(() -> elevator.setLevel(2), elevator).until(() -> (elevator.getExactLevel() == 2)).finallyDo(() -> elevator.stop());
   }
 
   // public static Command moveElevator(Elevator elevator, double speed, int level){
@@ -44,9 +42,7 @@ public class ElevatorCommands {
   // }
 
   public static Command pivot(Elevator elevator, double speed) {
-    return Commands.runOnce(() -> elevator.pivot(speed));
-    // return Commands.runEnd(() -> elevator.pivot(speed), () -> elevator.stopPivot(), elevator)
-    //     .until(() -> (elevator.getSwitch(true)));
+    return Commands.run(() -> elevator.pivot(speed));
   }
 
   // public static Command pivotDown(Elevator elevator, double speed) {
@@ -65,9 +61,9 @@ public class ElevatorCommands {
    * @param speed the speed (as a decimal percentage) that the elevator will lower itself
    * @return the relevant code statements as a Command object
    */
-  public static Command downLevel(Elevator elevator, double speed) {
-    return Commands.run(() -> elevator.setLevel(speed, 1), elevator)
-        .until(() -> (elevator.getExactLevel() == 1));
+  public static Command downLevel(Elevator elevator) {
+    elevator.reportEncoderValue();
+    return Commands.run(() -> elevator.setLevel(1), elevator).until(() -> (elevator.getExactLevel() == 1)).finallyDo(() -> elevator.stop());
   }
 
   /**
@@ -117,11 +113,13 @@ public class ElevatorCommands {
       double outtakeTime) {
     return Commands.sequence(
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.31)),
-        Commands.run(() -> elevator.setLevel(speed, level)),
+        Commands.runOnce(() -> elevator.reportEncoderValue()),
+        Commands.run(() -> elevator.setLevel(level)),
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.27)),
         Commands.run(() -> elevator.timedIntake(-Math.abs(outtakeSpeed), outtakeTime)),
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.29)),
-        Commands.run(() -> elevator.setLevel(speed, 0)),
+        Commands.runOnce(() -> elevator.reportEncoderValue()),
+        Commands.run(() -> elevator.setLevel(0)),
         Commands.runOnce(() -> LEDCommands.interrupt(led)));
   }
 
@@ -139,11 +137,13 @@ public class ElevatorCommands {
       Elevator elevator, LEDs led, double speed, double intakeSpeed, double intakeTime) {
     return Commands.sequence(
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.31)),
-        Commands.run(() -> elevator.setLevel(speed, 2)),
+        Commands.runOnce(() -> elevator.reportEncoderValue()),
+        Commands.run(() -> elevator.setLevel(2)),
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.27)),
         Commands.run(() -> elevator.timedIntake(intakeSpeed, intakeTime)),
         Commands.runOnce(() -> LEDCommands.runPattern(led, 0.29)),
-        Commands.run(() -> elevator.setLevel(speed, 1)),
+        Commands.runOnce(() -> elevator.reportEncoderValue()),
+        Commands.run(() -> elevator.setLevel(1)),
         Commands.runOnce(() -> LEDCommands.interrupt(led)));
   }
 

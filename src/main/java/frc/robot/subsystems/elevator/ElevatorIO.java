@@ -14,13 +14,15 @@ public class ElevatorIO {
 
   public void pivotPos(double speed, int target) {}
 
+  public void reportEncoderValue() {}
+
   /**
    * Moves the elevator to a specific "level"
    *
    * @param speed The speed at which to move the elevator, as a decimal percentage
    * @param level The "level" to move the elevator to
    */
-  public void setLevel(double speed, int level) {}
+  public void setLevel(int level) {}
 
   public void stopPivot() {}
 

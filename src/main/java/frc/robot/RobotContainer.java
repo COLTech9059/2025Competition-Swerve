@@ -265,7 +265,6 @@ public class RobotContainer {
 
   /** Use this method to define your Autonomous commands for use with PathPlanner / Choreo */
   private void defineAutoCommands() {
-
     NamedCommands.registerCommand(
         "Zero",
         Commands.runOnce(
@@ -282,9 +281,9 @@ public class RobotContainer {
             ElevatorCommands.pivot(elevator, 0.5),
             ElevatorCommands.timedIntake(elevator, -0.35, 3)));
 
-    NamedCommands.registerCommand("Raise Elevator", ElevatorCommands.upLevel(elevator, 0.35));
+    NamedCommands.registerCommand("Raise Elevator", ElevatorCommands.upLevel(elevator));
 
-    NamedCommands.registerCommand("Lower Elevator", ElevatorCommands.downLevel(elevator, 0.35));
+    NamedCommands.registerCommand("Lower Elevator", ElevatorCommands.downLevel(elevator));
 
     NamedCommands.registerCommand(
         "Center Alignment", DriveCommands.targetAlignment(m_drivebase, m_vision));
@@ -395,11 +394,11 @@ public class RobotContainer {
     // Operator Controls
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivotPos(elevator, 0.3, 2));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, -0.3));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().whileTrue(ElevatorCommands.pivotPos(elevator, 0.3, 1));
+    operatorController.leftTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.3));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake
@@ -413,17 +412,13 @@ public class RobotContainer {
     // SmartDashboard.putData(ElevatorCommands.runToSensor(elevator, led, elevator.getSpeed()));
 
     // Press Right Bumper --> Move elevator up one level
-    operatorController
-        .rightBumper()
-        .onTrue(ElevatorCommands.upLevel(elevator, elevator.getSpeed()));
+    operatorController.rightBumper().onTrue(ElevatorCommands.upLevel(elevator));
 
     // Press Left Bumper --> Move elevator down one level
-    operatorController
-        .leftBumper()
-        .onTrue(ElevatorCommands.downLevel(elevator, elevator.getSpeed()));
+    operatorController.leftBumper().onTrue(ElevatorCommands.downLevel(elevator));
 
     // X Button --> Intake Position
-    operatorController.x().onTrue(ElevatorCommands.intakePosition(elevator, elevator.getSpeed()));
+    operatorController.x().onTrue(ElevatorCommands.intakePosition(elevator));
   }
 
   public void randomizeLEDOnStartup() {
@@ -600,5 +595,10 @@ public class RobotContainer {
     //   scoreTraj.done().onTrue(scoringSubsystem.score());
 
     return routine;
+  }
+
+  public void dashboard() {
+    SmartDashboard.putData("Elevator", elevator);
+    SmartDashboard.putNumber("Relative Level", elevator.getLevel());
   }
 }

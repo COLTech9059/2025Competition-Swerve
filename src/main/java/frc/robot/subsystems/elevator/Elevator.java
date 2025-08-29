@@ -23,14 +23,18 @@ public class Elevator extends RBSISubsystem {
     this.io.configureMotors();
   }
 
+  public void reportEncoderValue() {
+    io.reportEncoderValue();
+  }
+
   /**
    * Moves the elevator to a specific "level"
    *
    * @param speed The speed at which to move the elevator, as a decimal percentage
    * @param level The "level" to move the elevator to
    */
-  public void setLevel(double speed, int level) {
-    io.setLevel(speed, level);
+  public void setLevel(int level) {
+    io.setLevel(level);
   }
 
   public void pivot(double speed) {

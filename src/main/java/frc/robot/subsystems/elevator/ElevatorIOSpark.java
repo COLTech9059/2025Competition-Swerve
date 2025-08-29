@@ -115,8 +115,8 @@ public class ElevatorIOSpark extends ElevatorIO {
 
   // Move the elevator to the given level at the given speed
   @Override
-  public void setLevel(double speed, int level) {
-    speed = Math.abs(speed);
+  public void setLevel(int level) {
+    double speed = .5;
     if (getExactLevel() == level) {
       eMotor.stopMotor();
       // eMotor2.stopMotor();
