@@ -70,7 +70,8 @@ public class ElevatorIOCascade extends ElevatorIO {
   public int getExactLevel() {
     if (bottomSwitch.get()) return 1;
     if (elevatorEncoder.getPosition() <= Constants.level2 + Constants.encoderMarginOfError
-        && elevatorEncoder.getPosition() >= Constants.level2 - Constants.encoderMarginOfError) return 2;
+        && elevatorEncoder.getPosition() >= Constants.level2 - Constants.encoderMarginOfError)
+      return 2;
     if (topSwitch.get()) return 3;
     return -1;
   }
@@ -155,10 +156,19 @@ public class ElevatorIOCascade extends ElevatorIO {
     }
 
     // Determine speed direction.
-    double input = Math.min(Math.max(0,(Math.PI/2) - ((elevatorEncoder.getPosition() - lastReportedEncoderValue)/ (Constants.encoderSetpoints[targetPosition - 1] - lastReportedEncoderValue) * (Math.PI / 2)) ),(Math.PI/2));
+    double input =
+        Math.min(
+            Math.max(
+                0,
+                (Math.PI / 2)
+                    - ((elevatorEncoder.getPosition() - lastReportedEncoderValue)
+                        / (Constants.encoderSetpoints[targetPosition - 1]
+                            - lastReportedEncoderValue)
+                        * (Math.PI / 2))),
+            (Math.PI / 2));
     double currentAlpha = Math.max(.1, Math.sin(input));
-    double speed = currentAlpha * .8;
-    if ((targetPosition < getExactLevel()) || (targetPosition < lastReportedElevatorLevel))
+    double speed = currentAlpha;
+    if ((targetPosition <= getExactLevel()) || (targetPosition <= lastReportedElevatorLevel))
       speed = -speed;
 
     // Set the speed.
@@ -240,16 +250,20 @@ public class ElevatorIOCascade extends ElevatorIO {
   public int getLevel() {
     if (bottomSwitch.get()) {
       lastReportedElevatorLevel = 1;
-      elevatorEncoder.setPosition(Constants.encoderSetpoints[0]); // p.s. it's at 0 because java tables start indexing at 0 :p
+      elevatorEncoder.setPosition(
+          Constants.encoderSetpoints[
+              0]); // p.s. it's at 0 because java tables start indexing at 0 :p
     }
     if (topSwitch.get()) {
       lastReportedElevatorLevel = 3;
       elevatorEncoder.setPosition(Constants.encoderSetpoints[2]); // same deal, 3 is 2.
     }
-    if (elevatorEncoder.getPosition() <= Constants.level2 + Constants.encoderMarginOfError
-        && elevatorEncoder.getPosition() >= Constants.level2 - Constants.encoderMarginOfError) {
-          lastReportedElevatorLevel = 2;
-        }
+    if (elevatorEncoder.getPosition()
+            <= Constants.encoderSetpoints[1] + Constants.encoderMarginOfError
+        && elevatorEncoder.getPosition()
+            >= Constants.encoderSetpoints[1] - Constants.encoderMarginOfError) {
+      lastReportedElevatorLevel = 2;
+    }
     return lastReportedElevatorLevel;
   }
 
@@ -265,9 +279,11 @@ public class ElevatorIOCascade extends ElevatorIO {
   @Override
   public void periodicUpdates() {
     SmartDashboard.putNumber("Elevator Level", getExactLevel());
-    SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
+    // SmartDashboard.putNumber("Elevator Encoder", elevatorEncoder.getPosition());
 
-    SmartDashboard.putNumber("E Encoder", elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Encoder Startpoint", lastReportedEncoderValue);
+    SmartDashboard.putNumber("Elev. Encoder Value", elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Last Reported Level", lastReportedElevatorLevel);
 
     SmartDashboard.putBoolean("Bottom switch", bottomSwitch.get());
     SmartDashboard.putBoolean("Top switch", topSwitch.get());

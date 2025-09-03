@@ -21,8 +21,10 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command upLevel(Elevator elevator) {
-    elevator.reportEncoderValue();
-    return Commands.run(() -> elevator.setLevel(3), elevator).until(() -> (elevator.getExactLevel() == 3)).finallyDo(() -> elevator.stop());
+    return Commands.runOnce(() -> elevator.reportEncoderValue(), elevator)
+        .andThen(Commands.run(() -> elevator.setLevel(3), elevator))
+        .onlyWhile(() -> (elevator.getExactLevel() != 3))
+        .finallyDo(() -> elevator.stop());
   }
 
   /**
@@ -34,7 +36,10 @@ public class ElevatorCommands {
    */
   public static Command intakePosition(Elevator elevator) {
     elevator.reportEncoderValue();
-    return Commands.run(() -> elevator.setLevel(2), elevator).until(() -> (elevator.getExactLevel() == 2)).finallyDo(() -> elevator.stop());
+    return Commands.runOnce(() -> elevator.reportEncoderValue(), elevator)
+        .andThen(Commands.run(() -> elevator.setLevel(2), elevator))
+        .onlyWhile(() -> (elevator.getExactLevel() != 2))
+        .finallyDo(() -> elevator.stop());
   }
 
   // public static Command moveElevator(Elevator elevator, double speed, int level){
@@ -63,7 +68,10 @@ public class ElevatorCommands {
    */
   public static Command downLevel(Elevator elevator) {
     elevator.reportEncoderValue();
-    return Commands.run(() -> elevator.setLevel(1), elevator).until(() -> (elevator.getExactLevel() == 1)).finallyDo(() -> elevator.stop());
+    return Commands.runOnce(() -> elevator.reportEncoderValue(), elevator)
+        .andThen(Commands.run(() -> elevator.setLevel(1), elevator))
+        .onlyWhile(() -> (elevator.getExactLevel() != 1))
+        .finallyDo(() -> elevator.stop());
   }
 
   /**
