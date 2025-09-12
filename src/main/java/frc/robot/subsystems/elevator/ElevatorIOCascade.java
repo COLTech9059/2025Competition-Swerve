@@ -45,7 +45,7 @@ public class ElevatorIOCascade extends ElevatorIO {
   public void configureMotors() {
     // Set Inversions & Ramp Rates
     elevatorMotorConfig.inverted(true);
-    pivotMotorConfig.inverted(true);
+    pivotMotorConfig.inverted(false);
     elevatorMotorConfig.openLoopRampRate(0.2);
     elevatorMotorConfig.closedLoopRampRate(0.2);
 
@@ -166,7 +166,8 @@ public class ElevatorIOCascade extends ElevatorIO {
                             - lastReportedEncoderValue)
                         * (Math.PI / 2))),
             (Math.PI / 2));
-    double currentAlpha = Math.max(.1, Math.sin(input));
+    double currentAlpha =
+        Math.max(.2, Math.sin(input)); // Change the decimal to change the lowest possible speed.
     double speed = currentAlpha;
     if ((targetPosition <= getExactLevel()) || (targetPosition <= lastReportedElevatorLevel))
       speed = -speed;
@@ -195,8 +196,16 @@ public class ElevatorIOCascade extends ElevatorIO {
     boolean canMoveForward = (!this.getSwitch(true) && (lastReportedPivotPosition != 2));
     boolean canMoveBackward = (!this.getSwitch(false) && (lastReportedPivotPosition != 1));
 
-    if (canMoveForward && (speed < 0)) pivotMotor.set(speed);
-    else if (canMoveBackward && (speed > 0)) pivotMotor.set(speed);
+    if (canMoveForward && (speed > 0)) pivotMotor.set(speed);
+    else if (canMoveBackward && (speed < 0)) pivotMotor.set(speed);
+    else pivotMotor.stopMotor();
+  }
+
+  @Override
+  public void resetPivot(double speed) {
+    speed = Math.abs(speed);
+
+    if (getExactLevel() != 2) pivotMotor.set(speed);
     else pivotMotor.stopMotor();
   }
 
@@ -207,10 +216,8 @@ public class ElevatorIOCascade extends ElevatorIO {
     if (target > 2) target = 2;
     if (target < 1) target = 1;
 
-    if (lastReportedPivotPosition == 1 && !this.getSwitch(true) && target == 2)
-      pivotMotor.set(-speed);
-    else if (lastReportedPivotPosition == 2 && !this.getSwitch(false) && target == 1)
-      pivotMotor.set(speed);
+    if (!this.getSwitch(true) && target == 2) pivotMotor.set(speed);
+    else if (!this.getSwitch(false) && target == 1) pivotMotor.set(-speed);
     else pivotMotor.stopMotor();
   }
 

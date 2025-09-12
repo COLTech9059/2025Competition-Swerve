@@ -27,6 +27,12 @@ public class ElevatorCommands {
         .finallyDo(() -> elevator.stop());
   }
 
+  public static Command resetPivot(Elevator elevator, double speed) {
+    return Commands.run(() -> elevator.resetPivot(speed))
+        .until(() -> (elevator.getPivotPos() == 2))
+        .andThen(pivot(elevator, 0.3));
+  }
+
   /**
    * Moves the elevator to intake position
    *
@@ -35,7 +41,6 @@ public class ElevatorCommands {
    * @return the relevant code statements as a Command object
    */
   public static Command intakePosition(Elevator elevator) {
-    elevator.reportEncoderValue();
     return Commands.runOnce(() -> elevator.reportEncoderValue(), elevator)
         .andThen(Commands.run(() -> elevator.setLevel(2), elevator))
         .onlyWhile(() -> (elevator.getExactLevel() != 2))
@@ -56,7 +61,9 @@ public class ElevatorCommands {
   // }
 
   public static Command pivotPos(Elevator elevator, double speed, int target) {
-    return Commands.run(() -> elevator.pivotPos(speed, target));
+    return Commands.run(() -> elevator.pivotPos(speed, target))
+        .until(() -> (elevator.getPivotPos() == target))
+        .finallyDo(() -> elevator.stopPivot());
   }
 
   /**

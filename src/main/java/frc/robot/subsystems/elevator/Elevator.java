@@ -45,6 +45,10 @@ public class Elevator extends RBSISubsystem {
     io.pivotPos(speed, target);
   }
 
+  public void resetPivot(double speed) {
+    io.resetPivot(speed);
+  }
+
   public void stopPivot() {
     io.stopPivot();
   }

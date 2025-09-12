@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.9,
-        "y": 2.85
+        "x": 5.0,
+        "y": 3.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.45,
-        "y": 2.070577136594005
+        "x": 4.55,
+        "y": 2.270577136594005
       },
       "isLocked": false,
       "linkedName": "Right to Reef end"
     },
     {
       "anchor": {
-        "x": 1.2,
-        "y": 1.0
+        "x": 1.125,
+        "y": 0.95
       },
       "prevControl": {
-        "x": 2.6818633558088,
-        "y": 1.893467453543546
+        "x": 2.524904056900367,
+        "y": 1.9670898324653534
       },
       "nextControl": null,
       "isLocked": true,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -125.00000000000001
+    "rotation": -130.0
   },
   "reversed": false,
   "folder": "Coral Lineup",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 117.5
   },
   "useDefaultConstraints": true
 }

@@ -273,15 +273,20 @@ public class RobotContainer {
                     new Pose2d(m_drivebase.getPose().getTranslation(), new Rotation2d())),
             m_drivebase));
 
-    NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.25, 3));
+    NamedCommands.registerCommand("Coral Shot", ElevatorCommands.timedIntake(elevator, 0.25, 2));
 
-    NamedCommands.registerCommand(
-        "Coral Intake",
-        Commands.sequence(
-            ElevatorCommands.pivot(elevator, 0.5),
-            ElevatorCommands.timedIntake(elevator, -0.35, 3)));
+    NamedCommands.registerCommand("Coral Intake", ElevatorCommands.timedIntake(elevator, -0.35, 3));
+
+    NamedCommands.registerCommand("Pivot Up", ElevatorCommands.pivotPos(elevator, 0.3, 2));
+
+    NamedCommands.registerCommand("Pivot Down", ElevatorCommands.pivotPos(elevator, 0.3, 1));
+
+    NamedCommands.registerCommand("Reset Pivot", ElevatorCommands.resetPivot(elevator, 0.3));
 
     NamedCommands.registerCommand("Raise Elevator", ElevatorCommands.upLevel(elevator));
+
+    NamedCommands.registerCommand(
+        "Elevator Intake Position", ElevatorCommands.intakePosition(elevator));
 
     NamedCommands.registerCommand("Lower Elevator", ElevatorCommands.downLevel(elevator));
 
@@ -394,11 +399,11 @@ public class RobotContainer {
     // Operator Controls
 
     // Right Trigger -> Pivot intake up
-    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, -0.3));
+    operatorController.rightTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.3));
     operatorController.rightTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // // Left Trigger -> Pivot intake down
-    operatorController.leftTrigger().whileTrue(ElevatorCommands.pivot(elevator, 0.3));
+    operatorController.leftTrigger().whileTrue(ElevatorCommands.pivot(elevator, -0.3));
     operatorController.leftTrigger().onFalse(Commands.runOnce(() -> elevator.pivot(0)));
 
     // A Button -> Intake

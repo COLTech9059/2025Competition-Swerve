@@ -14,6 +14,8 @@ public class ElevatorIO {
 
   public void pivotPos(double speed, int target) {}
 
+  public void resetPivot(double speed) {}
+
   public void reportEncoderValue() {}
 
   /**
